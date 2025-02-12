@@ -1,4 +1,4 @@
-# Near Vision (Short-Term Goals, 6-12 months)
+# Near Vision (April)
 
 ## Platform Development and MVP Launch
 
@@ -26,7 +26,7 @@
 
 - Introduce a freemium model where users can access basic features for free and unlock premium features (e.g., advanced filters, priority matching) through a subscription or one-time payment.
 
-# Far Vision (Long-Term Goals, 3-5 years)
+# Far Vision (Long-Term Goal)
 
 ## Expansion and Scaling
 
