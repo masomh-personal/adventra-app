@@ -42,7 +42,14 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 ## **Product Vision**
 ### **Far Vision**
-Adventra aims to become the **go-to platform** for outdoor adventurers looking for **activity partners**, **hiking groups**, and **community events**. Future iterations may include **real-time adventure planning**, **group chats**, and **AI-based adventure recommendations**.
+Adventra aims to become the **go-to platform** for outdoor adventurers looking for **activity partners**, **hiking groups**, and **community events**. Future iterations may include:
+- **Real-time adventure planning**
+- **AI-driven matching algorithms**
+- **Wearable device integration**
+- **Community features**
+- **Adventure gear marketplace** for rentals and purchases.
+- **Global expansion** with multi-language support and localized adventure recommendations.
+
 
 ### **Near Vision (MVP by April)**
 A functional web application that includes:
