@@ -1,4 +1,4 @@
-# Near Vision (April)
+# Near Vision (MVP by April)
 
 ## Platform Development and MVP Launch
 
