@@ -36,19 +36,14 @@ prisma/*.db-journal
 pgdata/
 *.pg_dump
 
+# Visual Studio folder
+.vs/
+
 # VSCode
 .vscode/
-.vscode/settings.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/*.code-workspace
 
 # WebStorm
 .idea/
-.idea/workspace.xml
-.idea/modules.xml
-.idea/*.iml
-.idea/misc.xml
 
 # MacOS
 .DS_Store
