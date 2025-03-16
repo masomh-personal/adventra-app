@@ -26,6 +26,8 @@ export default function HomePage() {
             Login
           </button>
         </div>
+
+        <h1 className="text-3xl font-bold underline">Hello world!</h1>
       </main>
 
       {/* Footer Section */}
@@ -44,6 +46,7 @@ export default function HomePage() {
         <div className="text-center mt-4">
           <p>&copy; 2025 Adventra. All rights reserved.</p>
         </div>
+        <h1 className="text-3xl font-bold underline">Hello, Next.js!</h1>
       </footer>
     </div>
   );
