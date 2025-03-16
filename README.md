@@ -92,6 +92,7 @@ Each Product Backlog Item (PBI) must include:
 📄 **Full details can be found in** [`docs/definition-of-ready.md`](_docs/definition-of-ready.md).
 
 ---
+
 ## **Useful Links**
 
 - **GitHub Repository**: [Repo Link](YOUR-GITHUB-REPO-URL-HERE)
@@ -99,6 +100,7 @@ Each Product Backlog Item (PBI) must include:
 - **Team Communication**: [Discord/Slack Invite](YOUR-TEAM-COMMS-LINK-HERE)
 
 ---
+
 ## Getting Started
 
 First, run the development server:

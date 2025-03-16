@@ -3,6 +3,7 @@
 This document outlines the **folder structure** of the Adventra project. It serves as a guide for team members to understand how files are organized.
 
 ## Root Directory (`adventura/`)
+
 ```
 adventura/
 │── frontend/                   # Frontend (Next.js + React)
@@ -54,8 +55,11 @@ adventura/
 │── LICENSE                       # GNU General Public License
 
 ```
+
 ## **Explanation of Key Directories**
+
 ### **Frontend (`frontend/`)**
+
 - **`public/`** → Stores static files like images and favicons.
 - **`src/components/`** → Reusable React components.
 - **`src/layouts/`** → Layout components (e.g., header, footer).
@@ -68,6 +72,7 @@ adventura/
 - **`src/middleware/`** → Frontend middleware (e.g., authentication).
 
 ### **Backend (`backend/`)**
+
 - **`prisma/`** → Contains Prisma schema and migrations.
 - **`src/api/`** → Handles API endpoints.
 - **`src/controllers/`** → Business logic for API routes.
@@ -78,16 +83,19 @@ adventura/
 - **`src/utils/`** → Utility functions for backend.
 
 ### **Documentation (`docs/`)**
+
 - **`product-vision.md`** → Describes the product vision and goals.
 - **`backlog-prioritization.md`** → Explains how backlog items are prioritized.
 - **`definition-of-ready.md`** → Defines criteria for backlog readiness.
 
 ### **Sprints (`sprints/`)**
+
 - Organized by sprint (e.g., `sprint-1/`, `sprint-2/`), where each sprint deliverable is stored.
 
 ---
 
 ## ✅ **How to Use This File**
+
 - Keep this file updated as the project structure evolves.
 - New team members should **read this first** to understand the file organization.
 - If folders are added/removed, update this document accordingly.
