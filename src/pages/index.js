@@ -18,7 +18,7 @@ export default function HomePage() {
         {/* Logo with rounded edges */}
         <img src="/adventra-logo.png" alt="Adventra Logo" className="h-24 rounded-full" />{' '}
         {/* Adjusted logo size */}
-        <h2 className="text-3xl font-[var(--font-heading)] font-bold text-center text-white">
+        <h2 className="text-3xl font-[var(--font-heading)] text-center text-white">
           Welcome to Adventra
         </h2>
         <p className="text-lg text-center text-white">
@@ -53,7 +53,7 @@ export default function HomePage() {
         <div className="text-center mt-4">
           <p>&copy; 2025 Adventra. All rights reserved.</p>
           <p className="mt-2 text-sm">
-            Made with <span className="text-red-500">❤️</span> from{' '}
+            Made with <span className="text-red-500">❤️</span> at{' '}
             <a
               href="https://www.kennesaw.edu/ccse/academics/software-engineering-and-game-development/index.php"
               target={'_blank'}
