@@ -66,7 +66,7 @@ A functional web application that includes:
 - **Adventure-based matching (swipe left/right)**
 - **Basic messaging system for matched users**
 
-📄 **Full details can be found in** [`docs/product-vision.md`](docs/product-vision.md).
+📄 **Full details can be found in** [`docs/product-vision.md`](_docs/product-vision.md).
 
 ---
 
@@ -75,7 +75,7 @@ A functional web application that includes:
 The backlog is managed in **GitHub Projects**. View the full backlog here:  
 ➡️ **[Backlog Link](https://github.com/users/masomh-personal/projects/2)**
 
-🔹 **Backlog Prioritization Rationale** is documented in **[`docs/backlog-prioritization.md`](docs/backlog-prioritization.md)**.
+🔹 **Backlog Prioritization Rationale** is documented in **[`docs/backlog-prioritization.md`](_docs/backlog-prioritization.md)**.
 
 ---
 
@@ -89,7 +89,7 @@ Each Product Backlog Item (PBI) must include:
 - **Story Point Estimation**
 - **Acceptance Criteria**
 
-📄 **Full details can be found in** [`docs/definition-of-ready.md`](docs/definition-of-ready.md).
+📄 **Full details can be found in** [`docs/definition-of-ready.md`](_docs/definition-of-ready.md).
 
 ---
 
