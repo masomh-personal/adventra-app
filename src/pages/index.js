@@ -3,7 +3,7 @@ export default function HomePage() {
     <div className="min-h-screen text-foreground flex flex-col justify-between">
       {/* Video Background (or GIF background) */}
       <div className="absolute top-0 left-0 w-full h-full z-[-1]">
-        <video autoPlay loop muted className="w-full h-full object-cover">
+        <video autoPlay muted className="w-full h-full object-cover">
           <source src="/media/hiking.mp4" type="video/mp4" />
         </video>
       </div>
@@ -51,7 +51,7 @@ export default function HomePage() {
           </a>
         </div>
         <div className="text-center mt-4">
-          <p>&copy; 2025 Adventra. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Adventra. All rights reserved.</p>
           <p className="mt-2 text-sm">
             Made with <span className="text-red-500">❤️</span> at{' '}
             <a
