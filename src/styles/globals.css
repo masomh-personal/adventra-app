@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* -- Design Tokens -- */
 :root {
@@ -28,152 +30,128 @@
   --border-radius-lg: 16px;
 }
 
-@theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-tertiary: var(--tertiary);
-  --color-text: var(--text);
-  --font-heading: var(--font-heading);
-  --font-body: var(--font-body);
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body), sans-serif;
+    line-height: 1.6;
+  }
 
-  --shadow-light: var(--shadow-light);
-  --shadow-medium: var(--shadow-medium);
-  --shadow-dark: var(--shadow-dark);
-
-  --border-radius-sm: var(--border-radius-sm);
-  --border-radius-md: var(--border-radius-md);
-  --border-radius-lg: var(--border-radius-lg);
-
-  --breakpoint-xs: var(--breakpoint-xs);
-  --breakpoint-sm: var(--breakpoint-sm);
-  --breakpoint-md: var(--breakpoint-md);
-  --breakpoint-lg: var(--breakpoint-lg);
-  --breakpoint-xl: var(--breakpoint-xl);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), sans-serif;
+  }
 }
 
-/* -- Body Styling -- */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-body), sans-serif;
-  line-height: 1.6;
-}
+@layer utilities {
+  .text-scaled {
+    font-size: 16px;
+  }
 
-/* -- Utility Classes for Testing -- */
+  .text-xs {
+    font-size: 12px;
+  }
 
-/* Text Scaling for Accessibility */
-.text-scaled {
-  font-size: 16px;  /* base size for accessibility */
-}
+  .text-sm {
+    font-size: 14px;
+  }
 
-.text-xs {
-  font-size: 12px;
-}
-
-.text-sm {
-  font-size: 14px;
-}
-
-.text-lg {
-  font-size: 18px;
-}
-
-.text-xl {
-  font-size: 20px;
-}
-
-/* Breakpoints for Responsive Design */
-@media (min-width: var(--breakpoint-sm)) {
-  .sm\:text-lg {
+  .text-lg {
     font-size: 18px;
   }
-}
 
-@media (min-width: var(--breakpoint-md)) {
-  .md\:text-xl {
-    font-size: 22px;
+  .text-xl {
+    font-size: 20px;
   }
-}
 
-@media (min-width: var(--breakpoint-lg)) {
-  .lg\:text-2xl {
-    font-size: 24px;
+  @media (min-width: var(--breakpoint-sm)) {
+    .sm\:text-lg {
+      font-size: 18px;
+    }
   }
-}
 
-@media (min-width: var(--breakpoint-xl)) {
-  .xl\:text-3xl {
-    font-size: 30px;
+  @media (min-width: var(--breakpoint-md)) {
+    .md\:text-xl {
+      font-size: 22px;
+    }
   }
-}
 
-/* Custom Button Styling */
-.btn {
-  display: inline-block;
-  padding: 12px 24px;
-  background-color: var(--primary);
-  color: white;
-  border-radius: var(--border-radius-md);
-  font-family: var(--font-heading), serif;
-  font-size: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
+  @media (min-width: var(--breakpoint-lg)) {
+    .lg\:text-2xl {
+      font-size: 24px;
+    }
+  }
 
-.btn:hover {
-  background-color: var(--secondary);
-  transform: scale(1.05);
-}
+  @media (min-width: var(--breakpoint-xl)) {
+    .xl\:text-3xl {
+      font-size: 30px;
+    }
+  }
 
-.btn:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: var(--border-radius-md);
+    font-family: var(--font-heading), serif;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 150px;
+    text-transform: uppercase;
+  }
 
-/* Spacing Utilities */
-.m-4 {
-  margin: 1rem;
-}
+  .btn:hover {
+    background-color: var(--secondary);
+    transform: scale(1.05);
+  }
 
-.p-4 {
-  padding: 1rem;
-}
+  .btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 
-.mt-8 {
-  margin-top: 2rem;
-}
+  .m-4 {
+    margin: 1rem;
+  }
 
-.mb-8 {
-  margin-bottom: 2rem;
-}
+  .p-4 {
+    padding: 1rem;
+  }
 
-.ml-auto {
-  margin-left: auto;
-}
+  .mt-8 {
+    margin-top: 2rem;
+  }
 
-.mr-auto {
-  margin-right: auto;
-}
+  .mb-8 {
+    margin-bottom: 2rem;
+  }
 
-/* Focus and Hover States */
-.focus\:outline-none:focus {
-  outline: none;
-}
+  .ml-auto {
+    margin-left: auto;
+  }
 
-.hover\:bg-tertiary:hover {
-  background-color: var(--tertiary);
-}
+  .mr-auto {
+    margin-right: auto;
+  }
 
-/* -- Accessible Color Contrast for Text -- */
-.high-contrast {
-  color: var(--foreground);
-  background-color: var(--primary);
-}
+  .focus\:outline-none:focus {
+    outline: none;
+  }
 
-.low-contrast {
-  color: var(--text);
-  background-color: var(--background);
+  .hover\:bg-tertiary:hover {
+    background-color: var(--tertiary);
+  }
+
+  .high-contrast {
+    color: var(--foreground);
+    background-color: var(--primary);
+  }
+
+  .low-contrast {
+    color: var(--text);
+    background-color: var(--background);
+  }
 }

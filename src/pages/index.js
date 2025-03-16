@@ -4,16 +4,16 @@ export default function HomePage() {
       {/* Header Section */}
       <header className="flex items-center justify-center p-4">
         {' '}
-        {/* Reduced padding here */}
+        {/* Reduced padding */}
         <div className="flex items-center space-x-4">
           {/* Logo (now loading from public directory) */}
-          <img src="/adventra-logo.png" alt="Adventra Logo" className="h-24" />{' '}
-          {/* Increased size to focus on logo */}
+          <img src="/adventra-logo.png" alt="Adventra Logo" className="h-16" />{' '}
+          {/* Adjusted logo size */}
         </div>
       </header>
 
       {/* Main Content Section */}
-      <main className="flex-1 flex flex-col justify-center items-center space-y-8 p-6">
+      <main className="flex-1 flex flex-col justify-center items-center space-y-8 p-6 text-center">
         <h2 className="text-4xl font-[var(--font-heading)] text-center">Welcome to Adventra</h2>
         <p className="text-xl text-center">
           A social network for outdoor adventurers. Connect, share, and explore!
@@ -21,10 +21,8 @@ export default function HomePage() {
 
         {/* Buttons for Login and Create Account */}
         <div className="flex space-x-4">
-          <button className="bg-primary text-white py-3 px-6 rounded-md shadow-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary">
-            Create Account
-          </button>
-          <button className="bg-transparent border-2 border-primary text-primary py-3 px-6 rounded-md shadow-lg hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+          <button className="btn mt-8">Create Account</button>
+          <button className="btn mt-8 bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white">
             Login
           </button>
         </div>
