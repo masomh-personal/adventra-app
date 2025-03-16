@@ -92,16 +92,6 @@ Each Product Backlog Item (PBI) must include:
 📄 **Full details can be found in** [`docs/definition-of-ready.md`](_docs/definition-of-ready.md).
 
 ---
-
-## **Folder Structure**
-
-- `frontend/` → Next.js & React frontend
-- `backend/` → PostgreSQL & Prisma backend
-- `docs/` → Documentation (Vision, Backlog, Definitions, etc.)
-- `sprints/` → Sprint deliverables
-
----
-
 ## **Useful Links**
 
 - **GitHub Repository**: [Repo Link](YOUR-GITHUB-REPO-URL-HERE)
@@ -109,69 +99,41 @@ Each Product Backlog Item (PBI) must include:
 - **Team Communication**: [Discord/Slack Invite](YOUR-TEAM-COMMS-LINK-HERE)
 
 ---
+## Getting Started
 
-## **Setup Instructions (For Developers)**
+First, run the development server:
 
-### **1. Clone the Repository**
-
-Open your terminal and run the following command to clone the project:
-
-```sh
-git clone https://github.com/YOUR-GITHUB-ORG/adventura.git
-cd adventura
-```
-
-### **2. Install Frontend Dependencies**
-
-Navigate to the frontend directory and install the required dependencies:
-
-```sh
-cd frontend
-npm install
+```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### **3. Set Up the Backend (PostgreSQL & Prisma)**
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Navigate to the backend directory, install dependencies, and set up the database:
+You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-```sh
-cd backend
-npm install
-npx prisma migrate dev
-```
+[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-### **4. Run the Development Server**
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
 
-After setting up both the frontend and backend, start the development environment:
+This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-```sh
-npm run dev
-```
+## Learn More
 
-### **5. Environment Variables**
+To learn more about Next.js, take a look at the following resources:
 
-Make sure you have a `.env` file set up with the necessary environment variables. Example:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
 
-```ini
-# Backend .env file
-DATABASE_URL=postgresql://your_user:your_password@localhost:5432/your_database
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
-```
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### **6. Linting & Formatting (Optional but Recommended)**
+## Deploy on Vercel
 
-To maintain code quality, run the following commands before committing code:
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-```sh
-npm run lint   # Check for linting issues
-npm run format # Auto-format code
-```
-
-### **7. Running Tests**
-
-To ensure the application is working as expected, run:
-
-```sh
-npm test
-```
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
