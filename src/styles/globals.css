@@ -2,14 +2,18 @@
 
 /* -- Design Tokens -- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #2E8B57;
-  --secondary: #FFB300;
-  --tertiary: #1E3A8A;
-  --text: #1A1A1A;
-  --font-heading: 'Montserrat', sans-serif; /* Montserrat for headings */
-  --font-body: 'Lexend', sans-serif;        /* Lexend for body text */
+  --background: #f2ede8;               /* Soft Beige - slightly richer */
+  --foreground: #232323;               /* Deeper Charcoal for contrast */
+
+  --primary: #3d6f4f;                  /* Darker Sage Green */
+  --primary-light: #7ea98b;            /* Earthy Pastel Green with better contrast */
+  --secondary: #d99a61;                /* Warm Sand - darker amber tone */
+  --tertiary: #476b89;                 /* Muted Steel Blue */
+
+  --text: #1f1f1f;                     /* Rich Gray - crisp against light bg */
+
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Lexend', sans-serif;
 
   /* -- Custom Breakpoints -- */
   --breakpoint-xs: 480px;
@@ -19,19 +23,21 @@
   --breakpoint-xl: 1600px;
 
   /* -- Shadows and Borders -- */
-  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-dark: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.07);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.12);
+  --shadow-dark: 0 10px 15px rgba(0, 0, 0, 0.15);
 
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 16px;
 }
 
+
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
   --color-secondary: var(--secondary);
   --color-tertiary: var(--tertiary);
   --color-text: var(--text);
