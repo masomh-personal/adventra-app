@@ -1,3 +1,5 @@
+import Button from '@/components/Button';
+
 export default function HomePage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center text-white text-center overflow-hidden">
@@ -22,9 +24,10 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col items-center space-y-2">
-          <button className="btn mt-4 bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white">
-            Login
-          </button>
+          {/*<button className="btn mt-4 bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white">*/}
+          {/*  Login*/}
+          {/*</button>*/}
+          <Button label={'Login'} onClick={() => console.log('TODO!')} />
           <a href="/signup" className="hover:text-secondary text-lg mt-2">
             Don’t have an account? Sign up today!
           </a>
