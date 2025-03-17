@@ -56,7 +56,35 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), sans-serif;
   font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
 }
+
+h1 {
+  font-size: 1.875rem; /* ~30px */
+}
+
+h2 {
+  font-size: 1.5rem; /* ~24px */
+}
+
+h3 {
+  font-size: 1.25rem; /* ~20px */
+}
+
+h4 {
+  font-size: 1.125rem; /* ~18px */
+}
+
+h5 {
+  font-size: 1rem; /* ~16px */
+}
+
+h6 {
+  font-size: 0.875rem; /* ~14px */
+}
+
+
 
 /* Logo Utility */
 .logo {

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Button from '@/components/Button';
 
 export default function HomePage() {
@@ -23,14 +24,12 @@ export default function HomePage() {
           A social network for outdoor adventurers. Connect, share, and explore!
         </p>
 
-        <div className="flex flex-col items-center space-y-2">
-          {/*<button className="btn mt-4 bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white">*/}
-          {/*  Login*/}
-          {/*</button>*/}
-          <Button label={'Login'} onClick={() => console.log('TODO!')} />
-          <a href="/signup" className="hover:text-secondary text-lg mt-2">
+        <div className="flex flex-col items-center space-y-2 mt-4">
+          <Button label="Login" onClick={() => console.log('TODO: Navigate to Login')} />
+
+          <Link href="/signup" className="hover:text-secondary text-lg mt-2 font-body">
             Don’t have an account? Sign up today!
-          </a>
+          </Link>
         </div>
       </section>
     </div>

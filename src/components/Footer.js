@@ -1,16 +1,18 @@
+import Link from 'next/link';
+
 export default function Footer() {
   return (
     <footer className="bg-primary text-white py-4 relative z-10">
       <div className="flex justify-center space-x-8 font-body">
-        <a href="/about" className="hover:text-secondary">
+        <Link href="/about" className="hover:text-secondary">
           About
-        </a>
-        <a href="/privacy-policy" className="hover:text-secondary">
+        </Link>
+        <Link href="/privacy-policy" className="hover:text-secondary">
           Privacy Policy
-        </a>
-        <a href="/contact" className="hover:text-secondary">
+        </Link>
+        <Link href="/contact" className="hover:text-secondary">
           Contact
-        </a>
+        </Link>
       </div>
       <div className="text-center mt-4 text-sm">
         <p>&copy; {new Date().getFullYear()} Adventra. All rights reserved.</p>
