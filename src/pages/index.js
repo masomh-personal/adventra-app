@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import Button from '@/components/Button';
+import { useRouter } from 'next/router';
 
 export default function HomePage() {
+  const router = useRouter(); // Initialize router
+
   return (
     <div className="relative min-h-screen flex items-center justify-center text-white text-center overflow-hidden">
       {/* Background Video */}
@@ -25,7 +28,7 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col items-center space-y-2 mt-4">
-          <Button label="Login" onClick={() => console.log('TODO: Navigate to Login')} />
+          <Button label="Login" onClick={() => router.push('/login')} />
 
           <Link href="/signup" className="hover:text-secondary text-lg mt-2 font-body">
             Don’t have an account? Sign up today!
