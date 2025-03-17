@@ -6,7 +6,7 @@ export default function Header() {
       {/* Logo + Text Link to Home */}
       <Link href="/" className="flex items-center space-x-2">
         <img src="/adventra-logo.png" alt="Adventra Logo" className="h-12" />
-        <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide">
+        <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
           adventra
         </span>
       </Link>
