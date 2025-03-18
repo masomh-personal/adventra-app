@@ -70,7 +70,7 @@ export default function PrivacyPolicyPage() {
         {/* Section 6 */}
         <h2 className="text-2xl font-heading mt-8 mb-3 text-secondary">6. Children’s Privacy</h2>
         <p className="mb-4">
-          Adventra is not intended for users under 13. We do not knowingly collect data from
+          Adventra is not intended for users under 18. We do not knowingly collect data from
           children. Contact us if you believe a minor has provided data.
         </p>
 
