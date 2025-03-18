@@ -103,7 +103,7 @@ export default function AboutPage() {
         </h2>
 
         <div className="space-y-4">
-          {faqs.map((faq, index) => {
+          {faqs.map(({ question, answer }, index) => {
             const isOpen = openFAQs.has(index);
             return (
               <div key={index} className="border border-gray-300 rounded-md">
@@ -111,7 +111,7 @@ export default function AboutPage() {
                   onClick={() => toggleFAQ(index)}
                   className="w-full text-left px-4 py-3 font-heading text-lg font-semibold flex justify-between items-center focus:outline-none"
                 >
-                  {faq.question}
+                  {question}
                   <span>{isOpen ? '-' : '+'}</span>
                 </button>
 
@@ -120,7 +120,7 @@ export default function AboutPage() {
                     isOpen ? 'max-h-96 pb-4' : 'max-h-0'
                   }`}
                 >
-                  {isOpen && <div className="text-lg leading-relaxed">{faq.answer}</div>}
+                  {isOpen && <div className="text-lg leading-relaxed">{answer}</div>}
                 </div>
               </div>
             );
