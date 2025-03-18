@@ -1,7 +1,16 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "checkJs": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "jest.setup.js", "**/*.test.js"],
+  "exclude": ["node_modules"],
+  "typeAcquisition": {
+    "enable": true
+  },
+  "types": ["jest"]
 }

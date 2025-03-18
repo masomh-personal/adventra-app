@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import Header from '../Header';
-import '@testing-library/jest-dom';
 
 describe('Header', () => {
   it('renders the Adventra logo text', () => {
@@ -15,5 +14,11 @@ describe('Header', () => {
     expect(screen.getByText(/About/i)).toBeInTheDocument();
     expect(screen.getByText(/Contact/i)).toBeInTheDocument();
     expect(screen.getByText(/Login/i)).toBeInTheDocument();
+  });
+
+  it('renders the Adventra logo image', () => {
+    render(<Header />);
+    const logoImage = screen.getByAltText(/adventra logo/i);
+    expect(logoImage).toBeInTheDocument();
   });
 });
