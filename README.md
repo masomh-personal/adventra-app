@@ -96,7 +96,7 @@ Each Product Backlog Item (PBI) must include:
 ## **Useful Links**
 
 - **GitHub Repository**: [Repo Link](YOUR-GITHUB-REPO-URL-HERE)
-- **GitHub Projects**: [Backlog Link](YOUR-BACKLOG-TOOL-URL-HERE)
+- **GitHub Projects / Kanban Board**: [Backlog Link](YOUR-BACKLOG-TOOL-URL-HERE)
 - **Team Communication**: [Discord/Slack Invite](YOUR-TEAM-COMMS-LINK-HERE)
 
 ---
