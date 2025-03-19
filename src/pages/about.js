@@ -1,54 +1,64 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function AboutPage() {
-  const faqs = [
-    {
-      question: 'Is Adventra free to use?',
-      answer:
-        'Yes! Adventra is free to join and use. Optional premium features may be introduced for enhanced experiences.',
-    },
-    {
-      question: 'How do I find adventure partners?',
-      answer:
-        'After creating a profile, explore matches based on your adventure preferences and connect through our swipe-to-match system.',
-    },
-    {
-      question: 'What kind of adventures are supported?',
-      answer:
-        'Adventra supports hiking, backpacking, kayaking, climbing, skiing, and more. Customize your profile for your interests.',
-    },
-    {
-      question: 'Is my data safe?',
-      answer: (
-        <>
-          Yes. We take your privacy seriously. Data is encrypted and secured. See our{' '}
-          <a href="/privacy-policy" className="text-primary hover:underline">
-            Privacy Policy
-          </a>{' '}
-          for details.
-        </>
-      ),
-    },
-    {
-      question: 'How can I contact support?',
-      answer: (
-        <>
-          Reach us anytime at{' '}
-          <a href="mailto:support@adventra.com" className="text-primary hover:underline">
-            support@adventra.com
-          </a>
-          . We’re here to help!
-        </>
-      ),
-    },
-  ];
+  // Generate UUIDs once for FAQ items
+  const faqs = useMemo(
+    () => [
+      {
+        id: uuidv4(),
+        question: 'Is Adventra free to use?',
+        answer:
+          'Yes! Adventra is free to join and use. Optional premium features may be introduced for enhanced experiences.',
+      },
+      {
+        id: uuidv4(),
+        question: 'How do I find adventure partners?',
+        answer:
+          'After creating a profile, explore matches based on your adventure preferences and connect through our swipe-to-match system.',
+      },
+      {
+        id: uuidv4(),
+        question: 'What kind of adventures are supported?',
+        answer:
+          'Adventra supports hiking, backpacking, kayaking, climbing, skiing, and more. Customize your profile for your interests.',
+      },
+      {
+        id: uuidv4(),
+        question: 'Is my data safe?',
+        answer: (
+          <>
+            Yes. We take your privacy seriously. Data is encrypted and secured. See our{' '}
+            <a href="/privacy-policy" className="text-primary hover:underline">
+              Privacy Policy
+            </a>{' '}
+            for details.
+          </>
+        ),
+      },
+      {
+        id: uuidv4(),
+        question: 'How can I contact support?',
+        answer: (
+          <>
+            Reach us anytime at{' '}
+            <a href="mailto:support@adventra.com" className="text-primary hover:underline">
+              support@adventra.com
+            </a>
+            . We’re here to help!
+          </>
+        ),
+      },
+    ],
+    [] // Generate UUIDs once
+  );
 
   const [openFAQs, setOpenFAQs] = useState(new Set());
 
-  const toggleFAQ = (index) => {
+  const toggleFAQ = (id) => {
     setOpenFAQs((prev) => {
       const updated = new Set(prev);
-      updated.has(index) ? updated.delete(index) : updated.add(index);
+      updated.has(id) ? updated.delete(id) : updated.add(id);
       return updated;
     });
   };
@@ -103,12 +113,12 @@ export default function AboutPage() {
         </h2>
 
         <div className="space-y-4">
-          {faqs.map(({ question, answer }, index) => {
-            const isOpen = openFAQs.has(index);
+          {faqs.map(({ id, question, answer }) => {
+            const isOpen = openFAQs.has(id);
             return (
-              <div key={index} className="border border-gray-300 rounded-md">
+              <div key={id} className="border border-gray-300 rounded-md">
                 <button
-                  onClick={() => toggleFAQ(index)}
+                  onClick={() => toggleFAQ(id)}
                   className="w-full text-left px-4 py-3 font-heading text-lg font-semibold flex justify-between items-center focus:outline-none"
                 >
                   {question}
