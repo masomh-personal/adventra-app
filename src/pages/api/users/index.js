@@ -1,7 +1,7 @@
 /**
  * @route   GET /api/users
  * @desc    Fetch all user profiles from Supabase
- * @access  Public (adjust as needed)
+ * @access  Public
  */
 
 import { supabase } from '@/lib/supabaseClient';

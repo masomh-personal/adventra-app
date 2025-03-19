@@ -1,7 +1,7 @@
 /**
  * @route   GET /api/users/:id
  * @desc    Fetch a user by ID
- * @access  Public (modify for authentication as needed)
+ * @access  Public
  *
  * @route   PUT /api/users/:id
  * @desc    Update a user by ID
