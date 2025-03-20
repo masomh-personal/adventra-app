@@ -1,6 +1,6 @@
-# Adventra Style Guide
+# Adventra Style Guide (V1)
 
-## 🎨 Color Scheme (Earth-Tone Inspired)
+## Color Scheme (Earth-Tone Inspired)
 
 | Purpose           | Hex Code  | Notes                                         |
 |-------------------|-----------|-----------------------------------------------|
@@ -14,7 +14,7 @@
 
 ---
 
-## 🔤 Font Scheme
+## Font Scheme
 
 | Usage        | Font Stack                    |
 |--------------|-------------------------------|
@@ -25,7 +25,7 @@
 
 ---
 
-## 📦 Usage Notes
+## Usage Notes
 - Colors and fonts are defined in `:root` using **CSS variables** inside `globals.css`.
 - Use `var(--primary)` or other variables in inline styles or custom utility classes.
 - Tailwind hover effects use **`--primary`** for contrast on **`--primary-light`** backgrounds.

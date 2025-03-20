@@ -1,72 +1,86 @@
-Backlog Prioritization Order:
+# 🗂️ Backlog Prioritization Order
 
-Create entities / ERD:
-Before we can start on system design we have to clearly define each of our entities
-and determine how they will interact with one another.
+## 1. Create Entities / ERD
+Before we can start system design, we must clearly define our **entities** and determine **how they interact** with one another.
 
-Create UML diagram:
-Once our entities are decided upon we can begin desiging our systems architecture.
-It is important to do this early so we may have a strong foundation to work from.
+---
 
-Design database:
-Before we create our database we must design it so that we do not run into
-problems that force us to make design changes later on.
+## 2. Create UML Diagram
+Once our entities are finalized, we can begin **designing our system architecture**. Doing this early provides a **strong foundation** for development.
 
-Design header / footer and our standard page layout:
-By starting on these elements early we can quickly decide upon a common design scheme for
-all of our webpages. This will save us work later on.
+---
 
-Create homepage:
-Prioritizing our homepage is important. This will be the first things users see and is the
-logical place to start.
+## 3. Design Database
+Designing the database **before creation** helps us avoid issues that could force structural changes later. This includes defining schema, constraints, and relationships.
 
-Create, create profile page:
-Setting up the layout of our registration page is also very important. We need it to be
-easy to naviagate and use. Prioritizing this page second makes the most sense.
+---
 
-Implement create profile functionality:
-Implementing this functionality will take a little time. Setting this page up to make database
-queries make prove to take some time. We can also reuse soem code from this section so it is
-worth doing early.
+## 4. Design Header / Footer & Standard Page Layout
+Early design of reusable components like **header and footer** establishes a **consistent layout** for all pages, saving rework later.
 
-Create user login page:
-Once account creation is implemented pivoting to login is a natural next step. Stylistically
-we can set up this page similar to our accoutn creation page for readability
+---
 
-Implement login functionality:
-Once the login page is finished the next most important thing is to get the login page functional.
-We should be able to reuse or rework some of the queries we used for account creation which will
-help save time.
+## 5. Create Homepage
+The homepage is the **first impression** for users. Prioritizing it helps define our **visual identity and user flow** early on.
 
-Create matching Page:
-Once users can register and login the next most important fucntion is to match with other users.
-The layout of this page is important since users will spend a lot of time on this page.
+---
 
-Implement matching functionality:
-This will be one of the most time entensive itmes on this list. Now that all the pre-requsite
-pages are created we will need to devote a lot of time to implementing our profile matching
-functionality.
+## 6. Create Profile Page
+A **clean, intuitive registration page** is key. We aim for easy navigation and user-friendly design.
 
-Create messaging Page:
-Once users are able to match they will need to be able to message one another to plan
-"Adventures" with one another.
+---
 
-Implement messaging functionality:
-Once the messaging pager is up we must implement the messaging functionality. Much like
-before we should be able to reuse or rework previous queries for the function.
+## 7. Implement Create Profile Functionality
+Implementing profile creation, validation, and database interaction is essential. Some functionality/code here can be **reused for login**.
 
-Create manage profile page:
-The manage profile page and functionality should be starightforward. We can reuse the account
-create page and use update queries to update profiles in the database.
+---
 
-Connect profiles to social media:
-Allowing users to insert links to social media usign queries to the database will be easy.
-We can add this to the manage profile page.
+## 8. Create User Login Page
+The **next logical step** is user login. Design-wise, it should align with the **registration page** for consistency.
 
-Implement user reporting and blocking:
-Allowing users to report or block other users will require us to create way to store these requests
-similar to how messages will be stored in the database.
+---
 
-Implement user status and availability indicator:
-We can add an option to the profile page that lets you toggle availabillity. This will be
-quick to implement.
+## 9. Implement Login Functionality
+Make the login functional and secure. We can reuse parts of the **profile creation logic** to save time.
+
+---
+
+## 10. Create Matching Page
+After login, users should be able to **discover and match** with others. This UI must be intuitive as users spend **significant time here**.
+
+---
+
+## 11. Implement Matching Functionality
+This will be **time-intensive** and requires careful planning. With necessary pages built, we can now focus on implementing **matching logic and algorithms**.
+
+---
+
+## 12. Create Messaging Page
+After matching, users need a way to **communicate**. Designing a **chat UI** is critical for real-time interaction.
+
+---
+
+## 13. Implement Messaging Functionality
+Make the chat functional. We can **reuse query logic** from earlier pages for efficiency.
+
+---
+
+## 14. Create Manage Profile Page
+Users should be able to **view/edit their profiles**. This page will reuse the **registration page UI** with update capabilities.
+
+---
+
+## 15. Connect Profiles to Social Media
+Allow users to **link social media** accounts. This can be added to the **Manage Profile page** with simple queries.
+
+---
+
+## 16. Implement User Reporting & Blocking
+Users must be able to **report or block** others. This feature will store actions in the database, **similar to messaging**.
+
+---
+
+## 17. Implement User Status & Availability
+Add **status toggles** (e.g., Active, Busy, Offline) in profiles. Quick implementation, with **real-time indicators** across the app.
+
+---

@@ -2,7 +2,7 @@
 
 ## Forecast
 
-Our team forecasts 16 story points to be completed during Sprint 1.
+Our team forecasts 16-story points to be completed during Sprint 1.
 
 ## Rationale
 

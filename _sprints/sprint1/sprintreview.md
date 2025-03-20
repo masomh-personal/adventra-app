@@ -1,11 +1,11 @@
-# 🌟 Sprint 5 Review
+# Sprint 1 Review
 
 **Dates:** March 3 - March 23  
 **Sprint Goal:** Foundational Design and Webpage Standardization
 
 ---
 
-## 👥 Team
+## Team
 
 | Name     | Role          |
 | -------- | ------------- |
@@ -17,7 +17,7 @@
 
 ---
 
-## ✅ Completed Work
+## Completed Work
 
 | Story                                         | Points | Status  |
 | --------------------------------------------- | ------ | ------- |
@@ -29,7 +29,7 @@
 
 ---
 
-## 📊 Metrics
+## Metrics
 
 - **Forecasted Points:** 18
 - **Completed Points:** 18
@@ -37,7 +37,7 @@
 
 ---
 
-## 🎥 Demo Highlights
+## Demo Highlights
 
 - Entity Relationship Diagram (ERD) finalized
 - Database design completed
@@ -46,26 +46,26 @@
 
 ---
 
-## 👍 What Went Well
+## What Went Well
 
 - Regular meetings were held consistently
 - All deadlines were met successfully
 
 ---
 
-## 🛠️ What Could Be Improved
+## What Could Be Improved
 
 - Pace of work can be better balanced throughout the sprint timeline
 - Consider scheduling additional meetings to increase collaboration and feedback opportunities
 
 ---
 
-## 🔧 Incomplete/Deferred Work
+## Incomplete/Deferred Work
 
 - **N/A** (All planned stories were completed this sprint)
 
 ---
 
-## 🚀 Next Steps
+## Next Steps
 
-- **Sprint 6 Planning:** March 25, 7:00 PM
+- **Sprint 2 Planning:** March 25, 7:00 PM
