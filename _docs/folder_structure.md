@@ -100,5 +100,5 @@ This document outlines the **folder structure** of the Adventra project. It serv
 
 ```bash
 ## use this command to recreate the folder structure
-npx tree-cli -l 5 --ignore 'node_modules/, .git/, .gitignore, coverage' -o structure.md
+npx tree-cli -l 5 --ignore 'node_modules/, .git/, .gitignore, coverage' -o _docs/folder_structure.txt
 ```
