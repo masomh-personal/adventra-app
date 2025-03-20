@@ -106,6 +106,7 @@ Follow these steps to run the Adventra app locally on your machine.
 ### 1. Clone the Repository
 ```bash
 git clone https://github.com/masomh-personal/adventra-app
+
 cd adventra-app
 
 git checkout main # if needed
