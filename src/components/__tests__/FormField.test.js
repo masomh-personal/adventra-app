@@ -8,10 +8,14 @@ describe('FormField', () => {
     label: 'Email',
     type: 'email',
     id: 'email',
-    register: jest.fn(),
+    register: jest.fn().mockReturnValue({}),
     errors: {},
     placeholder: 'Enter your email',
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   describe('rendering', () => {
     it('renders the label correctly', () => {
@@ -76,10 +80,17 @@ describe('FormField', () => {
   });
 
   describe('react-hook-form integration', () => {
-    it('calls register with the correct id', () => {
+    it('calls register with the correct id and registerOptions', () => {
+      const registerOptions = { required: 'This field is required' };
+      render(<FormField {...defaultProps} registerOptions={registerOptions} />);
+
+      expect(defaultProps.register).toHaveBeenCalledWith('email', registerOptions);
+    });
+
+    it('calls register with just the id when no registerOptions provided', () => {
       render(<FormField {...defaultProps} />);
 
-      expect(defaultProps.register).toHaveBeenCalledWith('email');
+      expect(defaultProps.register).toHaveBeenCalledWith('email', {});
     });
   });
 
@@ -92,6 +103,118 @@ describe('FormField', () => {
 
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('id', 'email');
+    });
+  });
+
+  describe('select input type', () => {
+    it('renders a select element with options', () => {
+      const selectProps = {
+        ...defaultProps,
+        type: 'select',
+        options: [
+          { value: 'option1', label: 'Option 1' },
+          { value: 'option2', label: 'Option 2' },
+        ],
+      };
+
+      render(<FormField {...selectProps} />);
+
+      expect(screen.getByLabelText('Email')).toBeInTheDocument();
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+      expect(screen.getByText('Option 1')).toBeInTheDocument();
+      expect(screen.getByText('Option 2')).toBeInTheDocument();
+    });
+
+    it('renders a placeholder option when provided', () => {
+      const selectProps = {
+        ...defaultProps,
+        type: 'select',
+        placeholder: 'Select an option',
+        options: [{ value: 'option1', label: 'Option 1' }],
+      };
+
+      render(<FormField {...selectProps} />);
+
+      expect(screen.getByText('Select an option')).toBeInTheDocument();
+    });
+  });
+
+  describe('textarea input type', () => {
+    it('renders a textarea element', () => {
+      const textareaProps = {
+        ...defaultProps,
+        type: 'textarea',
+      };
+
+      render(<FormField {...textareaProps} />);
+
+      const textarea = screen.getByLabelText('Email');
+      expect(textarea.tagName).toBe('TEXTAREA');
+      expect(textarea).toHaveAttribute('rows', '4');
+    });
+  });
+
+  describe('checkbox input type', () => {
+    it('renders a checkbox with label after the input', () => {
+      const checkboxProps = {
+        ...defaultProps,
+        type: 'checkbox',
+      };
+
+      render(<FormField {...checkboxProps} />);
+
+      const checkbox = screen.getByLabelText('Email');
+      expect(checkbox).toHaveAttribute('type', 'checkbox');
+
+      // For checkboxes, the label should be rendered after the input
+      const checkboxContainer = checkbox.closest('div');
+      expect(checkboxContainer.firstChild).toBe(checkbox);
+    });
+  });
+
+  describe('radio input type', () => {
+    it('renders radio buttons for each option', () => {
+      const radioProps = {
+        ...defaultProps,
+        type: 'radio',
+        options: [
+          { value: 'option1', label: 'Option 1' },
+          { value: 'option2', label: 'Option 2' },
+        ],
+      };
+
+      render(<FormField {...radioProps} />);
+
+      expect(screen.getByLabelText('Option 1')).toHaveAttribute('type', 'radio');
+      expect(screen.getByLabelText('Option 2')).toHaveAttribute('type', 'radio');
+    });
+  });
+
+  describe('custom styling', () => {
+    it('applies custom className to the input', () => {
+      const customProps = {
+        ...defaultProps,
+        className: 'custom-class',
+      };
+
+      render(<FormField {...customProps} />);
+
+      const input = screen.getByLabelText('Email');
+      expect(input).toHaveClass('custom-class');
+    });
+  });
+
+  describe('disabled state', () => {
+    it('disables the input when disabled prop is true', () => {
+      const disabledProps = {
+        ...defaultProps,
+        disabled: true,
+      };
+
+      render(<FormField {...disabledProps} />);
+
+      const input = screen.getByLabelText('Email');
+      expect(input).toBeDisabled();
     });
   });
 });
