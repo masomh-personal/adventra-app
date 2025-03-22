@@ -94,6 +94,37 @@ describe('FormField', () => {
     });
   });
 
+  describe('help text', () => {
+    it('displays help text when provided and no errors exist', () => {
+      const props = {
+        ...defaultProps,
+        helpText: 'This is some helpful information',
+      };
+
+      render(<FormField {...props} />);
+
+      expect(screen.getByText('This is some helpful information')).toBeInTheDocument();
+      expect(screen.getByText('This is some helpful information')).toHaveClass('text-gray-500');
+    });
+
+    it('does not display help text when there is an error', () => {
+      const props = {
+        ...defaultProps,
+        helpText: 'This is some helpful information',
+        errors: {
+          email: {
+            message: 'Email is required',
+          },
+        },
+      };
+
+      render(<FormField {...props} />);
+
+      expect(screen.queryByText('This is some helpful information')).not.toBeInTheDocument();
+      expect(screen.getByText('Email is required')).toBeInTheDocument();
+    });
+  });
+
   describe('accessibility', () => {
     it('associates label with input via id', () => {
       render(<FormField {...defaultProps} />);
