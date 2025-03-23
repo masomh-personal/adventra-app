@@ -10,7 +10,6 @@ export default function ContactPage() {
           <a href="mailto:support@adventra.com" className="text-primary hover:underline">
             support@adventra.com
           </a>
-          .
         </p>
 
         <form className="space-y-4">
