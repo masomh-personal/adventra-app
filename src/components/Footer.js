@@ -24,7 +24,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="hover:text-secondary underline"
           >
-            KSU
+            KSU's Software & Game Development Dept
           </a>
         </p>
       </div>
