@@ -20,7 +20,7 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <div className={`${headingFont.variable} ${bodyFont.variable} flex flex-col min-h-screen`}>
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow flex">
         <Component {...pageProps} />
       </main>
       <Footer />
