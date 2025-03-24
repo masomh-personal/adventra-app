@@ -1,18 +1,18 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import '@/styles/globals.css';
-import { Montserrat, Lexend } from 'next/font/google';
+import { Work_Sans, Hind_Madurai } from 'next/font/google';
 
 // Load fonts with specific weights and attach to CSS variables
-const headingFont = Montserrat({
+const headingFont = Work_Sans({
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-heading',
 });
 
-const bodyFont = Lexend({
+const bodyFont = Hind_Madurai({
   subsets: ['latin'],
-  weight: ['400', '600'],
+  weight: ['400', '500', '600'],
   variable: '--font-body',
 });
 

@@ -16,12 +16,12 @@
 
 ## Font Scheme
 
-| Usage        | Font Stack                    |
-|--------------|-------------------------------|
-| **Headings** | `'Montserrat', sans-serif`    |
-| **Body**     | `'Lexend', sans-serif`        |
+| Usage        | Font Stack                     |
+|--------------|--------------------------------|
+| **Headings** | `'Work Sans', sans-serif`      |
+| **Body**     | `'Hind Madurai', sans-serif`   |
 
-> These fonts are loaded via **Google Fonts CDN** in `_document.js` for seamless usage.
+> These fonts are loaded via **Next.js Font Optimization** in `_app.js` for improved performance and reduced layout shift.
 
 ---
 
