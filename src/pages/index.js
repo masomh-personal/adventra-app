@@ -19,7 +19,7 @@ export default function HomePage() {
 
       {/* Main Content */}
       <section className="z-10 px-4 space-y-4">
-        <h2 className="text-4xl font-heading">🏕️ Welcome to Adventra</h2>
+        <h2 className="text-4xl font-heading uppercase">🏕️ Welcome to Adventra</h2>
         <p className="text-lg font-body">
           A social network for outdoor adventurers. Connect, share, and explore!
         </p>
