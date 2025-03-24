@@ -19,7 +19,7 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full object-cover z-[-1]"
           onError={() => setVideoError(true)}
         >
-          <source src="/media/homepage_hiking.mp4" type="video/mp4" />
+          <source src="/media/homepage_hiking_compressed.mp4" type="video/mp4" />
         </video>
       ) : (
         <div
