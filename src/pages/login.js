@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { loginSchema } from '@/validation/loginSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
@@ -57,9 +58,9 @@ export default function LoginPage() {
 
           <p className="text-center text-sm mt-4">
             Don't have an account?{' '}
-            <a href="/signup" className="text-primary hover:underline">
+            <Link href="/signup" className="text-primary hover:underline">
               Sign up here
-            </a>
+            </Link>
           </p>
         </FormWrapper>
       </div>
