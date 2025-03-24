@@ -45,7 +45,7 @@ export default function AboutPage() {
             <a href="mailto:support@adventra.com" className="text-primary hover:underline">
               support@adventra.com
             </a>
-            . We’re here to help!
+            . We're here to help!
           </>
         ),
       },
@@ -64,8 +64,8 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 font-body">
-      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8">
+    <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
+      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 my-8">
         <h1 className="text-3xl font-heading text-primary text-center mb-2">About Adventra</h1>
         <hr className="border-t border-gray-300 mb-6" />
 
@@ -101,9 +101,9 @@ export default function AboutPage() {
 
         <h2 className="text-2xl font-heading text-secondary mt-6 mb-2">Our Future Vision</h2>
         <p className="text-lg leading-relaxed mb-8">
-          We’re just getting started. In the future, expect features like{' '}
+          We're just getting started. In the future, expect features like{' '}
           <strong>real-time event planning</strong>, <strong>group challenges</strong>, and{' '}
-          <strong>AI-powered adventure recommendations</strong>. We’re committed to growing with our
+          <strong>AI-powered adventure recommendations</strong>. We're committed to growing with our
           community, one trail at a time.
         </p>
 

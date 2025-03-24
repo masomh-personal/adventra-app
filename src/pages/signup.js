@@ -26,8 +26,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6 font-body">
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
+    <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
+      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
         <h2 className="text-3xl font-heading text-center mb-2">🏕️ Create Your Account</h2>
         <hr className="border-t border-gray-300 mb-6" />
 
