@@ -25,4 +25,5 @@ export const nameValidation = yup
 export const messageValidation = yup
   .string()
   .required('Please enter your message')
-  .min(10, 'Message must be at least 10 characters');
+  .min(10, 'Message must be at least 10 characters')
+  .max(2000, 'Message cannot exceed 2000 characters');

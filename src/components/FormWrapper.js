@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
  * @param {string} title - The form's title
  * @param {object} validationSchema - Yup validation schema for the form
  * @param {Function} onSubmit - Function to handle valid form submission
- * @param {ReactNode} children - FormField components inside
+ * @param {ReactNode|Function} children - FormField components inside or function receiving form context
  * @param {object} defaultValues - Default values for the form fields
  * @param {string} submitLabel - Text for the submit button
  * @param {boolean} loading - Whether the form is in a loading state
@@ -74,20 +74,22 @@ export default function FormWrapper({
 
       {/* Render children with form context */}
       <div className="space-y-4">
-        {React.Children.map(children, (child) => {
-          // Check if it's a valid element before adding props
-          if (React.isValidElement(child)) {
-            // Only pass form context to custom components, not to DOM elements
-            if (typeof child.type === 'function') {
-              // This is a custom component (like FormField)
-              return React.cloneElement(child, { ...formContext, ...child.props });
-            } else {
-              // This is a DOM element (like p, div, etc.)
+        {typeof children === 'function'
+          ? children(formContext)
+          : React.Children.map(children, (child) => {
+              // Check if it's a valid element before adding props
+              if (React.isValidElement(child)) {
+                // Only pass form context to custom components, not to DOM elements
+                if (typeof child.type === 'function') {
+                  // This is a custom component (like FormField)
+                  return React.cloneElement(child, { ...formContext, ...child.props });
+                } else {
+                  // This is a DOM element (like p, div, etc.)
+                  return child;
+                }
+              }
               return child;
-            }
-          }
-          return child;
-        })}
+            })}
       </div>
 
       {/* Submit button */}

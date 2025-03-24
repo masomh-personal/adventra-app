@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
 import { contactFormSchema } from '@/validation/contactSchema';
-import FormWrapper from '../components/FormWrapper';
-import FormField from '../components/FormField';
+import FormWrapper from '@/components/FormWrapper';
+import FormField from '@/components/FormField';
+import { CharacterCounter } from '@/components/CharacterCounter';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const MESSAGE_MAX_LENGTH = 2000;
 
   // Handle form submission
   const handleSubmit = async (data, { reset }) => {
-    // Placeholder for API call in future sprint
-    // TODO
     console.log('Form data submitted:', data);
-
-    // Show success alert
     alert('Message sent! (This is a placeholder)');
-
-    // Update submission state
     setSubmitted(true);
-
-    // Reset form
     reset();
-
-    // Reset submission state after a delay
     setTimeout(() => setSubmitted(false), 3000);
   };
 
@@ -44,30 +36,59 @@ export default function ContactPage() {
           className="space-y-4"
           submitLabel="Send Message"
         >
-          <FormField
-            label="Name"
-            id="name"
-            type="text"
-            placeholder="Your name"
-            registerOptions={{ required: true }}
-          />
+          {({ register, errors, watch, setValue }) => {
+            // Watch the message field to update character counter
+            const messageValue = watch('message') || '';
 
-          <FormField
-            label="Email"
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            registerOptions={{ required: true }}
-          />
+            return (
+              <>
+                <FormField
+                  label="Name"
+                  id="name"
+                  type="text"
+                  placeholder="Your name"
+                  register={register}
+                  errors={errors}
+                />
 
-          <FormField
-            label="Message"
-            id="message"
-            type="textarea"
-            placeholder="How can we help you?"
-            registerOptions={{ required: true }}
-            className="min-h-[120px]" // Ensure textarea has sufficient height
-          />
+                <FormField
+                  label="Email"
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  register={register}
+                  errors={errors}
+                />
+
+                <div className="space-y-1">
+                  <FormField
+                    label="Message"
+                    id="message"
+                    type="textarea"
+                    placeholder="How can we help you?"
+                    className="min-h-[120px]"
+                    register={register}
+                    errors={errors}
+                    registerOptions={{
+                      maxLength: MESSAGE_MAX_LENGTH,
+                      onChange: (e) => {
+                        // Get current value
+                        let value = e.target.value || '';
+
+                        // Truncate if needed
+                        if (value.length > MESSAGE_MAX_LENGTH) {
+                          value = value.substring(0, MESSAGE_MAX_LENGTH);
+                          e.target.value = value;
+                          setValue('message', value, { shouldValidate: true });
+                        }
+                      },
+                    }}
+                  />
+                  <CharacterCounter value={messageValue} maxLength={MESSAGE_MAX_LENGTH} />
+                </div>
+              </>
+            );
+          }}
         </FormWrapper>
 
         {submitted && (

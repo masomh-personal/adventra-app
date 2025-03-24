@@ -20,7 +20,7 @@ export default function FormField({
   type = 'text',
   id,
   register,
-  errors,
+  errors = {}, // Provide default empty object to prevent undefined errors
   placeholder,
   options = [],
   registerOptions = {},
@@ -28,19 +28,25 @@ export default function FormField({
   disabled = false,
   helpText,
 }) {
-  // Base classes for input styling
+  // Safely check for errors
+  const hasError = errors && id && errors[id];
+
+  // Base classes for input styling with defensive error checking
   const baseInputClasses = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
-    errors[id] ? 'border-red-500' : 'border-gray-300'
+    hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
   // Different input rendering based on type
   const renderInput = () => {
+    // Ensure register function exists
+    const registerFn = register || (() => ({}));
+
     switch (type) {
       case 'select':
         return (
           <select
             id={id}
-            {...register(id, registerOptions)}
+            {...registerFn(id, registerOptions)}
             className={baseInputClasses}
             disabled={disabled}
           >
@@ -61,7 +67,7 @@ export default function FormField({
         return (
           <textarea
             id={id}
-            {...register(id, registerOptions)}
+            {...registerFn(id, registerOptions)}
             placeholder={placeholder}
             className={baseInputClasses}
             disabled={disabled}
@@ -75,9 +81,9 @@ export default function FormField({
             <input
               type="checkbox"
               id={id}
-              {...register(id, registerOptions)}
+              {...registerFn(id, registerOptions)}
               className={`h-4 w-4 text-primary focus:ring-primary ${
-                errors[id] ? 'border-red-500' : 'border-gray-300'
+                hasError ? 'border-red-500' : 'border-gray-300'
               } ${className}`}
               disabled={disabled}
             />
@@ -96,9 +102,9 @@ export default function FormField({
                   type="radio"
                   id={`${id}-${option.value}`}
                   value={option.value}
-                  {...register(id, registerOptions)}
+                  {...registerFn(id, registerOptions)}
                   className={`h-4 w-4 text-primary focus:ring-primary ${
-                    errors[id] ? 'border-red-500' : 'border-gray-300'
+                    hasError ? 'border-red-500' : 'border-gray-300'
                   } ${className}`}
                   disabled={disabled}
                 />
@@ -115,7 +121,7 @@ export default function FormField({
           <input
             type={type}
             id={id}
-            {...register(id, registerOptions)}
+            {...registerFn(id, registerOptions)}
             placeholder={placeholder}
             className={baseInputClasses}
             disabled={disabled}
@@ -132,8 +138,8 @@ export default function FormField({
         </label>
       )}
       {renderInput()}
-      {helpText && !errors[id] && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
-      {errors[id] && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+      {helpText && !hasError && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
+      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
     </div>
   );
 }
