@@ -16,10 +16,10 @@
 
 ## Font Scheme
 
-| Usage        | Font Stack                     |
-|--------------|--------------------------------|
-| **Headings** | `'Work Sans', sans-serif`      |
-| **Body**     | `'Hind Madurai', sans-serif`   |
+| Usage        | Font Stack                |
+|--------------|---------------------------|
+| **Headings** | `'Quicksand', sans-serif` |
+| **Body**     | `'Nunito', sans-serif`    |
 
 > These fonts are loaded via **Next.js Font Optimization** in `_app.js` for improved performance and reduced layout shift.
 

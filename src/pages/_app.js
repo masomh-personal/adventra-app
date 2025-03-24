@@ -1,16 +1,16 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import '@/styles/globals.css';
-import { Work_Sans, Hind_Madurai } from 'next/font/google';
+import { Quicksand, Nunito } from 'next/font/google';
 
 // Load fonts with specific weights and attach to CSS variables
-const headingFont = Work_Sans({
+const headingFont = Quicksand({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-heading',
 });
 
-const bodyFont = Hind_Madurai({
+const bodyFont = Nunito({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-body',
