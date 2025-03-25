@@ -74,7 +74,10 @@ export default function Header() {
 
       {/* Mobile Navigation Menu (Dropdown) */}
       {isMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50">
+        <div
+          className="absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50"
+          data-testid="mobile-menu"
+        >
           <nav className="flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white">
             <Link href="/" className="hover:text-primary w-full text-center py-2">
               Home
