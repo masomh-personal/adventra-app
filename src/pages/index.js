@@ -23,13 +23,18 @@ export default function HomePage() {
         </video>
       ) : (
         <div
+          data-testid="gradient-fallback"
           className="absolute inset-0 bg-gradient-to-r from-green-800 to-blue-900 z-[-1]"
           aria-hidden="true"
         />
       )}
 
       {/* Dark Overlay for Better Text Readability */}
-      <div className="absolute inset-0 bg-black opacity-40 z-[-1]" aria-hidden="true" />
+      <div
+        data-testid="dark-overlay"
+        className="absolute inset-0 bg-black opacity-40 z-[-1]"
+        aria-hidden="true"
+      />
 
       {/* Main Content */}
       <section className="z-10 px-4 py-12 md:py-16 space-y-6 max-w-3xl mx-auto">
