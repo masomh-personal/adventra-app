@@ -1,131 +1,152 @@
+// src/components/__tests__/SignupPage.test.js
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import SignupPage from '../signup';
+import SignupPage from '@/pages/signup';
 
-describe('SignupPage Tests', () => {
-  // Mock alert function
-  window.alert = jest.fn();
+// Mock the FormWrapper component
+jest.mock('@/components/FormWrapper', () => {
+  return ({ children, onSubmit, submitLabel, loading }) => {
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const formData = {
+        name: document.getElementById('name')?.value || '',
+        email: document.getElementById('email')?.value || '',
+        password: document.getElementById('password')?.value || '',
+      };
+      const mockReset = jest.fn();
+      onSubmit(formData, { reset: mockReset });
+    };
+
+    return (
+      <form data-testid="signup-form" onSubmit={handleSubmit}>
+        {typeof children === 'function'
+          ? children({
+              register: jest.fn(),
+              errors: {},
+              watch: jest.fn(),
+              setValue: jest.fn(),
+            })
+          : children}
+        <button type="submit" data-testid="submit-button" disabled={loading}>
+          {submitLabel}
+        </button>
+      </form>
+    );
+  };
+});
+
+// Mock the FormField component
+jest.mock('@/components/FormField', () => {
+  return ({ id, label, type, placeholder, helpText }) => {
+    return (
+      <div data-testid={`form-field-${id}`}>
+        <label htmlFor={id}>{label}</label>
+        <input id={id} type={type} placeholder={placeholder || ''} data-testid={id} />
+        {helpText && <p data-testid={`help-text-${id}`}>{helpText}</p>}
+      </div>
+    );
+  };
+});
+
+describe('SignupPage', () => {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+  const originalAlert = window.alert;
+  const originalSetTimeout = setTimeout;
 
   beforeEach(() => {
-    window.alert.mockClear();
+    // Mock console methods and setTimeout
+    console.log = jest.fn();
+    console.error = jest.fn();
+    window.alert = jest.fn();
     jest.useFakeTimers();
   });
 
   afterEach(() => {
+    // Restore original methods
+    console.log = originalConsoleLog;
+    console.error = originalConsoleError;
+    window.alert = originalAlert;
     jest.useRealTimers();
+    jest.clearAllMocks();
   });
 
-  // Test rendering of components
-  it('renders all form elements correctly', () => {
-    render(<SignupPage />);
-
-    // Check heading and UI elements
-    expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
-    expect(screen.getByText(/already have an account/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /login here/i })).toHaveAttribute('href', '/login');
-
-    // Check form fields
-    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-
-    // Check button
-    expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
-
-    // Check help text
-    expect(screen.getByText(/must be at least 10 characters with/i)).toBeInTheDocument();
-  });
-
-  // Test form interaction
-  it('allows form values to be entered and maintained', () => {
-    render(<SignupPage />);
-
-    // Input test values
-    const nameInput = screen.getByLabelText(/full name/i);
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-
-    fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
-    fireEvent.change(emailInput, { target: { value: 'jane@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'StrongP@ssw0rd' } });
-
-    // Verify values are set
-    expect(nameInput).toHaveValue('Jane Doe');
-    expect(emailInput).toHaveValue('jane@example.com');
-    expect(passwordInput).toHaveValue('StrongP@ssw0rd');
-  });
-
-  // Test form submission with valid data
-  // TODO: will be adding API logic here to test
-  it.skip('handles form submission with valid data', async () => {
-    render(<SignupPage />);
-
-    // Fill form with valid data
-    fireEvent.change(screen.getByLabelText(/full name/i), {
-      target: { value: 'Jane Doe' },
-    });
-    fireEvent.change(screen.getByLabelText(/email address/i), {
-      target: { value: 'jane@example.com' },
-    });
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: 'StrongP@ssw0rd' },
+  describe('Rendering', () => {
+    it('should render the signup form with correct title', () => {
+      render(<SignupPage />);
+      expect(screen.getByText('🏕️ Create Your Account')).toBeInTheDocument();
     });
 
-    // Submit the form
-    fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
-
-    // Check loading state
-    const submitButton = screen.getByRole('button');
-    expect(submitButton).toBeDisabled();
-    expect(submitButton).toHaveTextContent(/submitting/i);
-
-    // Fast-forward timers to complete the mock API call
-    jest.advanceTimersByTime(1000);
-
-    await waitFor(() => {
-      expect(window.alert).toHaveBeenCalled();
+    it('should render all required form fields', () => {
+      render(<SignupPage />);
+      expect(screen.getByTestId('form-field-name')).toBeInTheDocument();
+      expect(screen.getByTestId('form-field-email')).toBeInTheDocument();
+      expect(screen.getByTestId('form-field-password')).toBeInTheDocument();
     });
 
-    // Verify button returns to normal state
-    await waitFor(() => {
-      expect(submitButton).not.toBeDisabled();
-      expect(submitButton).toHaveTextContent(/sign up/i);
+    it('should display password help text', () => {
+      render(<SignupPage />);
+      const helpText = screen.getByTestId('help-text-password');
+      expect(helpText).toBeInTheDocument();
+      expect(helpText).toHaveTextContent(
+        'NOTE: Must be at least 10 characters with uppercase, lowercase, number, and special character'
+      );
+    });
+
+    it('should render login link for existing users', () => {
+      render(<SignupPage />);
+      const loginLink = screen.getByText('Login here');
+      expect(loginLink).toBeInTheDocument();
+      expect(loginLink).toHaveAttribute('href', '/login');
+      expect(loginLink).toHaveClass('text-primary');
     });
   });
 
-  // UI accessibility test
-  it('ensures form elements have proper accessibility attributes', () => {
-    render(<SignupPage />);
+  describe('Form Functionality', () => {
+    it('should call handleSignup with form data when submitted', async () => {
+      render(<SignupPage />);
 
-    // Check that labels are properly connected to inputs
-    const nameLabel = screen.getByText(/full name/i);
-    const emailLabel = screen.getByText(/email address/i);
-    const passwordLabel = screen.getByText(/password/i);
+      // Fill in the form
+      fireEvent.change(screen.getByTestId('name'), {
+        target: { value: 'John Doe' },
+      });
 
-    const nameInput = screen.getByLabelText(/full name/i);
-    const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+      fireEvent.change(screen.getByTestId('email'), {
+        target: { value: 'john@example.com' },
+      });
 
-    expect(nameLabel).toHaveAttribute('for', nameInput.id);
-    expect(emailLabel).toHaveAttribute('for', emailInput.id);
-    expect(passwordLabel).toHaveAttribute('for', passwordInput.id);
-  });
+      fireEvent.change(screen.getByTestId('password'), {
+        target: { value: 'StrongP@ssw0rd' },
+      });
 
-  // Test help text visibility
-  it('shows correct helper text for password field', () => {
-    render(<SignupPage />);
+      // Submit the form
+      fireEvent.click(screen.getByTestId('submit-button'));
 
-    const helpText = screen.getByText(/must be at least 10 characters with/i);
-    expect(helpText).toBeVisible();
-    expect(helpText).toHaveClass('text-gray-500');
-  });
+      // Check that the button is disabled during submission
+      expect(screen.getByTestId('submit-button')).toBeDisabled();
 
-  // Test login link functionality
-  it('has a working login link', () => {
-    render(<SignupPage />);
+      // Verify console.log was called with form data
+      expect(console.log).toHaveBeenCalledWith('Signup data:', {
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'StrongP@ssw0rd',
+      });
 
-    const loginLink = screen.getByRole('link', { name: /login here/i });
-    expect(loginLink).toHaveAttribute('href', '/login');
+      // Fast-forward timers to complete the simulated API call
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      // Verify alert was called with success message
+      await waitFor(() => {
+        expect(window.alert).toHaveBeenCalledWith('Signup successful! (placeholder)');
+      });
+
+      // Check that the button is re-enabled after submission
+      await waitFor(() => {
+        expect(screen.getByTestId('submit-button')).not.toBeDisabled();
+      });
+    });
   });
 });
