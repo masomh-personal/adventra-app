@@ -1,7 +1,7 @@
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 font-body">
+    <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 font-body my-8">
         <h1 className="text-3xl font-heading mb-6 text-primary">Privacy Policy</h1>
 
         <p className="mb-4 leading-relaxed">
@@ -68,7 +68,7 @@ export default function PrivacyPolicyPage() {
         </ul>
 
         {/* Section 6 */}
-        <h2 className="text-2xl font-heading mt-8 mb-3 text-secondary">6. Children’s Privacy</h2>
+        <h2 className="text-2xl font-heading mt-8 mb-3 text-secondary">6. Children's Privacy</h2>
         <p className="mb-4">
           Adventra is not intended for users under 18. We do not knowingly collect data from
           children. Contact us if you believe a minor has provided data.
