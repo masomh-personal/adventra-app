@@ -1,37 +1,54 @@
+// src/lib/withAuth.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
 
-export default function withAuth(Component) {
+export default function withAuth(Component, options = {}) {
+  const { redirectIfAuthenticated = false } = options;
+
   return function AuthProtected(props) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-      const checkUser = async () => {
+      (async () => {
         try {
           const {
             data: { session },
             error,
           } = await supabase.auth.getSession();
 
-          if (error || !session) {
-            await router.push('/login');
+          // Check for any errors during session retrieval
+          if (error) {
+            console.error('Session retrieval error:', error);
+            // Optionally, you might want to set user to null or handle the error differently
+            setUser(null);
             return;
           }
 
-          setUser(session.user);
+          if (session) {
+            setUser(session.user);
+
+            // Only redirect if redirectIfAuthenticated is true
+            if (redirectIfAuthenticated) {
+              await router.push('/dashboard');
+              return;
+            }
+          }
+
+          // If no session and not redirecting, set user to null
+          if (!session) {
+            setUser(null);
+          }
         } catch (err) {
-          console.error('Auth check error:', err);
-          await router.push('/login');
+          console.error('Unexpected auth check error:', err);
+          setUser(null);
         } finally {
           setLoading(false);
         }
-      };
-
-      checkUser();
-    }, [router]);
+      })();
+    }, [router, redirectIfAuthenticated]);
 
     if (loading) {
       return (
