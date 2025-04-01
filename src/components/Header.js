@@ -1,24 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import supabase from '@/lib/supabaseClient';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // Close menu when route changes
+  // Check authentication status on component mount
   useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+
+    checkUser();
+
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    // Close menu when route changes
     const handleRouteChange = () => {
       setIsMenuOpen(false);
     };
 
     router.events.on('routeChangeStart', handleRouteChange);
 
-    // Clean up the event listener when component unmounts
+    // Clean up listeners
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
+      authListener.subscription.unsubscribe();
     };
   }, [router]);
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error logging out:', error);
+        return;
+      }
+
+      // Properly await the router push
+      await router.push('/login');
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -67,9 +101,15 @@ export default function Header() {
         <Link href="/contact" className="hover:text-primary">
           Contact
         </Link>
-        <Link href="/login" className="hover:text-primary">
-          Login
-        </Link>
+        {user ? (
+          <button onClick={handleLogout} className="hover:text-primary">
+            Logout
+          </button>
+        ) : (
+          <Link href="/login" className="hover:text-primary">
+            Login
+          </Link>
+        )}
       </nav>
 
       {/* Mobile Navigation Menu (Dropdown) */}
@@ -88,9 +128,15 @@ export default function Header() {
             <Link href="/contact" className="hover:text-primary w-full text-center py-2">
               Contact
             </Link>
-            <Link href="/login" className="hover:text-primary w-full text-center py-2">
-              Login
-            </Link>
+            {user ? (
+              <button onClick={handleLogout} className="hover:text-primary w-full text-center py-2">
+                Logout
+              </button>
+            ) : (
+              <Link href="/login" className="hover:text-primary w-full text-center py-2">
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       )}
