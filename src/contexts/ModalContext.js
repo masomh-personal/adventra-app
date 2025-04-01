@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const ModalContext = createContext({
   openModal: () => {},
@@ -6,11 +6,22 @@ const ModalContext = createContext({
   showErrorModal: () => {},
 });
 
-const ErrorModal = ({ title, message, onClose }) => (
-  <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+const ErrorModal = ({ title = 'Error', message, onClose }) => (
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full"
+  >
     <div className="flex justify-between items-center border-b pb-3 mb-4">
-      <h2 className="text-xl font-bold text-red-600">{title || 'Error'}</h2>
-      <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+      <h2 id="modal-title" className="text-xl font-bold text-red-600">
+        {title}
+      </h2>
+      <button
+        onClick={onClose}
+        className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+        aria-label="Close"
+      >
         ×
       </button>
     </div>
@@ -44,25 +55,43 @@ export const ModalProvider = ({ children }) => {
     [openModal, closeModal]
   );
 
+  // Escape key support
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    if (modalContent) {
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [modalContent, closeModal]);
+
   return (
-    <ModalContext.Provider
-      value={{
-        openModal,
-        closeModal,
-        showErrorModal,
-      }}
-    >
+    <ModalContext.Provider value={{ openModal, closeModal, showErrorModal }}>
       {children}
       {modalContent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="relative">{modalContent}</div>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={closeModal} // Click backdrop to close
+        >
+          <div
+            className="relative max-w-full"
+            onClick={(e) => e.stopPropagation()} // Prevent close on modal click
+          >
+            {modalContent}
+          </div>
         </div>
       )}
     </ModalContext.Provider>
   );
 };
 
-// Custom hook for using the modal context
 export const useModal = () => {
   const context = useContext(ModalContext);
   if (!context) {
