@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Button from '@/components/Button';
-import { useState } from 'react';
+import withAuth from '@/lib/withAuth';
 
-export default function HomePage() {
+function HomePage() {
   const router = useRouter();
   const [videoError, setVideoError] = useState(false);
 
@@ -56,3 +57,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+export default withAuth(HomePage, { redirectIfAuthenticated: true });
