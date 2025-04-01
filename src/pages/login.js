@@ -11,50 +11,48 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Check if user is already logged in
-  useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        await router.push('/dashboard');
-      }
-    };
-
-    checkUser();
-  }, [router]);
-
+  // Improved error handling for authentication
   const handleLogin = async (data) => {
+    // Reset any previous errors
     setError('');
     setLoading(true);
 
     try {
-      // Authenticate with Supabase
+      // Destructure to avoid throwing an error if undefined
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
+      // Check for authentication error first
       if (authError) {
-        throw authError;
+        // Specific error handling without throwing an error (and Next.js showing error window)
+        switch (authError.message) {
+          case 'Invalid login credentials':
+            setError('Invalid email or password. Please try again.');
+            break;
+          case 'Email not confirmed':
+            setError('Please verify your email before logging in.');
+            break;
+          default:
+            setError('An unexpected error occurred. Please try again.');
+        }
+        return; // Exit the function to prevent further execution
       }
 
-      console.log('Login successful:', authData);
-
-      // Redirect to dashboard after successful login
-      await router.push('/dashboard');
+      // Only proceed if no error
+      if (authData.user) {
+        // Use replace instead of push to prevent going back to log in
+        await router.replace('/dashboard');
+      }
     } catch (err) {
-      // Handle specific error types for better user experience
-      if (err.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please try again.');
-      } else if (err.message.includes('Email not confirmed')) {
-        setError('Please verify your email before logging in.');
-      } else {
-        setError(err.message || 'An error occurred while logging in');
-      }
-      console.error('Login error:', err);
+      // Catch any unexpected errors
+      setError('An unexpected error occurred. Please try again.');
+
+      // Log for debugging, but don't expose internal details to user
+      console.error('Unexpected login error:', err);
     } finally {
+      // Always reset loading state
       setLoading(false);
     }
   };
@@ -64,25 +62,30 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithOAuth({
+      // Destructure to handle potential errors gracefully
+      const { error: authError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          // Ensure this matches your actual redirect setup
+          redirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
+      // Handle any SSO-specific errors
       if (authError) {
-        throw authError;
+        setError(`Failed to login with ${provider}: ${authError.message}`);
+        setLoading(false);
       }
-
-      // No need to redirect - Supabase handles the redirect flow
+      // No need to do anything else - Supabase handles redirect
     } catch (err) {
-      setError(`Failed to login with ${provider}: ${err.message}`);
-      console.error('SSO login error:', err);
+      // Catch-all for any unexpected errors
+      setError(`An unexpected error occurred with ${provider} login.`);
+      console.error('SSO login unexpected error:', err);
       setLoading(false);
     }
   };
 
+  // Simple error handler on form (but we are showing user error for invalid credentials)
   const handleFormError = (errors) => {
     console.error('Form validation errors:', errors);
   };
