@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { loginSchema } from '@/validation/loginSchema';
@@ -11,12 +11,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        await router.push('/dashboard');
+      }
+    };
+
+    checkUser();
+  }, [router]);
+
   const handleLogin = async (data) => {
     setError('');
     setLoading(true);
 
     try {
-      // Real authentication using Supabase
+      // Authenticate with Supabase
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -29,9 +43,16 @@ export default function LoginPage() {
       console.log('Login successful:', authData);
 
       // Redirect to dashboard after successful login
-      router.push('/dashboard');
+      await router.push('/dashboard');
     } catch (err) {
-      setError(err.message || 'An error occurred while logging in');
+      // Handle specific error types for better user experience
+      if (err.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please try again.');
+      } else if (err.message.includes('Email not confirmed')) {
+        setError('Please verify your email before logging in.');
+      } else {
+        setError(err.message || 'An error occurred while logging in');
+      }
       console.error('Login error:', err);
     } finally {
       setLoading(false);
@@ -78,7 +99,7 @@ export default function LoginPage() {
           validationSchema={loginSchema}
           onSubmit={handleLogin}
           onError={handleFormError}
-          submitLabel="Login"
+          submitLabel={loading ? 'Logging in...' : 'Login'}
           loading={loading}
         >
           <FormField label="Email Address" type="email" id="email" placeholder="you@example.com" />
