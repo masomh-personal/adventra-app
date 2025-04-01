@@ -77,11 +77,11 @@ export const ModalProvider = ({ children }) => {
       {children}
       {modalContent && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={closeModal} // Click backdrop to close
         >
           <div
-            className="relative max-w-full"
+            className="relative transform scale-95 animate-scale-in"
             onClick={(e) => e.stopPropagation()} // Prevent close on modal click
           >
             {modalContent}

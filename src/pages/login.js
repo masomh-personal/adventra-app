@@ -1,91 +1,77 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { loginSchema } from '@/validation/loginSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 import supabase from '@/lib/supabaseClient';
+import { useModal } from '@/contexts/ModalContext';
 
 export default function LoginPage() {
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { showErrorModal } = useModal();
 
-  // Improved error handling for authentication
-  const handleLogin = async (data) => {
-    // Reset any previous errors
-    setError('');
+  const [loading, setLoading] = React.useState(false);
+
+  // Handles standard login with email and password
+  const handleLogin = async ({ email, password }) => {
     setLoading(true);
 
     try {
-      // Destructure to avoid throwing an error if undefined
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
 
-      // Check for authentication error first
-      if (authError) {
-        // Specific error handling without throwing an error (and Next.js showing error window)
-        switch (authError.message) {
+      if (error) {
+        switch (error.message) {
           case 'Invalid login credentials':
-            setError('Invalid email or password. Please try again.');
+            showErrorModal('Invalid email or password. Please try again.', 'Login Failed');
             break;
           case 'Email not confirmed':
-            setError('Please verify your email before logging in.');
+            showErrorModal('Please verify your email before logging in.', 'Email Not Confirmed');
             break;
           default:
-            setError('An unexpected error occurred. Please try again.');
+            showErrorModal('An unexpected error occurred. Please try again later.', 'Login Error');
         }
-        return; // Exit the function to prevent further execution
+        return;
       }
 
-      // Only proceed if no error
-      if (authData.user) {
-        // Use replace instead of push to prevent going back to log in
+      if (data?.user) {
         await router.replace('/dashboard');
       }
     } catch (err) {
-      // Catch any unexpected errors
-      setError('An unexpected error occurred. Please try again.');
-
-      // Log for debugging, but don't expose internal details to user
       console.error('Unexpected login error:', err);
+      showErrorModal('An unexpected error occurred during login.', 'Login Error');
     } finally {
-      // Always reset loading state
       setLoading(false);
     }
   };
 
+  // Handles third-party OAuth login
   const handleSSOLogin = async (provider) => {
-    setError('');
     setLoading(true);
 
     try {
-      // Destructure to handle potential errors gracefully
-      const { error: authError } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          // Ensure this matches your actual redirect setup
           redirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
-      // Handle any SSO-specific errors
-      if (authError) {
-        setError(`Failed to login with ${provider}: ${authError.message}`);
-        setLoading(false);
+      if (error) {
+        showErrorModal(`Failed to login with ${provider}: ${error.message}`, 'SSO Login Failed');
       }
-      // No need to do anything else - Supabase handles redirect
     } catch (err) {
-      // Catch-all for any unexpected errors
-      setError(`An unexpected error occurred with ${provider} login.`);
-      console.error('SSO login unexpected error:', err);
+      console.error(`SSO login error with ${provider}:`, err);
+      showErrorModal(`An unexpected error occurred with ${provider} login.`, 'SSO Login Error');
+    } finally {
       setLoading(false);
     }
   };
 
-  // Simple error handler on form (but we are showing user error for invalid credentials)
+  // Handles form validation errors
   const handleFormError = (errors) => {
     console.error('Form validation errors:', errors);
   };
@@ -96,8 +82,6 @@ export default function LoginPage() {
         <h2 className="text-3xl font-heading text-center mb-2">🏕️ Login to Adventra</h2>
         <hr className="border-t border-gray-300 mb-6" />
 
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">{error}</div>}
-
         <FormWrapper
           validationSchema={loginSchema}
           onSubmit={handleLogin}
@@ -106,24 +90,23 @@ export default function LoginPage() {
           loading={loading}
         >
           <FormField label="Email Address" type="email" id="email" placeholder="you@example.com" />
-
           <FormField
             label="Password"
             type="password"
             id="password"
             placeholder="Enter your password"
           />
-
           <FormField type="checkbox" id="rememberMe" label="Remember me" />
 
           <p className="text-center text-sm mt-4">
-            Don't have an account?{' '}
+            Don’t have an account?{' '}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up here
             </Link>
           </p>
         </FormWrapper>
 
+        {/* Divider */}
         <div className="mt-6 relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
@@ -133,6 +116,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* SSO Buttons */}
         <div className="mt-6 grid grid-cols-2 gap-4">
           <button
             onClick={() => handleSSOLogin('google')}
@@ -173,7 +157,7 @@ export default function LoginPage() {
             className="flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-[#1877F2] hover:bg-[#166FE5] transition-colors"
           >
             <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385h-3.047v-3.47h3.047v-2.642c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.514c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385c5.737-.9 10.125-5.864 10.125-11.854z" />
+              <path d="M24 12.073c0-6.627-5.373-12-12-12S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047v-2.642c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.514c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.063 24 12.073z" />
             </svg>
             Facebook
           </button>
