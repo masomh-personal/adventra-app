@@ -8,16 +8,16 @@ export default function Header() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // Check authentication status on component mount
   useEffect(() => {
-    const checkUser = async () => {
+    // Fetch initial session
+    const fetchSession = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       setUser(session?.user || null);
     };
 
-    checkUser();
+    fetchSession();
 
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
@@ -47,7 +47,7 @@ export default function Header() {
         return;
       }
 
-      // Properly await the router push
+      // Properly await router push
       await router.push('/login');
     } catch (error) {
       console.error('Unexpected logout error:', error);
@@ -102,9 +102,14 @@ export default function Header() {
           Contact
         </Link>
         {user ? (
-          <button onClick={handleLogout} className="hover:text-primary">
-            Logout
-          </button>
+          <>
+            <Link href="/dashboard" className="hover:text-primary">
+              Dashboard
+            </Link>
+            <button onClick={handleLogout} className="hover:text-primary">
+              Logout
+            </button>
+          </>
         ) : (
           <Link href="/login" className="hover:text-primary">
             Login
@@ -129,9 +134,17 @@ export default function Header() {
               Contact
             </Link>
             {user ? (
-              <button onClick={handleLogout} className="hover:text-primary w-full text-center py-2">
-                Logout
-              </button>
+              <>
+                <Link href="/dashboard" className="hover:text-primary w-full text-center py-2">
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="hover:text-primary w-full text-center py-2"
+                >
+                  Logout
+                </button>
+              </>
             ) : (
               <Link href="/login" className="hover:text-primary w-full text-center py-2">
                 Login
