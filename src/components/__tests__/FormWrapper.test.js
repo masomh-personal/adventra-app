@@ -198,7 +198,7 @@ describe('FormWrapper', () => {
       });
 
       // Button should change to "Submitting..." during submission
-      expect(submitButton).toHaveTextContent('Submitting...');
+      expect(submitButton).toHaveTextContent('Loading...');
       expect(submitButton).toBeDisabled();
 
       // Wait for submission to complete

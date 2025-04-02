@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Button from '@/components/Button';
 
 /**
  * Reusable Form Wrapper with react-hook-form + Yup validation
@@ -92,15 +93,16 @@ export default function FormWrapper({
             })}
       </div>
 
-      {/* Submit button */}
+      {/* Submit button using custom Button component */}
       <div className="pt-2">
-        <button
+        <Button
           type="submit"
-          disabled={isSubmitting || loading}
-          className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting || loading ? 'Submitting...' : submitLabel}
-        </button>
+          label={submitLabel}
+          isLoading={loading || isSubmitting}
+          disabled={loading || isSubmitting}
+          className="w-full"
+          size="lg"
+        />
       </div>
     </form>
   );
