@@ -24,8 +24,8 @@ export default function Button({
     secondary: 'bg-secondary text-white hover:bg-primary',
     outline:
       'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white',
-    ghost: 'bg-transparent text-primary hover:bg-gray-100 border border-transparent',
-    subtle: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    ghost: 'bg-gray-100 text-primary hover:bg-gray-200 border border-transparent',
+    subtle: 'bg-gray-200 text-gray-700 hover:bg-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700',
   };
 
