@@ -25,7 +25,7 @@ const ErrorModal = ({ title = 'Error', message, onClose }) => (
         ×
       </button>
     </div>
-    <p className="text-gray-700 mb-4">{message}</p>
+    <p className="text-gray-700 font-bold mb-4">{message}</p>
     <div className="flex justify-end">
       <button
         onClick={onClose}
