@@ -133,7 +133,7 @@ export default function FormField({
   return (
     <div className="form-field">
       {type !== 'checkbox' && (
-        <label htmlFor={id} className="block font-heading mb-1">
+        <label htmlFor={id} className="block font-heading mb-1 font-bold">
           {label}
         </label>
       )}
