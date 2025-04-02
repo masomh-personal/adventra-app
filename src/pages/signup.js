@@ -1,28 +1,60 @@
 import React, { useState } from 'react';
-import { signupSchema } from '@/validation/signupSchema.';
-import FormWrapper from '../components/FormWrapper';
-import FormField from '../components/FormField';
+import { useRouter } from 'next/router';
+import { signupSchema } from '@/validation/signupSchema';
+import FormWrapper from '@/components/FormWrapper';
+import FormField from '@/components/FormField';
+import supabase from '@/lib/supabaseClient';
+import { useModal } from '@/contexts/ModalContext';
+import DividerWithText from '@/components/DividerWithText';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { showErrorModal } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSignup = async (data, { reset }) => {
+  const handleSignup = async ({ name, email, password }) => {
     setIsSubmitting(true);
-    try {
-      // Simulate API call
-      console.log('Signup data:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Handle successful signup
-      alert('Signup successful! (placeholder)');
-      // Optionally reset the form or redirect
-      // reset();
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('Signup failed: ' + (error.message || 'Unknown error'));
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name }, // You can customize this field in Supabase
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (error) {
+        const errMsg =
+          error.message === 'User already registered'
+            ? 'This email is already registered. Please log in instead.'
+            : error.message || 'An unexpected error occurred during signup.';
+
+        const title = error.message === 'User already registered' ? 'Email Exists' : 'Signup Error';
+
+        return showErrorModal(errMsg, title);
+      }
+
+      if (data?.user) {
+        showErrorModal(
+          'Please check your email to confirm your account before logging in.',
+          'Signup Successful!'
+        );
+
+        // Optional: redirect after short delay
+        // setTimeout(() => router.push('/login'), 3000);
+      }
+    } catch (err) {
+      console.error('Unexpected signup error:', err);
+      showErrorModal('An unexpected error occurred. Please try again.', 'Signup Error');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFormError = (errors) => {
+    console.error('Form validation errors:', errors);
   };
 
   return (
@@ -34,7 +66,8 @@ export default function SignupPage() {
         <FormWrapper
           validationSchema={signupSchema}
           onSubmit={handleSignup}
-          submitLabel="Sign Up"
+          onError={handleFormError}
+          submitLabel={isSubmitting ? 'Signing Up...' : 'Sign Up'}
           loading={isSubmitting}
         >
           <FormField label="Full Name" type="text" id="name" placeholder="Your name" />
@@ -46,7 +79,6 @@ export default function SignupPage() {
             type="password"
             id="password"
             placeholder="Create a password"
-            helpText="NOTE: Must be at least 10 characters with uppercase, lowercase, number, and special character"
             registerOptions={{
               minLength: {
                 value: 10,
@@ -54,6 +86,16 @@ export default function SignupPage() {
               },
             }}
           />
+
+          <FormField
+            label="Confirm Password"
+            type="password"
+            id="confirmPassword"
+            placeholder="Re-enter your password"
+          />
+
+          {/* Divider */}
+          <DividerWithText />
 
           <p className="text-center text-sm mt-4">
             Already have an account?{' '}
