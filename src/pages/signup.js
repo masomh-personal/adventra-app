@@ -6,10 +6,11 @@ import FormField from '@/components/FormField';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
 import DividerWithText from '@/components/DividerWithText';
+import InfoBox from '@/components/InfoBox';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { showErrorModal } = useModal();
+  const { showErrorModal, showSuccessModal } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignup = async ({ name, email, password }) => {
@@ -20,31 +21,41 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          data: { full_name: name }, // You can customize this field in Supabase
+          data: { full_name: name },
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
 
-      if (error) {
-        const errMsg =
-          error.message === 'User already registered'
-            ? 'This email is already registered. Please log in instead.'
-            : error.message || 'An unexpected error occurred during signup.';
+      console.log('🔐 Supabase response:', { data, error });
 
-        const title = error.message === 'User already registered' ? 'Email Exists' : 'Signup Error';
+      // Catch known edge case: ghost user created but no identity
+      if (data?.user && data.user.identities?.length === 0) {
+        return showErrorModal(
+          'This email is already registered and awaiting confirmation. Please check your inbox or spam folder.',
+          'Signup Already Pending'
+        );
+      }
+
+      if (error || !data?.user) {
+        const errMsg =
+          error?.message === 'User already registered'
+            ? 'This email is already registered. Please log in instead.'
+            : error?.message || 'Signup failed. Please try again.';
+
+        const title =
+          error?.message === 'User already registered' || !data?.user
+            ? 'Signup Error'
+            : 'Unexpected Error';
 
         return showErrorModal(errMsg, title);
       }
 
-      if (data?.user) {
-        showErrorModal(
-          'Please check your email to confirm your account before logging in.',
-          'Signup Successful!'
-        );
-
-        // Optional: redirect after short delay
-        // setTimeout(() => router.push('/login'), 3000);
-      }
+      // Signup success
+      showSuccessModal(
+        'Please check your email to confirm your account before logging in.',
+        'Signup Successful!',
+        () => router.push('/')
+      );
     } catch (err) {
       console.error('Unexpected signup error:', err);
       showErrorModal('An unexpected error occurred. Please try again.', 'Signup Error');
@@ -92,6 +103,18 @@ export default function SignupPage() {
             type="password"
             id="confirmPassword"
             placeholder="Re-enter your password"
+          />
+
+          {/* InfoBox */}
+          <InfoBox
+            variant="info"
+            message={
+              <>
+                Password must be at least <strong>10 characters</strong> and include an{' '}
+                <strong>uppercase letter</strong>,<strong> lowercase letter</strong>, a{' '}
+                <strong>number</strong>, and a <strong>special character</strong>.
+              </>
+            }
           />
 
           {/* Divider */}
