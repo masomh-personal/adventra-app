@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { FiAlertCircle, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
 const ModalContext = createContext({
@@ -32,7 +33,7 @@ const BaseModal = ({
   message,
   onClose,
   variant = 'info',
-  closeLabel = 'Close',
+  closeButtonLabel = 'Close',
 }) => (
   <div
     role="dialog"
@@ -62,7 +63,7 @@ const BaseModal = ({
         onClick={onClose}
         className={`px-4 py-2 text-white rounded ${BUTTON_CLASSES[variant]}`}
       >
-        {closeLabel}
+        {closeButtonLabel}
       </button>
     </div>
   </div>
@@ -71,20 +72,20 @@ const BaseModal = ({
 export const ModalProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
   const [isClosing, setIsClosing] = useState(false);
-  const [afterCloseCallback, setAfterCloseCallback] = useState(null);
+  const router = useRouter();
 
   const closeModal = useCallback(() => {
-    setModalContent(null); // visually hide modal
-    setIsClosing(true); // trigger spinner overlay
+    const callback = modalContent?.props?.onClose;
+    setModalContent(null);
+    setIsClosing(true);
 
     setTimeout(() => {
       setIsClosing(false);
-      if (typeof afterCloseCallback === 'function') {
-        afterCloseCallback();
-        setAfterCloseCallback(null); // reset callback
+      if (typeof callback === 'function') {
+        callback();
       }
     }, 750);
-  }, [afterCloseCallback]);
+  }, [modalContent]);
 
   const openModal = useCallback((content) => {
     setModalContent(content);
@@ -92,20 +93,31 @@ export const ModalProvider = ({ children }) => {
 
   const showModal = useCallback(
     (variant) =>
-      (message, title, onClose = null, closeLabel = 'Close') => {
-        if (onClose) {
-          setAfterCloseCallback(() => onClose);
-        }
-
-        openModal(
+      (message, title, onClose, closeButtonLabel = 'Close') => {
+        const modal = (
           <BaseModal
             title={title}
             message={message}
             onClose={closeModal}
             variant={variant}
-            closeLabel={closeLabel}
+            closeButtonLabel={closeButtonLabel}
           />
         );
+
+        // Save reference to custom onClose if provided
+        if (typeof onClose === 'function') {
+          setModalContent(
+            <BaseModal
+              title={title}
+              message={message}
+              onClose={onClose}
+              variant={variant}
+              closeButtonLabel={closeButtonLabel}
+            />
+          );
+        } else {
+          openModal(modal);
+        }
       },
     [openModal, closeModal]
   );
@@ -114,6 +126,7 @@ export const ModalProvider = ({ children }) => {
   const showSuccessModal = showModal('success');
   const showInfoModal = showModal('info');
 
+  // Close modal on ESC key
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -130,9 +143,29 @@ export const ModalProvider = ({ children }) => {
     };
   }, [modalContent, closeModal]);
 
+  // CLEANUP MODAL ON ROUTE CHANGE
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setModalContent(null);
+      setIsClosing(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router]);
+
   return (
     <ModalContext.Provider
-      value={{ openModal, closeModal, showErrorModal, showSuccessModal, showInfoModal }}
+      value={{
+        openModal,
+        closeModal,
+        showErrorModal,
+        showSuccessModal,
+        showInfoModal,
+      }}
     >
       {children}
       {modalContent && (
