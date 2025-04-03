@@ -26,8 +26,6 @@ export default function SignupPage() {
         },
       });
 
-      console.log('🔐 Supabase response:', { data, error });
-
       // Catch known edge case: ghost user created but no identity
       if (data?.user && data.user.identities?.length === 0) {
         return showErrorModal(
@@ -52,9 +50,10 @@ export default function SignupPage() {
 
       // Signup success
       showSuccessModal(
-        'Please check your email to confirm your account before logging in.',
+        'Your account has been successfully created! Please check your email inbox (and spam folder) to verify your email address before logging in. Once verified, you can log in and begin using all the app features.',
         'Signup Successful!',
-        () => router.push('/')
+        () => router.push('/'),
+        'Go to Homepage'
       );
     } catch (err) {
       console.error('Unexpected signup error:', err);
