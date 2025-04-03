@@ -1,12 +1,39 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { FiAlertCircle, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
 const ModalContext = createContext({
   openModal: () => {},
   closeModal: () => {},
   showErrorModal: () => {},
+  showSuccessModal: () => {},
+  showInfoModal: () => {},
 });
 
-const ErrorModal = ({ title = 'Error', message, onClose }) => (
+const ICONS = {
+  error: <FiAlertCircle className="text-red-600 w-6 h-6 mr-2" />,
+  success: <FiCheckCircle className="text-green-600 w-6 h-6 mr-2" />,
+  info: <FiInfo className="text-blue-600 w-6 h-6 mr-2" />,
+};
+
+const TITLE_CLASSES = {
+  error: 'text-red-600',
+  success: 'text-green-600',
+  info: 'text-blue-600',
+};
+
+const BUTTON_CLASSES = {
+  error: 'bg-red-500 hover:bg-red-600',
+  success: 'bg-green-500 hover:bg-green-600',
+  info: 'bg-blue-500 hover:bg-blue-600',
+};
+
+const BaseModal = ({
+  title = 'Notice',
+  message,
+  onClose,
+  variant = 'info',
+  closeLabel = 'Close',
+}) => (
   <div
     role="dialog"
     aria-modal="true"
@@ -14,7 +41,11 @@ const ErrorModal = ({ title = 'Error', message, onClose }) => (
     className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full"
   >
     <div className="flex justify-between items-center border-b pb-3 mb-4">
-      <h2 id="modal-title" className="text-xl font-bold text-red-600">
+      <h2
+        id="modal-title"
+        className={`text-xl font-bold flex items-center ${TITLE_CLASSES[variant]}`}
+      >
+        {ICONS[variant]}
         {title}
       </h2>
       <button
@@ -29,9 +60,9 @@ const ErrorModal = ({ title = 'Error', message, onClose }) => (
     <div className="flex justify-end">
       <button
         onClick={onClose}
-        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        className={`px-4 py-2 text-white rounded ${BUTTON_CLASSES[variant]}`}
       >
-        Close
+        {closeLabel}
       </button>
     </div>
   </div>
@@ -39,23 +70,50 @@ const ErrorModal = ({ title = 'Error', message, onClose }) => (
 
 export const ModalProvider = ({ children }) => {
   const [modalContent, setModalContent] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const [afterCloseCallback, setAfterCloseCallback] = useState(null);
+
+  const closeModal = useCallback(() => {
+    setModalContent(null); // visually hide modal
+    setIsClosing(true); // trigger spinner overlay
+
+    setTimeout(() => {
+      setIsClosing(false);
+      if (typeof afterCloseCallback === 'function') {
+        afterCloseCallback();
+        setAfterCloseCallback(null); // reset callback
+      }
+    }, 750);
+  }, [afterCloseCallback]);
 
   const openModal = useCallback((content) => {
     setModalContent(content);
   }, []);
 
-  const closeModal = useCallback(() => {
-    setModalContent(null);
-  }, []);
+  const showModal = useCallback(
+    (variant) =>
+      (message, title, onClose = null, closeLabel = 'Close') => {
+        if (onClose) {
+          setAfterCloseCallback(() => onClose);
+        }
 
-  const showErrorModal = useCallback(
-    (message, title) => {
-      openModal(<ErrorModal title={title} message={message} onClose={closeModal} />);
-    },
+        openModal(
+          <BaseModal
+            title={title}
+            message={message}
+            onClose={closeModal}
+            variant={variant}
+            closeLabel={closeLabel}
+          />
+        );
+      },
     [openModal, closeModal]
   );
 
-  // Escape key support
+  const showErrorModal = showModal('error');
+  const showSuccessModal = showModal('success');
+  const showInfoModal = showModal('info');
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -73,18 +131,25 @@ export const ModalProvider = ({ children }) => {
   }, [modalContent, closeModal]);
 
   return (
-    <ModalContext.Provider value={{ openModal, closeModal, showErrorModal }}>
+    <ModalContext.Provider
+      value={{ openModal, closeModal, showErrorModal, showSuccessModal, showInfoModal }}
+    >
       {children}
       {modalContent && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4"
-          onClick={closeModal} // Click backdrop to close
+          onClick={closeModal}
         >
           <div
             className="relative transform scale-95 animate-scale-in"
-            onClick={(e) => e.stopPropagation()} // Prevent close on modal click
+            onClick={(e) => e.stopPropagation()}
           >
             {modalContent}
+            {isClosing && (
+              <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
+                <div className="animate-spin h-6 w-6 border-2 border-t-transparent border-gray-800 rounded-full" />
+              </div>
+            )}
           </div>
         </div>
       )}
