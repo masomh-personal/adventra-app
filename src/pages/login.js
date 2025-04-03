@@ -92,7 +92,7 @@ export default function LoginPage() {
   const handleSSOLogin = (provider) => {
     showErrorModal(
       `We are so sorry, SSO login with ${provider} is currently under development.`,
-      '⚠️ SSO Under Development'
+      'SSO Under Development'
     );
   };
 
