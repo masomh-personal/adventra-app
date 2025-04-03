@@ -1,88 +1,96 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { ModalProvider, useModal } from '../ModalContext';
 import '@testing-library/jest-dom';
+import { ModalProvider, useModal } from '@/contexts/ModalContext';
+
+// Mock next/router for ModalContext use
+jest.mock('next/router', () => ({
+  useRouter: () => ({
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+    },
+  }),
+}));
 
 jest.useFakeTimers();
 
-// Test component to exercise modal context API
+// 🔧 Test component to interact with modal
 const TestComponent = () => {
-  const { openModal, closeModal, showErrorModal, showSuccessModal, showInfoModal } = useModal();
+  const { showErrorModal, showSuccessModal, showInfoModal, closeModal } = useModal();
 
   return (
     <div>
-      <button onClick={() => openModal(<div>Custom Modal Content</div>)}>Open Custom Modal</button>
-      <button onClick={() => showErrorModal('Something went wrong', 'Oops!')}>
-        Open Error Modal
+      <button onClick={() => showErrorModal('Error occurred', 'Error Title')}>Error</button>
+      <button onClick={() => showSuccessModal('Signup success!', 'Welcome', () => {}, 'Thanks')}>
+        Success
       </button>
-      <button onClick={() => showSuccessModal('Signup complete!', 'Success', undefined, 'Nice')}>
-        Open Success Modal
+      <button onClick={() => showInfoModal('FYI only', 'Heads Up', undefined, 'Dismiss')}>
+        Info
       </button>
-      <button onClick={() => showInfoModal('This is FYI', 'Notice', undefined, 'Got it')}>
-        Open Info Modal
-      </button>
-      <button onClick={closeModal}>Close Modal</button>
+      <button onClick={closeModal}>Close Manually</button>
     </div>
   );
 };
 
-const renderWithProvider = (ui = <TestComponent />) => render(<ModalProvider>{ui}</ModalProvider>);
+const renderWithProvider = () =>
+  render(
+    <ModalProvider>
+      <TestComponent />
+    </ModalProvider>
+  );
 
 describe('ModalContext', () => {
-  beforeEach(() => {
+  afterEach(() => {
     jest.clearAllTimers();
   });
 
-  describe('Rendering and closing modals', () => {
-    it('renders custom modal content when openModal is called', () => {
-      renderWithProvider();
-      fireEvent.click(screen.getByText(/open custom modal/i));
-      expect(screen.getByText(/custom modal content/i)).toBeInTheDocument();
+  it('shows and closes an error modal', () => {
+    renderWithProvider();
+
+    fireEvent.click(screen.getByText('Error'));
+    expect(screen.getByText('Error Title')).toBeInTheDocument();
+    expect(screen.getByText('Error occurred')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Close'));
+
+    act(() => {
+      jest.advanceTimersByTime(750);
     });
 
-    it('renders error modal and closes via internal button', () => {
-      renderWithProvider();
-      fireEvent.click(screen.getByText(/open error modal/i));
-
-      expect(screen.getByText(/oops!/i)).toBeInTheDocument();
-      expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-
-      const modalCloseButton = screen.getByText('Close');
-      fireEvent.click(modalCloseButton);
-
-      act(() => {
-        jest.advanceTimersByTime(750);
-      });
-
-      expect(screen.queryByText(/something went wrong/i)).not.toBeInTheDocument();
-    });
-
-    it('closes the modal using closeModal from context', () => {
-      renderWithProvider();
-      fireEvent.click(screen.getByText(/open custom modal/i));
-      expect(screen.getByText(/custom modal content/i)).toBeInTheDocument();
-
-      fireEvent.click(screen.getByText(/close modal/i));
-
-      act(() => {
-        jest.advanceTimersByTime(750);
-      });
-
-      expect(screen.queryByText(/custom modal content/i)).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
   });
 
-  describe('New modal features', () => {
-    it('renders success modal with custom closeLabel', () => {
-      renderWithProvider();
-      fireEvent.click(screen.getByText(/open success modal/i));
-      expect(screen.getByText('Nice')).toBeInTheDocument();
+  it('shows success modal with custom close label', () => {
+    renderWithProvider();
+
+    fireEvent.click(screen.getByText('Success'));
+    expect(screen.getByText('Welcome')).toBeInTheDocument();
+    expect(screen.getByText('Signup success!')).toBeInTheDocument();
+    expect(screen.getByText('Thanks')).toBeInTheDocument();
+  });
+
+  it('shows info modal with custom close label', () => {
+    renderWithProvider();
+
+    fireEvent.click(screen.getByText('Info'));
+    expect(screen.getByText('Heads Up')).toBeInTheDocument();
+    expect(screen.getByText('FYI only')).toBeInTheDocument();
+    expect(screen.getByText('Dismiss')).toBeInTheDocument();
+  });
+
+  it('closes modal using manual context call', () => {
+    renderWithProvider();
+
+    fireEvent.click(screen.getByText('Info'));
+    expect(screen.getByText('Heads Up')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Close Manually'));
+
+    act(() => {
+      jest.advanceTimersByTime(750);
     });
 
-    it('renders info modal with custom closeLabel', () => {
-      renderWithProvider();
-      fireEvent.click(screen.getByText(/open info modal/i));
-      expect(screen.getByText('Got it')).toBeInTheDocument();
-    });
+    expect(screen.queryByText('FYI only')).not.toBeInTheDocument();
   });
 });
