@@ -28,12 +28,20 @@ const variants = {
   },
 };
 
-export default function InfoBox({ message, variant = 'info', className = '' }) {
+export default function InfoBox({
+  message,
+  variant = 'info',
+  className = '',
+  role = 'status',
+  testId = 'info-box',
+}) {
   const selected = variants[variant] || variants.info;
 
   return (
     <div className={`mt-4 flex justify-center ${className}`}>
       <div
+        role={role}
+        data-testid={testId}
         className={`flex items-start gap-2 max-w-md px-4 py-2 rounded-md border text-sm
           ${selected.bg} ${selected.border} ${selected.text}`}
       >
