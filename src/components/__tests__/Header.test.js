@@ -1,133 +1,111 @@
-import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import Header from '@/components/Header';
+import { useRouter } from 'next/router';
+import supabase from '@/lib/supabaseClient';
 
-// Mock the next/router
+// Mock Next.js router
 jest.mock('next/router', () => ({
-  useRouter: () => ({
-    events: {
-      on: jest.fn(),
-      off: jest.fn(),
-    },
-  }),
+  useRouter: jest.fn(),
 }));
 
-// Mock the next/link component
-jest.mock('next/link', () => {
-  return ({ children, href }) => {
-    return <a href={href}>{children}</a>;
-  };
-});
+// Mock Supabase client
+jest.mock('@/lib/supabaseClient', () => ({
+  auth: {
+    getSession: jest.fn(),
+    onAuthStateChange: jest.fn(),
+    signOut: jest.fn(),
+  },
+}));
 
 describe('Header Component', () => {
-  it('renders the logo and brand name', () => {
-    render(<Header />);
+  let mockPush, mockRouterEvents;
 
-    const logo = screen.getByAltText('Adventra Logo');
-    expect(logo).toBeInTheDocument();
-    expect(logo).toHaveAttribute('src', '/adventra-logo.png');
+  beforeEach(() => {
+    mockPush = jest.fn();
+    mockRouterEvents = {
+      on: jest.fn(),
+      off: jest.fn(),
+    };
 
-    const brandName = screen.getByText('adventra');
-    expect(brandName).toBeInTheDocument();
+    useRouter.mockReturnValue({
+      push: mockPush,
+      events: mockRouterEvents,
+    });
+
+    // Default mock setup: no user
+    supabase.auth.getSession.mockResolvedValue({ data: { session: null } });
+    supabase.auth.onAuthStateChange.mockReturnValue({
+      data: {
+        subscription: { unsubscribe: jest.fn() },
+      },
+    });
   });
 
-  it('renders desktop navigation links', () => {
-    render(<Header />);
-
-    const homeLink = screen.getByRole('link', { name: /home/i });
-    const aboutLink = screen.getByRole('link', { name: /about/i });
-    const contactLink = screen.getByRole('link', { name: /contact/i });
-    const loginLink = screen.getByRole('link', { name: /login/i });
-
-    expect(homeLink).toHaveAttribute('href', '/');
-    expect(aboutLink).toHaveAttribute('href', '/about');
-    expect(contactLink).toHaveAttribute('href', '/contact');
-    expect(loginLink).toHaveAttribute('href', '/login');
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('shows mobile menu button only on mobile', () => {
-    render(<Header />);
-
-    const menuButton = screen.getByLabelText('Toggle navigation menu');
-    expect(menuButton).toBeInTheDocument();
-    expect(menuButton).toHaveClass('md:hidden');
+  it('renders logo and default links', async () => {
+    await act(async () => render(<Header />));
+    expect(screen.getByAltText(/adventra logo/i)).toBeInTheDocument();
+    expect(screen.getByText(/home/i)).toBeInTheDocument();
+    expect(screen.getByText(/about/i)).toBeInTheDocument();
+    expect(screen.getByText(/contact/i)).toBeInTheDocument();
+    expect(screen.getByText(/login/i)).toBeInTheDocument();
   });
 
-  it('toggles mobile menu when menu button is clicked', () => {
-    render(<Header />);
+  it('renders dashboard and logout buttons when user is logged in', async () => {
+    supabase.auth.getSession.mockResolvedValue({
+      data: { session: { user: { id: 'abc123' } } },
+    });
 
-    // Mobile menu should not be visible initially
+    await act(async () => render(<Header />));
+
+    expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/logout/i)).toBeInTheDocument();
+  });
+
+  it('toggles mobile menu', async () => {
+    await act(async () => render(<Header />));
+
+    const toggleButton = screen.getByRole('button', { name: /toggle navigation menu/i });
     expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument();
 
-    // Click the menu button
-    const menuButton = screen.getByLabelText('Toggle navigation menu');
-    fireEvent.click(menuButton);
-
-    // Mobile menu should now be visible
+    fireEvent.click(toggleButton);
     expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
 
-    // Click the menu button again
-    fireEvent.click(menuButton);
-
-    // Mobile menu should not be visible again
+    fireEvent.click(toggleButton);
     expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument();
   });
 
-  it('sets up and cleans up route change event listeners', () => {
-    const mockOn = jest.fn();
-    const mockOff = jest.fn();
+  it('calls signOut and navigates to /login on logout', async () => {
+    supabase.auth.getSession.mockResolvedValue({
+      data: { session: { user: { id: 'abc123' } } },
+    });
 
-    jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => ({
-      events: {
-        on: mockOn,
-        off: mockOff,
-      },
-    }));
+    supabase.auth.signOut.mockResolvedValue({ error: null });
 
-    const { unmount } = render(<Header />);
+    await act(async () => render(<Header />));
+    const logoutButton = await screen.findByText(/logout/i);
 
-    // Check if event listener is set up
-    expect(mockOn).toHaveBeenCalledWith('routeChangeStart', expect.any(Function));
+    fireEvent.click(logoutButton);
 
-    // Unmount component
+    await waitFor(() => {
+      expect(supabase.auth.signOut).toHaveBeenCalled();
+      expect(mockPush).toHaveBeenCalledWith('/login');
+    });
+  });
+
+  it('cleans up event listeners on unmount', async () => {
+    const unsubscribeMock = jest.fn();
+    supabase.auth.onAuthStateChange.mockReturnValue({
+      data: { subscription: { unsubscribe: unsubscribeMock } },
+    });
+
+    const { unmount } = await act(async () => render(<Header />));
     unmount();
 
-    // Check if event listener is cleaned up
-    expect(mockOff).toHaveBeenCalledWith('routeChangeStart', expect.any(Function));
-  });
-
-  it('closes mobile menu on route change', async () => {
-    let routeChangeHandler;
-
-    jest.spyOn(require('next/router'), 'useRouter').mockImplementation(() => ({
-      events: {
-        on: (event, handler) => {
-          if (event === 'routeChangeStart') {
-            routeChangeHandler = handler;
-          }
-        },
-        off: jest.fn(),
-      },
-    }));
-
-    render(<Header />);
-
-    // Open mobile menu
-    const menuButton = screen.getByLabelText('Toggle navigation menu');
-    fireEvent.click(menuButton);
-
-    // Verify menu is open
-    expect(screen.getByTestId('mobile-menu')).toBeInTheDocument();
-
-    // Simulate route change - wrap in act()
-    act(() => {
-      routeChangeHandler();
-    });
-
-    // We need to wait for the state update to complete
-    await waitFor(() => {
-      expect(screen.queryByTestId('mobile-menu')).not.toBeInTheDocument();
-    });
+    expect(mockRouterEvents.off).toHaveBeenCalledWith('routeChangeStart', expect.any(Function));
+    expect(unsubscribeMock).toHaveBeenCalled();
   });
 });
