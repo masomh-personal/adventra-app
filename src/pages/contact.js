@@ -17,7 +17,6 @@ export default function ContactPage() {
     // Simulate fake API delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    console.log('Form data submitted:', data);
     setSubmitted(true);
     reset();
   };
@@ -43,6 +42,8 @@ export default function ContactPage() {
             <InfoBox
               variant="success"
               message="Thanks for reaching out! Your message has been sent successfully. You should hear back from us within 1–2 business days. Hold tight — we appreciate your patience!"
+              role="alert"
+              testId="success-message"
             />
             <div className="mt-6 flex justify-center gap-4">
               <Button
