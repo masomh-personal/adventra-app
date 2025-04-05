@@ -1,5 +1,4 @@
 import { FaSpinner } from 'react-icons/fa';
-
 export default function Button({
   label,
   onClick,
@@ -12,6 +11,8 @@ export default function Button({
   loadingLabel = 'Loading...',
   leftIcon = null,
   rightIcon = null,
+  testId = 'button',
+  role = 'button',
 }) {
   const sizeStyles = {
     sm: 'px-3 py-1 text-xs',
@@ -38,6 +39,8 @@ export default function Button({
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
+      data-testid={testId}
+      role={role}
       className={`
         ${baseStyle}
         ${sizeStyles[size] || sizeStyles.lg}
@@ -46,13 +49,8 @@ export default function Button({
         ${className}
       `}
     >
-      {/* Left Icon */}
       {isLoading ? <FaSpinner className="animate-spin h-4 w-4" /> : leftIcon}
-
-      {/* Button Label */}
       {isLoading ? loadingLabel : label}
-
-      {/* Right Icon */}
       {!isLoading && rightIcon}
     </button>
   );

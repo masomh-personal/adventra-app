@@ -72,4 +72,67 @@ describe('Button', () => {
     expect(button.className).toMatch(/focus:ring-2/);
     expect(button.className).toMatch(/focus:ring-primary/);
   });
+
+  it('uses custom testId prop', () => {
+    render(<Button label="Test ID" onClick={() => {}} testId="custom-button-id" />);
+    expect(screen.getByTestId('custom-button-id')).toBeInTheDocument();
+  });
+
+  it('applies secondary variant class', () => {
+    render(<Button label="Secondary" onClick={() => {}} variant="secondary" />);
+    const button = screen.getByText(/Secondary/i);
+    expect(button).toHaveClass('bg-secondary');
+    expect(button).toHaveClass('hover:bg-primary');
+  });
+
+  it('applies danger variant class', () => {
+    render(<Button label="Danger" onClick={() => {}} variant="danger" />);
+    const button = screen.getByText(/Danger/i);
+    expect(button).toHaveClass('bg-red-600');
+    expect(button).toHaveClass('hover:bg-red-700');
+  });
+
+  it('applies base size class', () => {
+    render(<Button label="Base Size" onClick={() => {}} size="base" />);
+    const button = screen.getByText(/Base Size/i);
+    expect(button.className).toMatch(/text-sm/);
+    expect(button.className).toMatch(/px-4 py-2/);
+  });
+
+  it('uses default type button', () => {
+    render(<Button label="Default Type" onClick={() => {}} />);
+    const button = screen.getByText(/Default Type/i);
+    expect(button).toHaveAttribute('type', 'button');
+  });
+
+  it('sets submit type correctly', () => {
+    render(<Button label="Submit Button" onClick={() => {}} type="submit" />);
+    const button = screen.getByText(/Submit Button/i);
+    expect(button).toHaveAttribute('type', 'submit');
+  });
+
+  it('applies ghost variant class', () => {
+    render(<Button label="Ghost" onClick={() => {}} variant="ghost" />);
+    const button = screen.getByText(/Ghost/i);
+    expect(button).toHaveClass('bg-gray-100');
+    expect(button).toHaveClass('text-primary');
+    expect(button).toHaveClass('hover:bg-gray-200');
+  });
+
+  it('uses default testId when not specified', () => {
+    render(<Button label="Default TestId" onClick={() => {}} />);
+    expect(screen.getByTestId('button')).toBeInTheDocument();
+  });
+
+  it('uses default role of button', () => {
+    render(<Button label="Role Test" onClick={() => {}} />);
+    const button = screen.getByText(/Role Test/i);
+    expect(button).toHaveAttribute('role', 'button');
+  });
+
+  it('allows custom role to be specified', () => {
+    render(<Button label="Custom Role" onClick={() => {}} role="link" />);
+    const button = screen.getByText(/Custom Role/i);
+    expect(button).toHaveAttribute('role', 'link');
+  });
 });
