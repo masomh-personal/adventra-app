@@ -19,16 +19,16 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 ## **Tech Stack**
 
-| **Technology**      | **Purpose**                     |
-| ------------------- | ------------------------------- |
-| **Next.js**         | Frontend framework              |
-| **React**           | UI components                   |
-| **Tailwind CSS**    | Styling framework               |
-| **PostgreSQL**      | Database                        |
-| **Prisma**          | ORM for database management     |
-| **Vercel**          | Hosting & deployment            |
-| **GitHub Projects** | Agile project management        |
-| **GitHub**          | Version control & documentation |
+| **Technology**    | **Purpose**                    |
+|-------------------|--------------------------------|
+| **Next.js**       | Frontend framework             |
+| **React**         | UI components                  |
+| **Tailwind CSS**  | Styling framework              |
+| **PostgreSQL**    | Database                       |
+| **Supabase**      | Backend-as-a-service (BaaS)    |
+| **Vercel**        | Hosting & deployment           |
+| **GitHub Projects** | Agile project management       |
+| **GitHub**        | Version control & documentation |
 
 ---
 
