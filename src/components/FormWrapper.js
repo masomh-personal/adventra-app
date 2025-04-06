@@ -32,7 +32,7 @@ export default function FormWrapper({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting, isValid, touchedFields },
     reset,
     control,
     watch,
@@ -41,7 +41,8 @@ export default function FormWrapper({
   } = useForm({
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
     defaultValues,
-    mode: 'onChange', // Enables real-time validation feedback
+    mode: 'onTouched', // Trigger validation on blur/touch
+    reValidateMode: 'onChange', // Re-validate when typing after touch
   });
 
   const isButtonDisabled = loading || isSubmitting || !isValid;
@@ -49,6 +50,7 @@ export default function FormWrapper({
   const formContext = {
     register,
     errors,
+    touchedFields,
     control,
     watch,
     setValue,

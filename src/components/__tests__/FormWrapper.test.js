@@ -92,13 +92,22 @@ describe('FormWrapper', () => {
   });
 
   describe('validation', () => {
-    it('shows error messages when fields are empty', async () => {
+    it('shows error messages when fields are empty after blur', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit} onError={mockOnError}>
           <FormField id="name" label="Name" />
           <FormField id="email" label="Email" />
         </FormWrapper>
       );
+
+      // Simulate the user touching (focusing + blurring) both fields
+      await act(async () => {
+        fireEvent.focus(screen.getByLabelText('Name'));
+        fireEvent.blur(screen.getByLabelText('Name'));
+
+        fireEvent.focus(screen.getByLabelText('Email'));
+        fireEvent.blur(screen.getByLabelText('Email'));
+      });
 
       await act(async () => {
         fireEvent.submit(screen.getByRole('form'));
