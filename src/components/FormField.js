@@ -15,6 +15,7 @@ export default function FormField({
   className = '',
   disabled = false,
   helpText,
+  ...props // Allows props like onChange to be passed in
 }) {
   const hasError = errors && id && errors[id];
   const registerFn = register || (() => ({}));
@@ -23,16 +24,30 @@ export default function FormField({
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
+  const getInputProps = () => ({
+    id,
+    placeholder,
+    disabled,
+    className: baseInputClasses,
+    ...registerFn(id, {
+      ...registerOptions,
+      onChange: (e) => {
+        registerOptions?.onChange?.(e);
+        props?.onChange?.(e);
+      },
+      onBlur: (e) => {
+        registerOptions?.onBlur?.(e);
+        props?.onBlur?.(e);
+      },
+    }),
+    ...props,
+  });
+
   const renderInput = () => {
     switch (type) {
       case 'select':
         return (
-          <select
-            id={id}
-            {...registerFn(id, registerOptions)}
-            className={baseInputClasses}
-            disabled={disabled}
-          >
+          <select {...getInputProps()}>
             {placeholder && (
               <option value="" disabled>
                 {placeholder}
@@ -47,28 +62,17 @@ export default function FormField({
         );
 
       case 'textarea':
-        return (
-          <textarea
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-            rows={4}
-          />
-        );
+        return <textarea rows={4} {...getInputProps()} />;
 
       case 'checkbox':
         return (
           <div className="flex items-center">
             <input
               type="checkbox"
-              id={id}
-              {...registerFn(id, registerOptions)}
+              {...getInputProps()}
               className={`h-4 w-4 text-primary focus:ring-primary ${
                 hasError ? 'border-red-500' : 'border-gray-300'
               } ${className}`}
-              disabled={disabled}
             />
             <label htmlFor={id} className="ml-2 block text-sm">
               {label}
@@ -100,16 +104,7 @@ export default function FormField({
         );
 
       default:
-        return (
-          <input
-            type={type}
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-          />
-        );
+        return <input type={type} {...getInputProps()} />;
     }
   };
 
