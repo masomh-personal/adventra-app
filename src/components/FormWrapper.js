@@ -66,6 +66,7 @@ export default function FormWrapper({
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit(handleFormSubmit, onError)}
       className={`space-y-4 ${className}`}
       role="form"
