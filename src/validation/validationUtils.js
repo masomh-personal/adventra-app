@@ -12,10 +12,10 @@ export const passwordValidation = yup
 
 export const emailValidation = yup
   .string()
-  .email('Please enter a valid email address') // basic structure validation
-  .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Email must include a valid domain like .com') // strict domain check
+  .email('Please enter a valid email address')
+  .matches(/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/, 'Email must include a valid domain like ".com" or ".net"')
   .required('Email is required')
-  .transform((value) => value.toLowerCase()); // Normalize email to lowercase
+  .transform((val) => (typeof val === 'string' ? val.toLowerCase() : val));
 
 export const nameValidation = yup
   .string()
