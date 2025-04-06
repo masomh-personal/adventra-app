@@ -12,9 +12,9 @@ export const passwordValidation = yup
 
 export const emailValidation = yup
   .string()
+  .required('Email is required')
   .email('Please enter a valid email address')
   .matches(/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/, 'Email must include a valid domain like ".com" or ".net"')
-  .required('Email is required')
   .transform((val) => (typeof val === 'string' ? val.toLowerCase() : val));
 
 export const nameValidation = yup
