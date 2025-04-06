@@ -67,6 +67,8 @@ export default function FormWrapper({
     }
   };
 
+  const shouldRenderSubmitButton = typeof submitLabel === 'string' && submitLabel.trim() !== '';
+
   return (
     <form
       noValidate
@@ -91,17 +93,19 @@ export default function FormWrapper({
             })}
       </div>
 
-      <div className="pt-2">
-        <Button
-          type="submit"
-          label={submitLabel}
-          isLoading={loading || isSubmitting}
-          isValid={isValid}
-          disabled={isButtonDisabled}
-          className="w-full"
-          size="lg"
-        />
-      </div>
+      {shouldRenderSubmitButton && (
+        <div className="pt-2">
+          <Button
+            type="submit"
+            label={submitLabel}
+            isLoading={loading || isSubmitting}
+            isValid={isValid}
+            disabled={isButtonDisabled}
+            className="w-full"
+            size="lg"
+          />
+        </div>
+      )}
     </form>
   );
 }

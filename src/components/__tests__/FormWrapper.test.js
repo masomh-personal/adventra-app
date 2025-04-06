@@ -56,7 +56,7 @@ describe('FormWrapper', () => {
       expect(screen.getByText('Test Form')).toBeInTheDocument();
       expect(screen.getByLabelText('Name')).toBeInTheDocument();
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
     });
 
     it('renders custom submit button label', async () => {
@@ -66,7 +66,19 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
+    });
+
+    it('does not render submit button if submitLabel is an empty string', async () => {
+      await safeRender(
+        <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
+          <FormField id="name" label="Name" />
+          <FormField id="email" label="Email" />
+        </FormWrapper>
+      );
+
+      const buttons = screen.queryAllByRole('button');
+      expect(buttons.length).toBe(0);
     });
 
     it('renders without title if not provided', async () => {
@@ -87,7 +99,20 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      expect(screen.getByRole('button')).toBeDisabled();
+      const button = screen.getByRole('button', { name: /submit/i });
+      expect(button).toBeDisabled();
+    });
+
+    it('does not render submit button if submitLabel is an empty string', async () => {
+      await safeRender(
+        <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
+          <FormField id="name" label="Name" />
+          <FormField id="email" label="Email" />
+        </FormWrapper>
+      );
+
+      const buttons = screen.queryAllByRole('button');
+      expect(buttons.length).toBe(0); // Should not render a submit button at all
     });
   });
 
@@ -100,11 +125,9 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      // Simulate the user touching (focusing + blurring) both fields
       await act(async () => {
         fireEvent.focus(screen.getByLabelText('Name'));
         fireEvent.blur(screen.getByLabelText('Name'));
-
         fireEvent.focus(screen.getByLabelText('Email'));
         fireEvent.blur(screen.getByLabelText('Email'));
       });
@@ -161,14 +184,14 @@ describe('FormWrapper', () => {
       await fillField('Name', 'Test User');
       await fillField('Email', 'test@example.com');
 
-      const button = screen.getByRole('button');
+      const button = screen.getByRole('button', { name: /submit/i });
 
       await act(async () => {
         fireEvent.click(button);
       });
 
       expect(button).toBeDisabled();
-      expect(button).toHaveTextContent('Processing...');
+      expect(button).toHaveTextContent(/processing/i);
       expect(screen.getByTestId('spinner')).toBeInTheDocument();
 
       await waitFor(() => {
