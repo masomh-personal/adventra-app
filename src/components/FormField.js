@@ -20,7 +20,7 @@ export default function FormField({
   type = 'text',
   id,
   register,
-  errors = {}, // Provide default empty object to prevent undefined errors
+  errors = {},
   placeholder,
   options = [],
   registerOptions = {},
@@ -28,51 +28,52 @@ export default function FormField({
   disabled = false,
   helpText,
 }) {
-  // Safely check for errors
   const hasError = errors && id && errors[id];
+  const registerFn = register || (() => ({}));
 
-  // Base classes for input styling with defensive error checking
   const baseInputClasses = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
-  // Different input rendering based on type
   const renderInput = () => {
-    // Ensure register function exists
-    const registerFn = register || (() => ({}));
-
     switch (type) {
       case 'select':
         return (
-          <select
-            id={id}
-            {...registerFn(id, registerOptions)}
-            className={baseInputClasses}
-            disabled={disabled}
-          >
-            {placeholder && (
-              <option value="" disabled>
-                {placeholder}
-              </option>
-            )}
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <>
+            <select
+              id={id}
+              {...registerFn(id, registerOptions)}
+              className={baseInputClasses}
+              disabled={disabled}
+            >
+              {placeholder && (
+                <option value="" disabled>
+                  {placeholder}
+                </option>
+              )}
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+          </>
         );
 
       case 'textarea':
         return (
-          <textarea
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-            rows={4}
-          />
+          <>
+            <textarea
+              id={id}
+              {...registerFn(id, registerOptions)}
+              placeholder={placeholder}
+              className={baseInputClasses}
+              disabled={disabled}
+              rows={4}
+            />
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+          </>
         );
 
       case 'checkbox':
@@ -90,6 +91,7 @@ export default function FormField({
             <label htmlFor={id} className="ml-2 block text-sm">
               {label}
             </label>
+            {hasError && <p className="text-red-500 text-sm ml-2">{errors[id].message}</p>}
           </div>
         );
 
@@ -113,19 +115,23 @@ export default function FormField({
                 </label>
               </div>
             ))}
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
           </div>
         );
 
       default:
         return (
-          <input
-            type={type}
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-          />
+          <>
+            <input
+              type={type}
+              id={id}
+              {...registerFn(id, registerOptions)}
+              placeholder={placeholder}
+              className={baseInputClasses}
+              disabled={disabled}
+            />
+            {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+          </>
         );
     }
   };
@@ -139,7 +145,6 @@ export default function FormField({
       )}
       {renderInput()}
       {helpText && !hasError && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
-      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
     </div>
   );
 }
