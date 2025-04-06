@@ -1,4 +1,5 @@
 import { ImSpinner9 } from 'react-icons/im';
+import Link from 'next/link';
 
 export default function Button({
   label,
@@ -15,6 +16,9 @@ export default function Button({
   rightIcon = null,
   testId = 'button',
   role = 'button',
+  as = 'button', // 'button' or 'a'
+  href = '',
+  ...rest
 }) {
   const isButtonDisabled = disabled || isLoading || !isValid;
 
@@ -32,6 +36,11 @@ export default function Button({
     ghost: 'bg-gray-100 text-primary hover:bg-gray-200 border border-transparent',
     subtle: 'bg-gray-200 text-gray-700 hover:bg-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700',
+    tertiary: 'bg-tertiary text-white hover:bg-primary', // fits dark/navy vibes
+    link: 'bg-transparent text-primary underline hover:text-secondary p-0', // mimics a text link
+    muted: 'bg-[#e2e2e2] text-gray-700 hover:bg-[#d0d0d0]', // neutral/disabled-ish button
+    clean: 'bg-white text-primary border border-gray-300 hover:bg-gray-100', // for dashboards/cards
+    inverse: 'bg-white text-primary hover:text-white hover:bg-primary border border-primary', // good for light/dark switch
   };
 
   const baseStyle =
@@ -40,23 +49,17 @@ export default function Button({
   const disabledStyle = 'opacity-50 cursor-not-allowed';
   const invalidStyle = 'bg-gray-300 text-gray-500 hover:bg-gray-300';
 
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={isButtonDisabled}
-      aria-disabled={isButtonDisabled}
-      data-testid={testId}
-      role={role}
-      className={`
-        ${baseStyle}
-        ${sizeStyles[size] || sizeStyles.lg}
-        ${variants[variant] || variants.primary}
-        ${isButtonDisabled ? disabledStyle : ''}
-        ${!isValid && !isLoading && !disabled ? invalidStyle : ''}
-        ${className}
-      `}
-    >
+  const combinedClassName = `
+    ${baseStyle}
+    ${sizeStyles[size] || sizeStyles.lg}
+    ${variants[variant] || variants.primary}
+    ${isButtonDisabled ? disabledStyle : ''}
+    ${!isValid && !isLoading && !disabled ? invalidStyle : ''}
+    ${className}
+  `;
+
+  const content = (
+    <>
       {isLoading ? (
         <ImSpinner9
           data-testid="spinner"
@@ -67,6 +70,37 @@ export default function Button({
       )}
       {isLoading ? loadingLabel : label}
       {!isLoading && rightIcon}
+    </>
+  );
+
+  if (as === 'a') {
+    return (
+      <Link href={href} passHref legacyBehavior>
+        <a
+          className={combinedClassName}
+          data-testid={testId}
+          role={role}
+          aria-disabled={isButtonDisabled}
+          {...rest}
+        >
+          {content}
+        </a>
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={isButtonDisabled}
+      aria-disabled={isButtonDisabled}
+      data-testid={testId}
+      role={role}
+      className={combinedClassName}
+      {...rest}
+    >
+      {content}
     </button>
   );
 }
