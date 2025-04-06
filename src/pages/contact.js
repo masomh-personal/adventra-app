@@ -51,12 +51,14 @@ export default function ContactPage() {
                 variant="primary"
                 size="base"
                 onClick={() => router.push('/')}
+                testId="return-home-btn"
               />
               <Button
                 label="Go to Login"
                 variant="outline"
                 size="base"
                 onClick={() => router.push('/login')}
+                testId="go-to-login-btn"
               />
             </div>
           </>
