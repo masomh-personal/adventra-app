@@ -32,7 +32,7 @@ export default function FormWrapper({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
     control,
     watch,
@@ -41,10 +41,11 @@ export default function FormWrapper({
   } = useForm({
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
     defaultValues,
-    mode: 'onBlur',
+    mode: 'onChange', // Enables real-time validation feedback
   });
 
-  // Provide form context to all children
+  const isButtonDisabled = loading || isSubmitting || !isValid;
+
   const formContext = {
     register,
     errors,
@@ -53,9 +54,9 @@ export default function FormWrapper({
     setValue,
     getValues,
     isSubmitting: isSubmitting || loading,
+    isValid,
   };
 
-  // Handler for form submission
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data, { reset, setValue, getValues });
@@ -74,33 +75,27 @@ export default function FormWrapper({
     >
       {title && <h2 className="text-2xl font-heading text-center">{title}</h2>}
 
-      {/* Render children with form context */}
       <div className="space-y-4">
         {typeof children === 'function'
           ? children(formContext)
           : React.Children.map(children, (child) => {
-              // Check if it's a valid element before adding props
               if (React.isValidElement(child)) {
-                // Only pass form context to custom components, not to DOM elements
                 if (typeof child.type === 'function') {
-                  // This is a custom component (like FormField)
                   return React.cloneElement(child, { ...formContext, ...child.props });
-                } else {
-                  // This is a DOM element (like p, div, etc.)
-                  return child;
                 }
+                return child;
               }
               return child;
             })}
       </div>
 
-      {/* Submit button using custom Button component */}
       <div className="pt-2">
         <Button
           type="submit"
           label={submitLabel}
           isLoading={loading || isSubmitting}
-          disabled={loading || isSubmitting}
+          isValid={isValid}
+          disabled={isButtonDisabled}
           className="w-full"
           size="lg"
         />
