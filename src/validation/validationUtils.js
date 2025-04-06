@@ -1,14 +1,39 @@
 import * as yup from 'yup';
 
-// REUSABLE/SHARED validation rules
-export const passwordValidation = yup
-  .string()
-  .min(10, 'Password must be at least 10 characters')
-  .matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-    'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character'
-  )
-  .required('Password is required');
+// Centralized criteria used by both Yup and the UI
+export const passwordCriteria = [
+  {
+    label: 'At least 10 characters',
+    test: (val) => val?.length >= 10,
+    yup: (schema) => schema.min(10, 'Password must be at least 10 characters'),
+  },
+  {
+    label: 'Lowercase letter',
+    test: (val) => /[a-z]/.test(val),
+    yup: (schema) => schema.matches(/[a-z]/, 'Must include a lowercase letter'),
+  },
+  {
+    label: 'Uppercase letter',
+    test: (val) => /[A-Z]/.test(val),
+    yup: (schema) => schema.matches(/[A-Z]/, 'Must include an uppercase letter'),
+  },
+  {
+    label: 'Number',
+    test: (val) => /\d/.test(val),
+    yup: (schema) => schema.matches(/\d/, 'Must include a number'),
+  },
+  {
+    label: 'Special character',
+    test: (val) => /[^A-Za-z0-9]/.test(val),
+    yup: (schema) => schema.matches(/[^A-Za-z0-9]/, 'Must include a special character'),
+  },
+];
+
+// Dynamically build Yup schema from criteria array
+export const passwordValidation = passwordCriteria.reduce(
+  (schema, rule) => rule.yup(schema),
+  yup.string().required('Password is required')
+);
 
 export const emailValidation = yup
   .string()
