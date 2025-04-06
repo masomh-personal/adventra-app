@@ -12,7 +12,8 @@ export const passwordValidation = yup
 
 export const emailValidation = yup
   .string()
-  .email('Please enter a valid email address')
+  .email('Please enter a valid email address') // basic structure validation
+  .matches(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, 'Email must include a valid domain like .com') // strict domain check
   .required('Email is required')
   .transform((value) => value.toLowerCase()); // Normalize email to lowercase
 
