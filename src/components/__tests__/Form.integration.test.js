@@ -2,8 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
-
-// Import the actual components we want to test
 import FormWrapper from '../FormWrapper';
 import FormField from '../FormField';
 
