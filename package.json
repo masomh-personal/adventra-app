@@ -10,7 +10,7 @@
     "lint": "next lint",
     "test": "jest --watchAll",
     "test:coverage": "jest --coverage",
-    "clean": "rm -rf node_modules .next package-lock.json && npm cache clean --force && npx jest --clearCache",
+    "clean": "npx jest --clearCache && rm -rf node_modules .next package-lock.json && npm cache clean --force",
     "clean:test": "npx jest --clearCache"
   },
   "dependencies": {
