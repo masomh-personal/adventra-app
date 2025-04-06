@@ -22,7 +22,7 @@ export default function MagicLinkForm({ onSubmit, onCancel, loading }) {
   return (
     <FormWrapper
       validationSchema={schema}
-      onSubmit={({ email }) => onSubmit(email)}
+      onSubmit={({ email }) => onSubmit({ email: email.toLowerCase() })}
       loading={loading}
       className="animate-fade-in"
       submitLabel="" // Hides FormWrapper's default submit

@@ -83,7 +83,7 @@ describe('MagicLinkForm', () => {
       });
 
       await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalledWith('test@example.com');
+        expect(mockOnSubmit).toHaveBeenCalledWith({ email: 'test@example.com' });
       });
     });
 
