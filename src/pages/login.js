@@ -10,15 +10,15 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook, FaInstagram, FaApple } from 'react-icons/fa';
 import Button from '@/components/Button';
 import DividerWithText from '@/components/DividerWithText';
+import MagicLinkForm from '@/components/MagicLinkForm';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { showErrorModal } = useModal();
+  const { showErrorModal, showSuccessModal } = useModal();
   const [loading, setLoading] = useState(false);
   const [showMagicForm, setShowMagicForm] = useState(false);
-  const [magicEmail, setMagicEmail] = useState('');
 
-  // Email/password login
+  // Handle standard login
   const handleLogin = async ({ email, password }) => {
     setLoading(true);
     try {
@@ -53,18 +53,15 @@ export default function LoginPage() {
     }
   };
 
-  // Supabase Magic Link
-  const handleMagicLinkLogin = async (e) => {
-    e.preventDefault();
-    if (!magicEmail) return;
-
-    const mlErrorText = '⚠️ Magic Link Error';
-    const mlSuccessTest = '✅ Magic Link Sent';
+  // Handle magic link login
+  const handleMagicLinkLogin = async ({ email }) => {
+    const mlErrorText = 'Magic Link Error';
+    const mlSuccessText = 'Magic Link Sent';
 
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
-        email: magicEmail,
+        email,
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
         },
@@ -74,8 +71,7 @@ export default function LoginPage() {
         return showErrorModal('Unable to send magic link. Please try again.', mlErrorText);
       }
 
-      showErrorModal('Check your email inbox for a secure login link!', mlSuccessTest);
-      setMagicEmail('');
+      showSuccessModal('Check your email inbox for a secure login link!', mlSuccessText);
       setShowMagicForm(false);
     } catch (err) {
       console.error('Magic link error:', err);
@@ -129,81 +125,72 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
+    <div
+      className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body"
+      data-testid="login-page"
+    >
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
         <h2 className="text-3xl font-heading text-center mb-2">🏕️ Login to Adventra</h2>
         <hr className="border-t border-gray-300 mb-6" />
 
-        <FormWrapper
-          validationSchema={loginSchema}
-          onSubmit={handleLogin}
-          onError={handleFormError}
-          submitLabel={loading ? 'Logging in...' : 'Login'}
-          loading={loading}
-        >
-          <FormField label="Email Address" type="email" id="email" placeholder="you@example.com" />
-          <FormField
-            label="Password"
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-          />
-          {/*<FormField type="checkbox" id="rememberMe" label="Remember me" />*/}
-
-          <p className="text-center text-sm mt-4">
-            Don’t have an account?{' '}
-            <Link href="/signup" className="text-primary hover:underline">
-              Sign up here
-            </Link>
-          </p>
-        </FormWrapper>
+        {/* Standard Email/Password Login Form */}
+        {!showMagicForm && (
+          <FormWrapper
+            validationSchema={loginSchema}
+            onSubmit={handleLogin}
+            onError={handleFormError}
+            submitLabel={loading ? 'Logging in...' : 'Login'}
+            loading={loading}
+            formProps={{ 'data-testid': 'login-form' }}
+          >
+            <FormField
+              label="Email Address"
+              type="email"
+              id="email"
+              placeholder="you@example.com"
+            />
+            <FormField
+              label="Password"
+              type="password"
+              id="password"
+              placeholder="Enter your password"
+            />
+            <p className="text-center text-sm mt-4">
+              Don’t have an account?{' '}
+              <Link href="/signup" className="text-primary hover:underline">
+                Sign up here
+              </Link>
+            </p>
+          </FormWrapper>
+        )}
 
         {/* Magic Link Section */}
         <div className="mt-6">
           {!showMagicForm ? (
             <Button
               label="Login with One-Time Email Link"
-              onClick={() => setShowMagicForm(true)}
-              variant="subtle"
+              onClick={() => {
+                if (!loading) setShowMagicForm(true);
+              }}
+              variant="secondary"
               className="text-sm w-full"
               size="base"
+              aria-label="Switch to magic link login"
+              testId="show-magic"
             />
           ) : (
-            <form onSubmit={handleMagicLinkLogin} className="space-y-3 animate-fade-in">
-              <input
-                type="email"
-                value={magicEmail}
-                onChange={(e) => setMagicEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-
-              <div className="flex gap-4 justify-center">
-                <Button
-                  type="submit"
-                  label="Send One-Time Link"
-                  variant="secondary"
-                  size="base"
-                  disabled={loading}
-                />
-                <Button
-                  type="button"
-                  label="Cancel"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setMagicEmail('');
-                    setShowMagicForm(false);
-                  }}
-                />
-              </div>
-            </form>
+            <MagicLinkForm
+              loading={loading}
+              onSubmit={handleMagicLinkLogin}
+              onCancel={() => {
+                if (!loading) setShowMagicForm(false);
+              }}
+            />
           )}
         </div>
 
         {/* Divider */}
-        <DividerWithText text="Or continue with" />
+        <DividerWithText text="or continue with" />
 
         {/* SSO Buttons */}
         <div className="mt-6 grid grid-cols-2 gap-4">
@@ -213,6 +200,8 @@ export default function LoginPage() {
               onClick={() => handleSSOLogin(name)}
               disabled={loading}
               className={`flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-black ${bg} ${text} ${border || ''} ${hover} transition`}
+              aria-label={`Login with ${name}`}
+              data-testid={`sso-${name.toLowerCase()}`}
             >
               {icon}
               {name}
@@ -220,7 +209,7 @@ export default function LoginPage() {
           ))}
         </div>
 
-        {/* Forgot Password */}
+        {/* Forgot Password Link */}
         <div className="mt-4 text-center">
           <Link href="/forgot-password" className="text-sm text-primary hover:underline">
             Forgot your password?
