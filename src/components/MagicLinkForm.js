@@ -4,6 +4,7 @@ import FormField from '@/components/FormField';
 import Button from '@/components/Button';
 import { emailValidation } from '@/validation/validationUtils';
 import * as yup from 'yup';
+import { LuArrowLeft } from 'react-icons/lu'; // ← Clean back arrow icon
 
 const schema = yup.object({
   email: emailValidation,
@@ -24,7 +25,7 @@ export default function MagicLinkForm({ onSubmit, onCancel, loading }) {
       onSubmit={({ email }) => onSubmit(email)}
       loading={loading}
       className="animate-fade-in"
-      submitLabel=""
+      submitLabel="" // Hides FormWrapper's default submit
     >
       {(formContext) => (
         <>
@@ -38,13 +39,15 @@ export default function MagicLinkForm({ onSubmit, onCancel, loading }) {
 
           <div className="flex justify-center gap-4 pt-2">
             <Button
-              type="submit"
-              label="Send One-Time Link"
-              variant="primary"
+              type="button"
+              label="Back to Login"
+              variant="outline"
               size="base"
-              isLoading={loading}
-              isValid={formContext.isValid}
+              onClick={onCancel}
+              leftIcon={<LuArrowLeft className="h-4 w-4" />}
+              testId="cancel-magic"
             />
+
             <Button
               type="submit"
               label="Send One-Time Link"

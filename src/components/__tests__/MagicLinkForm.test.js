@@ -26,7 +26,17 @@ describe('MagicLinkForm', () => {
 
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /send one-time link/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /back to login/i })).toBeInTheDocument();
+    });
+
+    it('renders the back arrow icon in "Back to Login" button', async () => {
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />
+      );
+
+      const backBtn = screen.getByRole('button', { name: /back to login/i });
+      const svg = backBtn.querySelector('svg');
+      expect(svg).toBeInTheDocument();
     });
   });
 
@@ -82,7 +92,6 @@ describe('MagicLinkForm', () => {
         <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={true} />
       );
 
-      // Fill with valid email to activate form context
       await act(async () => {
         fireEvent.change(screen.getByLabelText(/email/i), {
           target: { value: 'test@example.com' },
@@ -92,20 +101,19 @@ describe('MagicLinkForm', () => {
       const submitBtn = screen.getByTestId('submit-magic');
       expect(submitBtn).toBeDisabled();
 
-      // scoped lookup inside the button
       const spinner = within(submitBtn).getByTestId('spinner');
       expect(spinner).toBeInTheDocument();
     });
   });
 
   describe('Cancel Action', () => {
-    it('calls onCancel when Cancel button is clicked', async () => {
+    it('calls onCancel when "Back to Login" button is clicked', async () => {
       await safeRender(
         <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />
       );
 
       await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+        fireEvent.click(screen.getByRole('button', { name: /back to login/i }));
       });
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1);
