@@ -28,15 +28,15 @@ describe('PasswordStrengthMeter', () => {
     expect(bar).toBeInTheDocument();
   });
 
-  it('renders all password criteria in the checklist', () => {
+  it('renders all password criteria in the checklist when not all are passed', () => {
     render(<PasswordStrengthMeter password="weak" />);
     passwordCriteria.forEach((rule) => {
       expect(screen.getByText(rule.label)).toBeInTheDocument();
     });
   });
 
-  it('displays passed rules in green and failed rules in red', () => {
-    const password = 'Password1@'; // Should pass all
+  it('displays passed rules in green and failed rules in red when checklist is visible', () => {
+    const password = 'Password1'; // Not strong enough to hide checklist
     render(<PasswordStrengthMeter password={password} />);
 
     passwordCriteria.forEach((rule) => {
@@ -60,5 +60,19 @@ describe('PasswordStrengthMeter', () => {
       render(<PasswordStrengthMeter password={password} />);
       expect(screen.getByText(label)).toBeInTheDocument();
     });
+  });
+
+  it('displays success message and hides checklist when all password criteria are satisfied', () => {
+    const password = 'Password1@'; // Assumes this satisfies all criteria
+    render(<PasswordStrengthMeter password={password} />);
+
+    // Checklist should not be in the DOM
+    expect(screen.queryByTestId('checklist')).not.toBeInTheDocument();
+
+    // Success message should be shown
+    expect(screen.getByTestId('all-passed-message')).toBeInTheDocument();
+    expect(screen.getByTestId('all-passed-message')).toHaveTextContent(
+      'Fantastic! Your password meets all requirements'
+    );
   });
 });

@@ -15,6 +15,7 @@ export default function PasswordStrengthMeter({ password }) {
   const passed = passwordCriteria.filter((rule) => rule.test(password));
   const score = passed.length;
   const { label, color, bar } = getStrengthLabel(score);
+  const allPassed = score === passwordCriteria.length;
 
   return (
     <div className="w-full mt-4 space-y-4" aria-live="polite" data-testid="password-strength-meter">
@@ -38,34 +39,44 @@ export default function PasswordStrengthMeter({ password }) {
         </div>
       </div>
 
-      {/* Checklist */}
-      <fieldset
-        className="bg-gray-50 rounded-md p-3 border border-gray-200"
-        data-testid="checklist"
-      >
-        <legend className="sr-only">Password Requirements</legend>
-        <ul className="text-xs space-y-1">
-          {passwordCriteria.map((rule, idx) => {
-            const isPassed = rule.test(password);
-            return (
-              <li
-                key={idx}
-                className={`flex items-center gap-2 transition-opacity duration-300 ${
-                  isPassed ? 'opacity-100' : 'opacity-70'
-                }`}
-                data-testid={`rule-${idx}`}
-              >
-                {isPassed ? (
-                  <FaCheckCircle className="text-green-500" aria-label="Passed" />
-                ) : (
-                  <FaTimesCircle className="text-red-500" aria-label="Failed" />
-                )}
-                <span className={isPassed ? 'text-green-700' : 'text-red-500'}>{rule.label}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </fieldset>
+      {/* Checklist or Success Message */}
+      {allPassed ? (
+        <div
+          className="flex items-center gap-2 p-3 text-sm rounded-md bg-green-50 border border-green-200 text-green-800 font-medium"
+          data-testid="all-passed-message"
+        >
+          <FaCheckCircle className="text-green-500 size-5" />
+          Fantastic! Your password meets all requirements
+        </div>
+      ) : (
+        <fieldset
+          className="bg-gray-50 rounded-md p-3 border border-gray-200"
+          data-testid="checklist"
+        >
+          <legend className="sr-only">Password Requirements</legend>
+          <ul className="text-xs space-y-1">
+            {passwordCriteria.map((rule, idx) => {
+              const isPassed = rule.test(password);
+              return (
+                <li
+                  key={idx}
+                  className={`flex items-center gap-2 transition-opacity duration-300 ${
+                    isPassed ? 'opacity-100' : 'opacity-70'
+                  }`}
+                  data-testid={`rule-${idx}`}
+                >
+                  {isPassed ? (
+                    <FaCheckCircle className="text-green-500" aria-label="Passed" />
+                  ) : (
+                    <FaTimesCircle className="text-red-500" aria-label="Failed" />
+                  )}
+                  <span className={isPassed ? 'text-green-700' : 'text-red-500'}>{rule.label}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </fieldset>
+      )}
     </div>
   );
 }
