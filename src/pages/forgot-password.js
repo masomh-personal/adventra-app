@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import * as yup from 'yup';
+import { emailValidation } from '@/validation/validationUtils';
+import supabase from '@/lib/supabaseClient';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
-import { emailValidation } from '@/validation/validationUtils';
+import InfoBox from '@/components/InfoBox';
+import { AiOutlineArrowLeft } from 'react-icons/ai'; // ✅ using your component
 
-// Simple validation schema using your existing email validation
 const forgotPasswordSchema = yup.object({
   email: emailValidation,
 });
@@ -13,20 +15,31 @@ const forgotPasswordSchema = yup.object({
 export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleForgotPassword = async (data) => {
     setError('');
+    setSuccess('');
     setLoading(true);
+    setSubmittedEmail(data.email);
 
-    // Simulate processing delay
-    setTimeout(() => {
-      // Set success message
-      setSuccess(
-        `Password reset instructions have been sent to ${data.email}. Please check your inbox for further instructions.`
-      );
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email);
+
+      if (error) {
+        setError(error.message || 'Failed to send reset email. Please try again.');
+      } else {
+        setSuccess(
+          `If an account with ${data.email} exists, you will receive password reset instructions shortly.`
+        );
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setError('Something went wrong. Please try again later.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   const handleFormError = (errors) => {
@@ -42,8 +55,13 @@ export default function ForgotPasswordPage() {
         </p>
         <hr className="border-t border-gray-300 mb-6" />
 
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">{error}</div>}
-        {success && <div className="bg-green-50 text-green-600 p-3 rounded-md mb-4">{success}</div>}
+        {/* InfoBox for error */}
+        {error && <InfoBox variant="error" message={error} testId="forgot-password-error" />}
+
+        {/* InfoBox for success */}
+        {success && (
+          <InfoBox variant="success" message={success} testId="forgot-password-success" />
+        )}
 
         {!success ? (
           <FormWrapper
@@ -62,10 +80,9 @@ export default function ForgotPasswordPage() {
           </FormWrapper>
         ) : (
           <div className="text-center mt-4">
-            <p className="mb-4">
-              Our team is working on your request. You should receive an email shortly.
-            </p>
+            <p className="mb-4">You can close this page or return to login below.</p>
             <Link
+              data-testid="return-to-login-link"
               href="/login"
               className="inline-block px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
             >
@@ -75,8 +92,12 @@ export default function ForgotPasswordPage() {
         )}
 
         {!success && (
-          <div className="mt-6 text-center">
-            <Link href="/login" className="text-sm text-primary hover:underline">
+          <div className="mt-4 text-center">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <AiOutlineArrowLeft className="w-4 h-4" />
               Back to login
             </Link>
           </div>
