@@ -15,12 +15,13 @@ export default function FormField({
   className = '',
   disabled = false,
   helpText,
-  ...props // Allows props like onChange to be passed in
+  onChange,
+  onBlur,
 }) {
-  const hasError = errors && id && errors[id];
+  const hasError = errors?.[id];
   const registerFn = register || (() => ({}));
 
-  const baseInputClasses = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+  const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
@@ -28,19 +29,18 @@ export default function FormField({
     id,
     placeholder,
     disabled,
-    className: baseInputClasses,
+    className: inputClass,
     ...registerFn(id, {
       ...registerOptions,
       onChange: (e) => {
         registerOptions?.onChange?.(e);
-        props?.onChange?.(e);
+        onChange?.(e);
       },
       onBlur: (e) => {
         registerOptions?.onBlur?.(e);
-        props?.onBlur?.(e);
+        onBlur?.(e);
       },
     }),
-    ...props,
   });
 
   const renderInput = () => {
@@ -120,7 +120,7 @@ export default function FormField({
 
       {helpText && !hasError && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
 
-      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id]?.message}</p>}
     </div>
   );
 }

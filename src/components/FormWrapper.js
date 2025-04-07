@@ -4,29 +4,29 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Button from '@/components/Button';
 
 /**
- * Reusable Form Wrapper with react-hook-form + Yup validation
+ * FormWrapper component for managing forms using React Hook Form and Yup validation.
  *
- * @param {string} title - The form's title
- * @param {object} validationSchema - Yup validation schema for the form
- * @param {Function} onSubmit - Function to handle valid form submission
- * @param {ReactNode|Function} children - FormField components inside or function receiving form context
- * @param {object} defaultValues - Default values for the form fields
- * @param {string} submitLabel - Text for the submit button
- * @param {boolean} loading - Whether the form is in a loading state
- * @param {string} className - Additional classes for the form
- * @param {Function} onError - Function to handle form errors
- * @param {object} formProps - Additional props to pass to the form
+ * @param {string} title - Optional form title.
+ * @param {object} validationSchema - Yup schema for validation.
+ * @param {Function} onSubmit - Callback for successful form submission.
+ * @param {Function} onError - Callback for validation errors.
+ * @param {ReactNode|Function} children - Form children or render function with form context.
+ * @param {object} defaultValues - Optional default values for the form.
+ * @param {string} submitLabel - Submit button text.
+ * @param {boolean} loading - Submit loading state.
+ * @param {string} className - Additional class names for the form wrapper.
+ * @param {object} formProps - Additional props to pass to the <form> element.
  */
 export default function FormWrapper({
   title,
   validationSchema,
   onSubmit,
+  onError,
   children,
   defaultValues = {},
   submitLabel = 'Submit',
   loading = false,
   className = '',
-  onError,
   formProps = {},
 }) {
   const {
@@ -41,11 +41,9 @@ export default function FormWrapper({
   } = useForm({
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
     defaultValues,
-    mode: 'onTouched', // Trigger validation on blur/touch
-    reValidateMode: 'onChange', // Re-validate when typing after touch
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   });
-
-  const isButtonDisabled = loading || isSubmitting || !isValid;
 
   const formContext = {
     register,
@@ -59,11 +57,13 @@ export default function FormWrapper({
     isValid,
   };
 
+  const isButtonDisabled = loading || isSubmitting || !isValid;
+
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data, { reset, setValue, getValues });
-    } catch (error) {
-      console.error('Form submission error:', error);
+    } catch (err) {
+      console.error('Form submission error:', err);
     }
   };
 
@@ -83,13 +83,12 @@ export default function FormWrapper({
         {typeof children === 'function'
           ? children(formContext)
           : React.Children.map(children, (child) => {
-              if (React.isValidElement(child)) {
-                if (typeof child.type === 'function') {
-                  return React.cloneElement(child, { ...formContext, ...child.props });
-                }
-                return child;
-              }
-              return child;
+              if (!React.isValidElement(child)) return child;
+
+              const isCustomComponent = typeof child.type === 'function';
+              return isCustomComponent
+                ? React.cloneElement(child, { ...formContext, ...child.props })
+                : child;
             })}
       </div>
 
