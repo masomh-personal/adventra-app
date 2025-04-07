@@ -14,11 +14,25 @@ export default function ContactPage() {
   const router = useRouter();
 
   const handleSubmit = async (data, { reset }) => {
-    // Simulate fake API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/fakeContact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
 
-    setSubmitted(true);
-    reset();
+      if (!response.ok) {
+        throw new Error('Submission failed');
+      }
+
+      setSubmitted(true);
+      reset();
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      // Optionally: show error toast or InfoBox here (if we were using a real api)
+    }
   };
 
   return (

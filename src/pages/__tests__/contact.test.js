@@ -24,19 +24,24 @@ describe('ContactPage', () => {
     fireEvent.change(screen.getByLabelText(/message/i), { target: { value: message } });
   };
 
-  const waitForSubmitDelay = () => new Promise((res) => setTimeout(res, 1200));
-
   const submitForm = async (formData) => {
     fillContactForm(formData);
     await act(async () => {
       fireEvent.submit(screen.getByRole('form'));
-      await waitForSubmitDelay();
     });
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     useRouter.mockReturnValue({ push: mockPush });
+
+    // Global mock for fetch (instant response)
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ message: 'Mock success' }),
+      })
+    );
   });
 
   afterEach(() => {
@@ -45,9 +50,7 @@ describe('ContactPage', () => {
 
   describe('Initial Rendering', () => {
     it('renders heading, text, and form fields', async () => {
-      await act(async () => {
-        render(<ContactPage />);
-      });
+      await act(async () => render(<ContactPage />));
 
       expect(screen.getByRole('heading', { name: /contact us/i })).toBeInTheDocument();
       expect(screen.getByText(/got questions, feedback/i)).toBeInTheDocument();
@@ -57,10 +60,7 @@ describe('ContactPage', () => {
     });
 
     it('applies Tailwind spacing classes', async () => {
-      await act(async () => {
-        render(<ContactPage />);
-      });
-
+      await act(async () => render(<ContactPage />));
       expect(screen.getByRole('form')).toHaveClass('space-y-4', 'mt-4');
     });
   });
@@ -68,7 +68,6 @@ describe('ContactPage', () => {
   describe('Form Interactions', () => {
     it('updates field values on user input', async () => {
       await act(async () => render(<ContactPage />));
-
       fillContactForm({ name: 'Jane', email: 'jane@site.com', message: 'Test' });
 
       expect(screen.getByLabelText(/name/i).value).toBe('Jane');
@@ -127,7 +126,6 @@ describe('ContactPage', () => {
       fireEvent.change(emailInput, { target: { value: 'bad-email' } });
 
       await act(async () => fireEvent.submit(screen.getByRole('form')));
-
       expect(emailInput.validity.valid).toBe(false);
     });
 
@@ -152,11 +150,7 @@ describe('ContactPage', () => {
       const form = screen.getByRole('form');
       form.setAttribute('novalidate', 'true');
 
-      fillContactForm({
-        name: 'John',
-        email: 'john@example.com',
-        message: 'Hi',
-      });
+      fillContactForm({ name: 'John', email: 'john@example.com', message: 'Hi' });
 
       await act(async () => {
         fireEvent.submit(form);
@@ -187,8 +181,7 @@ describe('ContactPage', () => {
     });
 
     it('shows alert with thank you message', () => {
-      const alert = screen.getByRole('alert');
-      expect(alert).toHaveTextContent(/thanks for reaching out/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/thanks for reaching out/i);
     });
 
     it('displays navigation buttons', () => {
@@ -259,6 +252,59 @@ describe('ContactPage', () => {
         message: '¡Hola! 你好 ありがとう éñçã ✓✓✓',
       });
       expect(screen.getByTestId('success-message')).toBeInTheDocument();
+    });
+  });
+
+  describe('Performance (Realistic API Delay)', () => {
+    it('waits 1500ms before showing success message', async () => {
+      jest.useFakeTimers(); // Control time manually
+
+      const fetchMock = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: () => Promise.resolve({ message: 'Simulated delayed success' }),
+              });
+            }, 1500);
+          })
+      );
+
+      global.fetch = fetchMock;
+
+      await act(async () => {
+        render(<ContactPage />);
+      });
+
+      await act(async () => {
+        fireEvent.change(screen.getByLabelText(/name/i), {
+          target: { value: 'Test User' },
+        });
+        fireEvent.change(screen.getByLabelText(/email/i), {
+          target: { value: 'test@example.com' },
+        });
+        fireEvent.change(screen.getByLabelText(/message/i), {
+          target: { value: 'This is a test message' },
+        });
+
+        fireEvent.submit(screen.getByRole('form'));
+      });
+
+      // At this point, fetch has been called, but setTimeout hasn't completed
+      expect(screen.queryByTestId('success-message')).not.toBeInTheDocument();
+
+      // Fast-forward time by 1500ms
+      await act(async () => {
+        jest.advanceTimersByTime(1500);
+      });
+
+      // Wait for fetch resolution + DOM update
+      await screen.findByTestId('success-message');
+
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+
+      jest.useRealTimers(); // Reset for other tests
     });
   });
 });
