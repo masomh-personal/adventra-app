@@ -161,7 +161,7 @@ export default function LoginPage() {
                 as="a"
                 href="/signup"
                 label="Signup for free!"
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 className="text-sm px-2 py-1"
                 aria-label="Go to signup page"
@@ -179,7 +179,7 @@ export default function LoginPage() {
               onClick={() => {
                 if (!loading) setShowMagicForm(true);
               }}
-              variant="secondary"
+              variant="tertiary"
               className="text-sm w-full"
               size="base"
               aria-label="Switch to magic link login"
