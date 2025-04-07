@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { signupSchema } from '@/validation/signupSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
-import DividerWithText from '@/components/DividerWithText';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
@@ -119,23 +118,21 @@ export default function SignupPage() {
             onPaste={(e) => e.preventDefault()}
             autoComplete="new-password"
           />
-
-          <DividerWithText />
-
-          <p className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
-            Already have an account?
-            <Button
-              as="a"
-              href="/login"
-              label="Log in"
-              variant="secondary"
-              size="sm"
-              className="text-sm px-2 py-1"
-              aria-label="Go to login page"
-              testId="login-button"
-            />
-          </p>
         </FormWrapper>
+
+        <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+          Already have an account?
+          <Button
+            as="a"
+            href="/login"
+            label="Log in"
+            variant="secondary"
+            size="sm"
+            className="text-sm px-2 py-1"
+            aria-label="Go to login page"
+            testId="login-button"
+          />
+        </div>
       </div>
     </div>
   );

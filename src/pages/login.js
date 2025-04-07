@@ -155,19 +155,6 @@ export default function LoginPage() {
               id="password"
               placeholder="Enter your password"
             />
-            <p className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
-              Don’t have an account?
-              <Button
-                as="a"
-                href="/signup"
-                label="Signup for free!"
-                variant="secondary"
-                size="sm"
-                className="text-sm px-2 py-1"
-                aria-label="Go to signup page"
-                testId="signup-button"
-              />
-            </p>
           </FormWrapper>
         )}
 
@@ -194,6 +181,20 @@ export default function LoginPage() {
               }}
             />
           )}
+        </div>
+
+        <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+          Don’t have an account?
+          <Button
+            as="a"
+            href="/signup"
+            label="Signup for free!"
+            variant="secondary"
+            size="sm"
+            className="text-sm px-2 py-1"
+            aria-label="Go to signup page"
+            testId="signup-button"
+          />
         </div>
 
         {/* Divider */}
