@@ -1,5 +1,4 @@
 import { ImSpinner9 } from 'react-icons/im';
-import Link from 'next/link';
 
 export default function Button({
   label,
@@ -81,17 +80,16 @@ export default function Button({
 
   if (as === 'a') {
     return (
-      <Link href={href} passHref legacyBehavior>
-        <a
-          className={combinedClassName}
-          data-testid={testId}
-          role={role}
-          aria-disabled={isButtonDisabled}
-          {...rest}
-        >
-          {content}
-        </a>
-      </Link>
+      <a
+        href={href}
+        className={combinedClassName}
+        data-testid={testId}
+        role={role}
+        aria-disabled={isButtonDisabled}
+        {...rest}
+      >
+        {content}
+      </a>
     );
   }
 

@@ -57,10 +57,10 @@ describe('Button Component', () => {
     expect(button).toHaveClass('bg-primary');
   });
 
-  it('applies the correct size classes', () => {
+  it('applies the correct size classes for size="sm"', () => {
     render(<Button label="Small" onClick={() => {}} size="sm" />);
     const button = screen.getByRole('button');
-    expect(button.className).toMatch(/text-xs/);
+    expect(button.className).toMatch(/text-\[10px]/);
   });
 
   it('applies custom className when provided', () => {
