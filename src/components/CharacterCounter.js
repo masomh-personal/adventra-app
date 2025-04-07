@@ -13,7 +13,7 @@ export function CharacterCounter({ value = '', maxLength }) {
 
   return (
     <div
-      className={`text-xs text-right mt-1 ${
+      className={`text-xs font-heading font-bold text-right mt-1 ${
         isAtLimit ? 'text-red-500 font-bold' : isNearLimit ? 'text-amber-500' : 'text-green-600'
       }`}
       data-testid="char-counter"
