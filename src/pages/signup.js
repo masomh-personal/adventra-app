@@ -3,15 +3,17 @@ import { useRouter } from 'next/router';
 import { signupSchema } from '@/validation/signupSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
+import DividerWithText from '@/components/DividerWithText';
+import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
-import DividerWithText from '@/components/DividerWithText';
-import InfoBox from '@/components/InfoBox';
+import Button from '@/components/Button';
 
 export default function SignupPage() {
   const router = useRouter();
   const { showErrorModal, showSuccessModal } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState('');
 
   const handleSignup = async ({ name, email, password }) => {
     setIsSubmitting(true);
@@ -26,7 +28,6 @@ export default function SignupPage() {
         },
       });
 
-      // Catch known edge case: ghost user created but no identity
       if (data?.user && data.user.identities?.length === 0) {
         return showErrorModal(
           'This email is already registered and awaiting confirmation. Please check your inbox or spam folder.',
@@ -48,9 +49,8 @@ export default function SignupPage() {
         return showErrorModal(errMsg, title);
       }
 
-      // Signup success
       showSuccessModal(
-        'Your account has been successfully created! Please check your email inbox (and spam folder) to verify your email address before logging in. Once verified, you can log in and begin using all the app features.',
+        'Your account has been successfully created! Please check your email inbox (and spam folder) to verify your email address before logging in.',
         'Signup Successful!',
         () => router.push('/'),
         'Go to Homepage'
@@ -82,48 +82,48 @@ export default function SignupPage() {
         >
           <FormField label="Full Name" type="text" id="name" placeholder="Your name" />
 
-          <FormField label="Email Address" type="email" id="email" placeholder="you@example.com" />
+          <FormField
+            label="Email Address"
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+          />
 
           <FormField
             label="Password"
-            type="password"
             id="password"
+            type="password"
             placeholder="Create a password"
-            registerOptions={{
-              minLength: {
-                value: 10,
-                message: 'Password must be at least 10 characters',
-              },
-            }}
+            autoComplete="new-password"
+            onChange={(e) => setPassword(e.target.value)}
           />
+
+          <PasswordStrengthMeter password={password} />
 
           <FormField
             label="Confirm Password"
             type="password"
             id="confirmPassword"
             placeholder="Re-enter your password"
+            onPaste={(e) => e.preventDefault()}
+            autoComplete="new-password"
           />
 
-          {/* InfoBox */}
-          <InfoBox
-            variant="info"
-            message={
-              <>
-                Password must be at least <strong>10 characters</strong> and include an{' '}
-                <strong>uppercase letter</strong>,<strong> lowercase letter</strong>, a{' '}
-                <strong>number</strong>, and a <strong>special character</strong>.
-              </>
-            }
-          />
-
-          {/* Divider */}
           <DividerWithText />
 
-          <p className="text-center text-sm mt-4">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline">
-              Login here
-            </a>
+          <p className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+            Already have an account?
+            <Button
+              as="a"
+              href="/login"
+              label="Log in"
+              variant="secondary"
+              size="sm"
+              className="text-sm px-2 py-1"
+              aria-label="Go to login page"
+              testId="login-button"
+            />
           </p>
         </FormWrapper>
       </div>
