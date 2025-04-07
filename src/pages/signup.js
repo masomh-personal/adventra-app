@@ -8,6 +8,7 @@ import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
 import Button from '@/components/Button';
+import { dbCreateUser } from '@/hooks/dbCreateUser';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,29 +29,38 @@ export default function SignupPage() {
         },
       });
 
-      if (data?.user && data.user.identities?.length === 0) {
-        return showErrorModal(
-          'This email is already registered and awaiting confirmation. Please check your inbox or spam folder.',
-          'Signup Already Pending'
-        );
-      }
-
+      // Case: Duplicate email or other Supabase signup error
+      // NOTE: we turned off email confirmation requirement
       if (error || !data?.user) {
-        const errMsg =
-          error?.message === 'User already registered'
-            ? 'This email is already registered. Please log in instead.'
-            : error?.message || 'Signup failed. Please try again.';
+        const isDuplicate = error?.message === 'User already registered';
 
-        const title =
-          error?.message === 'User already registered' || !data?.user
-            ? 'Signup Error'
-            : 'Unexpected Error';
+        const errMsg = isDuplicate
+          ? 'This email is already registered. Please log in instead or reset your password if needed.'
+          : error?.message || 'Signup failed. Please try again.';
+
+        const title = isDuplicate ? 'Email Already Registered' : 'Signup Error';
 
         return showErrorModal(errMsg, title);
       }
 
+      // Create custom user record in public.user (after adding to auth.user with Supabase)
+      try {
+        await dbCreateUser({
+          user_id: data.user.id,
+          name,
+          email,
+        });
+      } catch (dbError) {
+        console.error('User created in auth but failed in custom DB:', dbError.message);
+        return showErrorModal(
+          'Signup succeeded but an internal error occurred when saving your profile. Please contact support.',
+          'Signup Incomplete'
+        );
+      }
+
+      // Final success message
       showSuccessModal(
-        'Your account has been successfully created! Please check your email inbox (and spam folder) to verify your email address before logging in.',
+        'Your account is all set — time to lace up those hiking boots and find your next adventuring partner!',
         'Signup Successful!',
         () => router.push('/'),
         'Go to Homepage'
