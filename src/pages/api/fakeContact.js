@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   // Simulate 1.5 second processing delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   // Return mock success
   return res.status(200).json({
