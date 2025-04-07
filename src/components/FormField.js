@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Reusable Form Field that supports multiple input types
+ * Reusable Form Field that supports multiple input types with testability & accessibility
  */
 export default function FormField({
   label,
@@ -20,6 +20,7 @@ export default function FormField({
 }) {
   const hasError = errors?.[id];
   const registerFn = register || (() => ({}));
+  const errorId = `${id}-error`;
 
   const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
@@ -30,6 +31,8 @@ export default function FormField({
     placeholder,
     disabled,
     className: inputClass,
+    'aria-invalid': hasError ? 'true' : undefined,
+    'aria-describedby': hasError ? errorId : undefined,
     ...registerFn(id, {
       ...registerOptions,
       onChange: (e) => {
@@ -118,9 +121,22 @@ export default function FormField({
 
       {renderInput()}
 
-      {helpText && !hasError && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
+      {helpText && !hasError && (
+        <p className="text-gray-500 text-sm mt-1" id={`${id}-help`}>
+          {helpText}
+        </p>
+      )}
 
-      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id]?.message}</p>}
+      {hasError && (
+        <p
+          id={errorId}
+          data-testid={`${id}-error`}
+          className="text-red-500 text-sm mt-1"
+          role="alert"
+        >
+          {errors[id]?.message}
+        </p>
+      )}
     </div>
   );
 }
