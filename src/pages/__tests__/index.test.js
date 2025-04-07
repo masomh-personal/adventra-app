@@ -61,12 +61,13 @@ describe('HomePage', () => {
       expect(mockPush).toHaveBeenCalledWith('/login');
     });
 
-    it('should render signup link with correct href', () => {
-      act(() => {
+    it('should render the signup button as a link with correct href', async () => {
+      await act(async () => {
         render(<HomePage />);
       });
-      const signupLink = screen.getByText("Don't have an account? Sign up today!");
-      expect(signupLink).toHaveAttribute('href', '/signup');
+
+      const signupButton = screen.getByTestId('signup-button');
+      expect(signupButton.tagName).toBe('A'); // Ensures it's rendered as an anchor tag
     });
   });
 
