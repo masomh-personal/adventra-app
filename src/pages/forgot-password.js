@@ -6,6 +6,7 @@ import FormField from '@/components/FormField';
 import InfoBox from '@/components/InfoBox';
 import Button from '@/components/Button';
 import { LuArrowLeft } from 'react-icons/lu';
+import { BiLockAlt } from 'react-icons/bi';
 
 const forgotPasswordSchema = yup.object({
   email: emailValidation,
@@ -47,7 +48,11 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
-        <h2 className="text-3xl font-heading text-center mb-2">Reset Password</h2>
+        <h2 className="text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2">
+          <BiLockAlt className="text-primary text-4xl" />
+          Reset Password
+        </h2>
+
         <p className="text-center text-gray-600 mb-6">
           Enter your email address and we’ll send you instructions to reset your password.
         </p>

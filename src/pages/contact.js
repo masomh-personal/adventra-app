@@ -6,6 +6,7 @@ import FormField from '@/components/FormField';
 import { CharacterCounter } from '@/components/CharacterCounter';
 import InfoBox from '@/components/InfoBox';
 import Button from '@/components/Button';
+import { HiOutlineMailOpen } from 'react-icons/hi';
 
 const MESSAGE_MAX_LENGTH = 2000;
 
@@ -24,7 +25,8 @@ export default function ContactPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Submission failed');
+        // NOTE: this should never be thrown
+        console.error('Submission failed');
       }
 
       setSubmitted(true);
@@ -38,7 +40,10 @@ export default function ContactPage() {
   return (
     <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
       <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8 my-12">
-        <h2 className="text-3xl font-heading text-center mb-2">Contact Us</h2>
+        <h2 className="text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2">
+          <HiOutlineMailOpen className="text-primary text-4xl animate-fade-in-up" />
+          Contact Us
+        </h2>
         <hr className="border-t border-gray-300 mb-6" />
 
         <p className="text-lg mb-6 text-center">
