@@ -13,7 +13,7 @@ const InfoCard = ({
 }) => {
   return (
     <div
-      className="bg-gray-50 p-6 rounded-md text-center"
+      className="bg-slate-100 p-6 rounded-lg text-center border border-gray-300 shadow-md"
       data-testid={testId || 'infocard-container'}
     >
       {imgSrc && (
@@ -45,13 +45,3 @@ const InfoCard = ({
 };
 
 export default InfoCard;
-
-// NOTE: Todo for for 'swiping' and 'matches' section, we can reuse this component like this:
-// <InfoCard
-//   title="John Doe"
-//   description="Enjoys hiking and rock climbing."
-//   buttonLabel="View Profile"
-//   onClick={() => { /* View profile logic */ }}
-//   imgSrc="/images/john-doe.jpg" // Replace with the actual image path
-//   imgAlt="Profile picture of John Doe"
-// />
