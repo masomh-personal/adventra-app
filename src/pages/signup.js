@@ -1,28 +1,79 @@
 import React, { useState } from 'react';
-import { signupSchema } from '@/validation/signupSchema.';
-import FormWrapper from '../components/FormWrapper';
-import FormField from '../components/FormField';
+import { useRouter } from 'next/router';
+import { signupSchema } from '@/validation/signupSchema';
+import FormWrapper from '@/components/FormWrapper';
+import FormField from '@/components/FormField';
+import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
+import supabase from '@/lib/supabaseClient';
+import { useModal } from '@/contexts/ModalContext';
+import Button from '@/components/Button';
+import { dbCreateUser } from '@/hooks/dbCreateUser';
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { showErrorModal, showSuccessModal } = useModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [password, setPassword] = useState('');
 
-  const handleSignup = async (data, { reset }) => {
+  const handleSignup = async ({ name, email, password }) => {
     setIsSubmitting(true);
-    try {
-      // Simulate API call
-      console.log('Signup data:', data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Handle successful signup
-      alert('Signup successful! (placeholder)');
-      // Optionally reset the form or redirect
-      // reset();
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('Signup failed: ' + (error.message || 'Unknown error'));
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      // Case: Duplicate email or other Supabase signup error
+      // NOTE: we turned off email confirmation requirement
+      if (error || !data?.user) {
+        const isDuplicate = error?.message === 'User already registered';
+
+        const errMsg = isDuplicate
+          ? 'This email is already registered. Please log in instead or reset your password if needed.'
+          : error?.message || 'Signup failed. Please try again.';
+
+        const title = isDuplicate ? 'Email Already Registered' : 'Signup Error';
+
+        return showErrorModal(errMsg, title);
+      }
+
+      // Create custom user record in public.user (after adding to auth.user with Supabase)
+      try {
+        await dbCreateUser({
+          user_id: data.user.id,
+          name,
+          email,
+        });
+      } catch (dbError) {
+        console.error('User created in auth but failed in custom DB:', dbError.message);
+        return showErrorModal(
+          'Signup succeeded but an internal error occurred when saving your profile. Please contact support.',
+          'Signup Incomplete'
+        );
+      }
+
+      // Final success message
+      showSuccessModal(
+        'Your account is all set — time to lace up those hiking boots and find your next adventuring partner!',
+        'Signup Successful!',
+        () => router.push('/'),
+        'Go to Homepage'
+      );
+    } catch (err) {
+      console.error('Unexpected signup error:', err);
+      showErrorModal('An unexpected error occurred. Please try again.', 'Signup Error');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleFormError = (errors) => {
+    console.error('Form validation errors:', errors);
   };
 
   return (
@@ -34,34 +85,54 @@ export default function SignupPage() {
         <FormWrapper
           validationSchema={signupSchema}
           onSubmit={handleSignup}
-          submitLabel="Sign Up"
+          onError={handleFormError}
+          submitLabel={isSubmitting ? 'Signing Up...' : 'Sign Up'}
           loading={isSubmitting}
         >
           <FormField label="Full Name" type="text" id="name" placeholder="Your name" />
 
-          <FormField label="Email Address" type="email" id="email" placeholder="you@example.com" />
+          <FormField
+            label="Email Address"
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+          />
 
           <FormField
             label="Password"
-            type="password"
             id="password"
+            type="password"
             placeholder="Create a password"
-            helpText="NOTE: Must be at least 10 characters with uppercase, lowercase, number, and special character"
-            registerOptions={{
-              minLength: {
-                value: 10,
-                message: 'Password must be at least 10 characters',
-              },
-            }}
+            autoComplete="new-password"
+            onChange={(e) => setPassword(e.target.value)}
           />
 
-          <p className="text-center text-sm mt-4">
-            Already have an account?{' '}
-            <a href="/login" className="text-primary hover:underline">
-              Login here
-            </a>
-          </p>
+          <PasswordStrengthMeter password={password} />
+
+          <FormField
+            label="Confirm Password"
+            type="password"
+            id="confirmPassword"
+            placeholder="Re-enter your password"
+            onPaste={(e) => e.preventDefault()}
+            autoComplete="new-password"
+          />
         </FormWrapper>
+
+        <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+          Already have an account?
+          <Button
+            as="a"
+            href="/login"
+            label="Log in"
+            variant="secondary"
+            size="sm"
+            className="text-sm px-2 py-1"
+            aria-label="Go to login page"
+            testId="login-button"
+          />
+        </div>
       </div>
     </div>
   );

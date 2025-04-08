@@ -1,9 +1,9 @@
-import Link from 'next/link';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Button from '@/components/Button';
-import { useState } from 'react';
+import withAuth from '@/lib/withAuth';
 
-export default function HomePage() {
+function HomePage() {
   const router = useRouter();
   const [videoError, setVideoError] = useState(false);
 
@@ -46,13 +46,31 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col items-center space-y-3 mt-6">
-          <Button label="Login" onClick={() => router.push('/login')} />
+          <Button
+            label="Login"
+            onClick={() => router.push('/login')}
+            aria-label="Go to login page"
+            testId="login-button"
+          />
 
-          <Link href="/signup" className="hover:text-secondary text-lg mt-2 font-body font-bold">
-            Don't have an account? Sign up today!
-          </Link>
+          <p className="text-center text-sm flex items-center justify-center gap-2 flex-wrap">
+            Don’t have an account?
+          </p>
+
+          <Button
+            as="a"
+            href="/signup"
+            label="Signup for free!"
+            variant="secondary"
+            size="base"
+            className="text-sm px-2 py-1"
+            aria-label="Go to signup page"
+            testId="signup-button"
+          />
         </div>
       </section>
     </div>
   );
 }
+
+export default withAuth(HomePage, { redirectIfAuthenticated: true });

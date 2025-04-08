@@ -1,55 +1,56 @@
 import React from 'react';
 
 /**
- * Reusable Form Field that supports multiple input types
- *
- * @param {string} label - Label for the field
- * @param {string} type - Input type (text, email, password, select, textarea, checkbox, radio, etc.)
- * @param {string} id - Unique ID and name for the field
- * @param {Function} register - react-hook-form register function
- * @param {object} errors - Errors from react-hook-form
- * @param {string} placeholder - Placeholder text
- * @param {array} options - Options for select, radio, etc. [{value: '', label: ''}]
- * @param {object} registerOptions - Additional register options (required, min, max, etc.)
- * @param {string} className - Additional classes for the input element
- * @param {boolean} disabled - Whether the field is disabled
- * @param {string} helpText - Optional help text to display below the field
+ * Reusable Form Field that supports multiple input types with testability & accessibility
  */
 export default function FormField({
   label,
   type = 'text',
   id,
   register,
-  errors = {}, // Provide default empty object to prevent undefined errors
+  errors = {},
   placeholder,
   options = [],
   registerOptions = {},
   className = '',
   disabled = false,
   helpText,
+  onChange,
+  onBlur,
 }) {
-  // Safely check for errors
-  const hasError = errors && id && errors[id];
+  const hasError = errors?.[id];
+  const registerFn = register || (() => ({}));
+  const errorId = `${id}-error`;
 
-  // Base classes for input styling with defensive error checking
-  const baseInputClasses = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
+  const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
-  // Different input rendering based on type
-  const renderInput = () => {
-    // Ensure register function exists
-    const registerFn = register || (() => ({}));
+  const getInputProps = () => ({
+    id,
+    placeholder,
+    disabled,
+    className: inputClass,
+    'aria-invalid': hasError ? 'true' : undefined,
+    'aria-describedby': hasError ? errorId : undefined,
+    ...registerFn(id, {
+      ...registerOptions,
+      onChange: (e) => {
+        registerOptions?.onChange?.(e);
+        onChange?.(e);
+      },
+      onBlur: (e) => {
+        registerOptions?.onBlur?.(e);
+        onBlur?.(e);
+      },
+    }),
+  });
 
+  const renderInput = () => {
     switch (type) {
       case 'select':
         return (
-          <select
-            id={id}
-            {...registerFn(id, registerOptions)}
-            className={baseInputClasses}
-            disabled={disabled}
-          >
+          <select {...getInputProps()}>
             {placeholder && (
               <option value="" disabled>
                 {placeholder}
@@ -64,28 +65,17 @@ export default function FormField({
         );
 
       case 'textarea':
-        return (
-          <textarea
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-            rows={4}
-          />
-        );
+        return <textarea rows={4} {...getInputProps()} />;
 
       case 'checkbox':
         return (
           <div className="flex items-center">
             <input
               type="checkbox"
-              id={id}
-              {...registerFn(id, registerOptions)}
+              {...getInputProps()}
               className={`h-4 w-4 text-primary focus:ring-primary ${
                 hasError ? 'border-red-500' : 'border-gray-300'
               } ${className}`}
-              disabled={disabled}
             />
             <label htmlFor={id} className="ml-2 block text-sm">
               {label}
@@ -117,29 +107,36 @@ export default function FormField({
         );
 
       default:
-        return (
-          <input
-            type={type}
-            id={id}
-            {...registerFn(id, registerOptions)}
-            placeholder={placeholder}
-            className={baseInputClasses}
-            disabled={disabled}
-          />
-        );
+        return <input type={type} {...getInputProps()} />;
     }
   };
 
   return (
     <div className="form-field">
       {type !== 'checkbox' && (
-        <label htmlFor={id} className="block font-heading mb-1">
+        <label htmlFor={id} className="block font-heading mb-1 font-bold">
           {label}
         </label>
       )}
+
       {renderInput()}
-      {helpText && !hasError && <p className="text-gray-500 text-sm mt-1">{helpText}</p>}
-      {hasError && <p className="text-red-500 text-sm mt-1">{errors[id].message}</p>}
+
+      {helpText && !hasError && (
+        <p className="text-gray-500 text-sm mt-1" id={`${id}-help`}>
+          {helpText}
+        </p>
+      )}
+
+      {hasError && (
+        <p
+          id={errorId}
+          data-testid={`${id}-error`}
+          className="text-red-500 text-sm mt-1"
+          role="alert"
+        >
+          {errors[id]?.message}
+        </p>
+      )}
     </div>
   );
 }

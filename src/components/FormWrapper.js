@@ -1,37 +1,38 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Button from '@/components/Button';
 
 /**
- * Reusable Form Wrapper with react-hook-form + Yup validation
+ * FormWrapper component for managing forms using React Hook Form and Yup validation.
  *
- * @param {string} title - The form's title
- * @param {object} validationSchema - Yup validation schema for the form
- * @param {Function} onSubmit - Function to handle valid form submission
- * @param {ReactNode|Function} children - FormField components inside or function receiving form context
- * @param {object} defaultValues - Default values for the form fields
- * @param {string} submitLabel - Text for the submit button
- * @param {boolean} loading - Whether the form is in a loading state
- * @param {string} className - Additional classes for the form
- * @param {Function} onError - Function to handle form errors
- * @param {object} formProps - Additional props to pass to the form
+ * @param {string} title - Optional form title.
+ * @param {object} validationSchema - Yup schema for validation.
+ * @param {Function} onSubmit - Callback for successful form submission.
+ * @param {Function} onError - Callback for validation errors.
+ * @param {ReactNode|Function} children - Form children or render function with form context.
+ * @param {object} defaultValues - Optional default values for the form.
+ * @param {string} submitLabel - Submit button text.
+ * @param {boolean} loading - Submit loading state.
+ * @param {string} className - Additional class names for the form wrapper.
+ * @param {object} formProps - Additional props to pass to the <form> element.
  */
 export default function FormWrapper({
   title,
   validationSchema,
   onSubmit,
+  onError,
   children,
   defaultValues = {},
   submitLabel = 'Submit',
   loading = false,
   className = '',
-  onError,
   formProps = {},
 }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid, touchedFields },
     reset,
     control,
     watch,
@@ -40,31 +41,37 @@ export default function FormWrapper({
   } = useForm({
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
     defaultValues,
-    mode: 'onBlur',
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   });
 
-  // Provide form context to all children
   const formContext = {
     register,
     errors,
+    touchedFields,
     control,
     watch,
     setValue,
     getValues,
     isSubmitting: isSubmitting || loading,
+    isValid,
   };
 
-  // Handler for form submission
+  const isButtonDisabled = loading || isSubmitting || !isValid;
+
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data, { reset, setValue, getValues });
-    } catch (error) {
-      console.error('Form submission error:', error);
+    } catch (err) {
+      console.error('Form submission error:', err);
     }
   };
 
+  const shouldRenderSubmitButton = typeof submitLabel === 'string' && submitLabel.trim() !== '';
+
   return (
     <form
+      noValidate
       onSubmit={handleSubmit(handleFormSubmit, onError)}
       className={`space-y-4 ${className}`}
       role="form"
@@ -72,36 +79,32 @@ export default function FormWrapper({
     >
       {title && <h2 className="text-2xl font-heading text-center">{title}</h2>}
 
-      {/* Render children with form context */}
       <div className="space-y-4">
         {typeof children === 'function'
           ? children(formContext)
           : React.Children.map(children, (child) => {
-              // Check if it's a valid element before adding props
-              if (React.isValidElement(child)) {
-                // Only pass form context to custom components, not to DOM elements
-                if (typeof child.type === 'function') {
-                  // This is a custom component (like FormField)
-                  return React.cloneElement(child, { ...formContext, ...child.props });
-                } else {
-                  // This is a DOM element (like p, div, etc.)
-                  return child;
-                }
-              }
-              return child;
+              if (!React.isValidElement(child)) return child;
+
+              const isCustomComponent = typeof child.type === 'function';
+              return isCustomComponent
+                ? React.cloneElement(child, { ...formContext, ...child.props })
+                : child;
             })}
       </div>
 
-      {/* Submit button */}
-      <div className="pt-2">
-        <button
-          type="submit"
-          disabled={isSubmitting || loading}
-          className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting || loading ? 'Submitting...' : submitLabel}
-        </button>
-      </div>
+      {shouldRenderSubmitButton && (
+        <div className="pt-2">
+          <Button
+            type="submit"
+            label={submitLabel}
+            isLoading={loading || isSubmitting}
+            isValid={isValid}
+            disabled={isButtonDisabled}
+            className="w-full"
+            size="lg"
+          />
+        </div>
+      )}
     </form>
   );
 }

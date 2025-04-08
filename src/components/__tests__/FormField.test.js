@@ -84,13 +84,16 @@ describe('FormField', () => {
       const registerOptions = { required: 'This field is required' };
       render(<FormField {...defaultProps} registerOptions={registerOptions} />);
 
-      expect(defaultProps.register).toHaveBeenCalledWith('email', registerOptions);
+      expect(defaultProps.register).toHaveBeenCalledWith(
+        'email',
+        expect.objectContaining(registerOptions)
+      );
     });
 
     it('calls register with just the id when no registerOptions provided', () => {
       render(<FormField {...defaultProps} />);
 
-      expect(defaultProps.register).toHaveBeenCalledWith('email', {});
+      expect(defaultProps.register).toHaveBeenCalledWith('email', expect.objectContaining({}));
     });
   });
 

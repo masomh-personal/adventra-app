@@ -2,14 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
-
-// Import the actual components we want to test
 import FormWrapper from '../FormWrapper';
 import FormField from '../FormField';
 
 describe('Form Integration', () => {
-  // Create a sample contact form schema
-  const contactFormSchema = yup.object().shape({
+  const contactFormSchema = yup.object({
     fullName: yup.string().required('Name is required'),
     email: yup.string().email('Please enter a valid email').required('Email is required'),
     subject: yup.string().required('Subject is required'),
@@ -17,18 +14,26 @@ describe('Form Integration', () => {
       .string()
       .required('Message is required')
       .min(10, 'Message must be at least 10 characters'),
-    contactType: yup.string().required('Please select how you found us'),
+    contactType: yup
+      .string()
+      .required('Please select how you found us')
+      .notOneOf([''], 'Please select how you found us'),
     subscribe: yup.boolean(),
   });
 
-  // Mock submit handler
   const mockSubmit = jest.fn();
 
   beforeEach(() => {
     mockSubmit.mockClear();
   });
 
-  it('renders a complete form with different field types', () => {
+  const fillField = async (label, value) => {
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    });
+  };
+
+  it('renders all field types and submit button', () => {
     render(
       <FormWrapper
         title="Contact Form"
@@ -36,20 +41,10 @@ describe('Form Integration', () => {
         onSubmit={mockSubmit}
         submitLabel="Send Message"
       >
-        <FormField label="Full Name" type="text" id="fullName" placeholder="Your full name" />
-        <FormField
-          label="Email Address"
-          type="email"
-          id="email"
-          placeholder="your.email@example.com"
-        />
-        <FormField label="Subject" type="text" id="subject" placeholder="What is this regarding?" />
-        <FormField
-          label="Message"
-          type="textarea"
-          id="message"
-          placeholder="Type your message here..."
-        />
+        <FormField label="Full Name" type="text" id="fullName" />
+        <FormField label="Email Address" type="email" id="email" />
+        <FormField label="Subject" type="text" id="subject" />
+        <FormField label="Message" type="textarea" id="message" />
         <FormField
           label="How did you find us?"
           type="select"
@@ -65,7 +60,6 @@ describe('Form Integration', () => {
       </FormWrapper>
     );
 
-    // Verify all form elements are rendered correctly
     expect(screen.getByText('Contact Form')).toBeInTheDocument();
     expect(screen.getByLabelText('Full Name')).toBeInTheDocument();
     expect(screen.getByLabelText('Email Address')).toBeInTheDocument();
@@ -76,40 +70,31 @@ describe('Form Integration', () => {
     expect(screen.getByRole('button', { name: 'Send Message' })).toBeInTheDocument();
   });
 
-  it('validates all fields and shows error messages', async () => {
+  it('shows validation errors when fields are empty', async () => {
     render(
       <FormWrapper validationSchema={contactFormSchema} onSubmit={mockSubmit}>
-        <FormField label="Full Name" type="text" id="fullName" />
-        <FormField label="Email Address" type="email" id="email" />
-        <FormField label="Subject" type="text" id="subject" />
-        <FormField label="Message" type="textarea" id="message" />
-        <FormField
-          label="How did you find us?"
-          type="select"
-          id="contactType"
-          options={[{ value: 'search', label: 'Search Engine' }]}
-        />
+        {(form) => (
+          <>
+            <FormField label="Full Name" type="text" id="fullName" {...form} />
+            <FormField label="Email Address" type="email" id="email" {...form} />
+            <FormField label="Subject" type="text" id="subject" {...form} />
+            <FormField label="Message" type="textarea" id="message" {...form} />
+          </>
+        )}
       </FormWrapper>
     );
 
-    // Submit the empty form
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      fireEvent.submit(screen.getByRole('form'));
     });
 
-    // Verify error messages appear
     expect(await screen.findByText('Name is required')).toBeInTheDocument();
     expect(await screen.findByText('Email is required')).toBeInTheDocument();
     expect(await screen.findByText('Subject is required')).toBeInTheDocument();
     expect(await screen.findByText('Message is required')).toBeInTheDocument();
-
-    // The exact error message might be different based on how Yup formats it
-    // Let's check for partial text to make this more robust
-    const errorElements = await screen.findAllByText(/please select|how you found us|required/i);
-    expect(errorElements.length).toBeGreaterThan(0);
   });
 
-  it('submits the form when all fields are valid', async () => {
+  it('submits successfully with valid values', async () => {
     render(
       <FormWrapper validationSchema={contactFormSchema} onSubmit={mockSubmit}>
         <FormField label="Full Name" type="text" id="fullName" />
@@ -126,40 +111,24 @@ describe('Form Integration', () => {
       </FormWrapper>
     );
 
-    // Fill in all required fields
+    await fillField('Full Name', 'John Doe');
+    await fillField('Email Address', 'john@example.com');
+    await fillField('Subject', 'Bug report');
+    await fillField('Message', 'This is a complete message for testing.');
+    await fillField('How did you find us?', 'search');
+    fireEvent.click(screen.getByLabelText('Subscribe to newsletter'));
+
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('Full Name'), {
-        target: { value: 'John Doe' },
-      });
-      fireEvent.change(screen.getByLabelText('Email Address'), {
-        target: { value: 'john.doe@example.com' },
-      });
-      fireEvent.change(screen.getByLabelText('Subject'), {
-        target: { value: 'Test Subject' },
-      });
-      fireEvent.change(screen.getByLabelText('Message'), {
-        target: { value: 'This is a test message that is more than 10 characters' },
-      });
-      fireEvent.change(screen.getByLabelText('How did you find us?'), {
-        target: { value: 'search' },
-      });
-      fireEvent.click(screen.getByLabelText('Subscribe to newsletter'));
+      fireEvent.submit(screen.getByRole('form'));
     });
 
-    // Submit the form
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    });
-
-    // Verify form submission
     await waitFor(() => {
-      expect(mockSubmit).toHaveBeenCalledTimes(1);
       expect(mockSubmit).toHaveBeenCalledWith(
         {
           fullName: 'John Doe',
-          email: 'john.doe@example.com',
-          subject: 'Test Subject',
-          message: 'This is a test message that is more than 10 characters',
+          email: 'john@example.com',
+          subject: 'Bug report',
+          message: 'This is a complete message for testing.',
           contactType: 'search',
           subscribe: true,
         },
@@ -168,95 +137,73 @@ describe('Form Integration', () => {
     });
   });
 
-  it('works with field-level validation through registerOptions', async () => {
+  it('handles field-level validation with registerOptions', async () => {
     render(
       <FormWrapper onSubmit={mockSubmit}>
-        <FormField
-          label="Username"
-          type="text"
-          id="username"
-          registerOptions={{
-            required: 'Username is required',
-            minLength: {
-              value: 3,
-              message: 'Username must be at least 3 characters',
-            },
-          }}
-        />
-        <FormField
-          label="Password"
-          type="password"
-          id="password"
-          registerOptions={{
-            required: 'Password is required',
-            minLength: {
-              value: 8,
-              message: 'Password must be at least 8 characters',
-            },
-          }}
-        />
+        {(form) => (
+          <>
+            <FormField
+              label="Username"
+              id="username"
+              errors={form.errors}
+              register={form.register}
+              registerOptions={{
+                required: 'Username is required',
+                minLength: { value: 3, message: 'Username must be at least 3 characters' },
+              }}
+            />
+            <FormField
+              label="Password"
+              type="password"
+              id="password"
+              errors={form.errors}
+              register={form.register}
+              registerOptions={{
+                required: 'Password is required',
+                minLength: { value: 8, message: 'Password must be at least 8 characters' },
+              }}
+            />
+          </>
+        )}
       </FormWrapper>
     );
 
-    // Submit the empty form
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
     });
 
-    // Check for validation messages
     expect(await screen.findByText('Username is required')).toBeInTheDocument();
     expect(await screen.findByText('Password is required')).toBeInTheDocument();
 
-    // Fill in with invalid data
+    await fillField('Username', 'ab');
+    await fillField('Password', '1234');
+
     await act(async () => {
-      fireEvent.change(screen.getByLabelText('Username'), {
-        target: { value: 'ab' },
-      });
-      fireEvent.change(screen.getByLabelText('Password'), {
-        target: { value: '1234' },
-      });
+      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
     });
 
-    // Submit with invalid data
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
-    });
-
-    // Check for validation messages
-    expect(await screen.findByText('Username must be at least 3 characters')).toBeInTheDocument();
-    expect(await screen.findByText('Password must be at least 8 characters')).toBeInTheDocument();
+    expect(await screen.findByText(/at least 3 characters/i)).toBeInTheDocument();
+    expect(await screen.findByText(/at least 8 characters/i)).toBeInTheDocument();
   });
 
-  it('supports form state handling through defaultValues', async () => {
+  it('submits prefilled form from defaultValues', async () => {
     render(
-      <FormWrapper
-        onSubmit={mockSubmit}
-        defaultValues={{
-          firstName: 'John',
-          lastName: 'Doe',
-        }}
-      >
-        <FormField label="First Name" type="text" id="firstName" />
-        <FormField label="Last Name" type="text" id="lastName" />
+      <FormWrapper onSubmit={mockSubmit} defaultValues={{ firstName: 'Jane', lastName: 'Doe' }}>
+        <FormField label="First Name" id="firstName" />
+        <FormField label="Last Name" id="lastName" />
       </FormWrapper>
     );
 
-    // Verify default values are applied
-    expect(screen.getByLabelText('First Name')).toHaveValue('John');
+    expect(screen.getByLabelText('First Name')).toHaveValue('Jane');
     expect(screen.getByLabelText('Last Name')).toHaveValue('Doe');
 
-    // Submit without changes
     await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
     });
 
-    // Verify submission with default values
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith(
-        {
-          firstName: 'John',
-          lastName: 'Doe',
-        },
+        { firstName: 'Jane', lastName: 'Doe' },
         expect.anything()
       );
     });

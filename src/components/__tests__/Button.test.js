@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Button from '../Button';
 import '@testing-library/jest-dom';
+import Button from '../Button';
+import { FaCheck, FaArrowRight } from 'react-icons/fa';
 
-describe('Button', () => {
+describe('Button Component', () => {
   it('renders with the correct label', () => {
     render(<Button label="Click Me" onClick={() => {}} />);
     expect(screen.getByText(/Click Me/i)).toBeInTheDocument();
@@ -17,19 +18,82 @@ describe('Button', () => {
 
   it('is disabled when disabled prop is true', () => {
     render(<Button label="Disabled" onClick={() => {}} disabled />);
-    const button = screen.getByText(/Disabled/i);
-    expect(button).toBeDisabled();
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  it('applies the correct variant class for primary', () => {
+  it('is disabled when isValid is false', () => {
+    render(<Button label="Invalid" onClick={() => {}} isValid={false} />);
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+
+  it('sets aria-disabled when invalid or disabled', () => {
+    render(<Button label="Aria" onClick={() => {}} isValid={false} />);
+    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('displays loading spinner and label when isLoading is true', () => {
+    render(<Button label="Submit" loadingLabel="Loading..." isLoading onClick={() => {}} />);
+    expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
+  });
+
+  it('renders left and right icons', () => {
+    render(
+      <Button
+        label="Go"
+        onClick={() => {}}
+        leftIcon={<FaCheck data-testid="left-icon" />}
+        rightIcon={<FaArrowRight data-testid="right-icon" />}
+      />
+    );
+    expect(screen.getByTestId('left-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('right-icon')).toBeInTheDocument();
+  });
+
+  it('applies the correct variant classes', () => {
     render(<Button label="Primary" onClick={() => {}} variant="primary" />);
-    const button = screen.getByText(/Primary/i);
+    const button = screen.getByRole('button');
     expect(button).toHaveClass('bg-primary');
   });
 
-  it('applies the correct variant class for outline', () => {
-    render(<Button label="Outline" onClick={() => {}} variant="outline" />);
-    const button = screen.getByText(/Outline/i);
-    expect(button).toHaveClass('border-primary');
+  it('applies the correct size classes for size="sm"', () => {
+    render(<Button label="Small" onClick={() => {}} size="sm" />);
+    const button = screen.getByRole('button');
+    expect(button.className).toMatch(/text-\[10px]/);
+  });
+
+  it('applies custom className when provided', () => {
+    render(<Button label="Custom" onClick={() => {}} className="custom-class" />);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('custom-class');
+  });
+
+  it('uses custom testId when provided', () => {
+    render(<Button label="Custom TestId" onClick={() => {}} testId="custom-id" />);
+    expect(screen.getByTestId('custom-id')).toBeInTheDocument();
+  });
+
+  it('uses default testId when not specified', () => {
+    render(<Button label="Default TestId" onClick={() => {}} />);
+    expect(screen.getByTestId('button')).toBeInTheDocument();
+  });
+
+  it('uses default button type when not specified', () => {
+    render(<Button label="Default Type" onClick={() => {}} />);
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
+  });
+
+  it('applies custom type when specified', () => {
+    render(<Button label="Submit" onClick={() => {}} type="submit" />);
+    expect(screen.getByRole('button')).toHaveAttribute('type', 'submit');
+  });
+
+  it('uses default role and allows custom role override', () => {
+    render(<Button label="Default Role" onClick={() => {}} />);
+    expect(screen.getByRole('button')).toHaveAttribute('role', 'button');
+
+    render(<Button label="Custom Role" onClick={() => {}} role="link" />);
+    expect(screen.getByText(/Custom Role/i)).toHaveAttribute('role', 'link');
   });
 });

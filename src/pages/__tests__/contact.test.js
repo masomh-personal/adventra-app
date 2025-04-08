@@ -1,213 +1,310 @@
-// src/components/__tests__/ContactPage.test.js
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
 import ContactPage from '@/pages/contact';
+import { useRouter } from 'next/router';
+import '@testing-library/jest-dom';
 
-// Mock the FormWrapper component
-jest.mock('@/components/FormWrapper', () => {
-  return ({ children, onSubmit, submitLabel }) => {
-    const formState = {
-      register: jest.fn(),
-      errors: {},
-      watch: jest.fn().mockImplementation((field) => {
-        if (field === 'message') return '';
-      }),
-      setValue: jest.fn(),
-    };
-
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const formData = {
-        name: document.getElementById('name')?.value || '',
-        email: document.getElementById('email')?.value || '',
-        message: document.getElementById('message')?.value || '',
-      };
-      const mockReset = jest.fn();
-      onSubmit(formData, { reset: mockReset });
-    };
-
-    return (
-      <form data-testid="contact-form" onSubmit={handleSubmit}>
-        {typeof children === 'function' ? children(formState) : children}
-        <button type="submit" data-testid="submit-button">
-          {submitLabel}
-        </button>
-      </form>
-    );
-  };
-});
-
-// Mock the FormField component
-jest.mock('@/components/FormField', () => {
-  return ({ id, label, type, placeholder, register, errors, registerOptions }) => {
-    const handleChange = (e) => {
-      if (registerOptions?.onChange) {
-        registerOptions.onChange(e);
-      }
-    };
-
-    return (
-      <div data-testid={`form-field-${id}`}>
-        <label htmlFor={id}>{label}</label>
-        {type === 'textarea' ? (
-          <textarea
-            id={id}
-            placeholder={placeholder || ''}
-            data-testid={id}
-            onChange={handleChange}
-          />
-        ) : (
-          <input
-            id={id}
-            type={type}
-            placeholder={placeholder || ''}
-            data-testid={id}
-            onChange={handleChange}
-          />
-        )}
-      </div>
-    );
-  };
-});
-
-// Mock the CharacterCounter component
-jest.mock('@/components/CharacterCounter', () => ({
-  CharacterCounter: ({ value, maxLength }) => (
-    <div data-testid="character-counter">
-      {value.length} / {maxLength}
-    </div>
-  ),
+jest.mock('next/router', () => ({
+  useRouter: jest.fn(),
 }));
 
+// Silence test logs
+jest.spyOn(console, 'log').mockImplementation(() => {});
+
 describe('ContactPage', () => {
-  const originalConsoleLog = console.log;
-  const originalAlert = window.alert;
-  const originalSetTimeout = window.setTimeout;
+  const mockPush = jest.fn();
+
+  const fillContactForm = ({
+    name = 'John Doe',
+    email = 'john@example.com',
+    message = 'Hello Adventra!',
+  } = {}) => {
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: name } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: email } });
+    fireEvent.change(screen.getByLabelText(/message/i), { target: { value: message } });
+  };
+
+  const submitForm = async (formData) => {
+    fillContactForm(formData);
+    await act(async () => {
+      fireEvent.submit(screen.getByRole('form'));
+    });
+  };
 
   beforeEach(() => {
-    // Mock console methods
-    console.log = jest.fn();
-    window.alert = jest.fn();
-    jest.useFakeTimers();
+    jest.clearAllMocks();
+    useRouter.mockReturnValue({ push: mockPush });
+
+    // Global mock for fetch (instant response)
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ message: 'Mock success' }),
+      })
+    );
   });
 
   afterEach(() => {
-    // Restore original methods
-    console.log = originalConsoleLog;
-    window.alert = originalAlert;
-    jest.useRealTimers();
-    jest.clearAllMocks();
+    cleanup();
   });
 
-  describe('Rendering', () => {
-    it('should render the contact form with correct title', () => {
-      render(<ContactPage />);
-      expect(screen.getByText('Contact Us')).toBeInTheDocument();
+  describe('Initial Rendering', () => {
+    it('renders heading, text, and form fields', async () => {
+      await act(async () => render(<ContactPage />));
+
+      expect(screen.getByRole('heading', { name: /contact us/i })).toBeInTheDocument();
+      expect(screen.getByText(/got questions, feedback/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
     });
 
-    it('should render the email contact info', () => {
-      render(<ContactPage />);
-      const emailLink = screen.getByText('support@adventra.com');
-      expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:support@adventra.com');
-    });
-
-    it('should render all required form fields', () => {
-      render(<ContactPage />);
-      expect(screen.getByTestId('form-field-name')).toBeInTheDocument();
-      expect(screen.getByTestId('form-field-email')).toBeInTheDocument();
-      expect(screen.getByTestId('form-field-message')).toBeInTheDocument();
-    });
-
-    it('should render character counter for message field', () => {
-      render(<ContactPage />);
-      expect(screen.getByTestId('character-counter')).toBeInTheDocument();
+    it('applies Tailwind spacing classes', async () => {
+      await act(async () => render(<ContactPage />));
+      expect(screen.getByRole('form')).toHaveClass('space-y-4', 'mt-4');
     });
   });
 
-  describe('Form Functionality', () => {
-    it('should call handleSubmit with form data when submitted', async () => {
-      render(<ContactPage />);
+  describe('Form Interactions', () => {
+    it('updates field values on user input', async () => {
+      await act(async () => render(<ContactPage />));
+      fillContactForm({ name: 'Jane', email: 'jane@site.com', message: 'Test' });
 
-      // Fill in the form
-      fireEvent.change(screen.getByTestId('name'), {
-        target: { value: 'John Doe' },
-      });
-
-      fireEvent.change(screen.getByTestId('email'), {
-        target: { value: 'john@example.com' },
-      });
-
-      fireEvent.change(screen.getByTestId('message'), {
-        target: { value: 'This is a test message' },
-      });
-
-      // Submit the form
-      fireEvent.click(screen.getByTestId('submit-button'));
-
-      // Check that window.alert was called
-      expect(window.alert).toHaveBeenCalledWith('Message sent! (This is a placeholder)');
-
-      // Check that console.log was called with the form data
-      expect(console.log).toHaveBeenCalledWith('Form data submitted:', {
-        name: 'John Doe',
-        email: 'john@example.com',
-        message: 'This is a test message',
-      });
-
-      // Check that success message is displayed
-      expect(
-        screen.getByText('Your message has been sent. Thank you for contacting us!')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/name/i).value).toBe('Jane');
+      expect(screen.getByLabelText(/email/i).value).toBe('jane@site.com');
+      expect(screen.getByLabelText(/message/i).value).toBe('Test');
     });
 
-    it('should hide success message after timeout', async () => {
-      render(<ContactPage />);
+    it('updates and colors the character counter', async () => {
+      await act(async () => render(<ContactPage />));
 
-      // Fill in and submit the form
-      fireEvent.change(screen.getByTestId('name'), { target: { value: 'John Doe' } });
-      fireEvent.change(screen.getByTestId('email'), { target: { value: 'john@example.com' } });
-      fireEvent.change(screen.getByTestId('message'), { target: { value: 'Test message' } });
-      fireEvent.click(screen.getByTestId('submit-button'));
+      const input = screen.getByLabelText(/message/i);
+      const counter = screen.getByTestId('char-counter');
 
-      // Verify success message is shown
-      expect(
-        screen.getByText('Your message has been sent. Thank you for contacting us!')
-      ).toBeInTheDocument();
+      fireEvent.change(input, { target: { value: 'A'.repeat(450) } });
+      expect(counter).toHaveTextContent('450/2000');
+      expect(counter).toHaveClass('text-green-600');
 
-      // Fast-forward time
-      act(() => {
-        jest.advanceTimersByTime(3000);
+      fireEvent.change(input, { target: { value: 'A'.repeat(1800) } });
+      expect(counter).toHaveClass('text-amber-500');
+
+      fireEvent.change(input, { target: { value: 'A'.repeat(2000) } });
+      expect(counter).toHaveClass('text-red-500');
+    });
+
+    it('truncates message input at 2000 characters', async () => {
+      await act(async () => render(<ContactPage />));
+      const input = screen.getByLabelText(/message/i);
+
+      await act(async () => {
+        fireEvent.change(input, { target: { value: 'A'.repeat(2100) } });
       });
 
-      // Verify success message is hidden
-      expect(
-        screen.queryByText('Your message has been sent. Thank you for contacting us!')
-      ).not.toBeInTheDocument();
+      expect(input.value.length).toBe(2000);
     });
   });
 
-  describe('Message Length Validation', () => {
-    it('should truncate message if it exceeds max length', () => {
-      render(<ContactPage />);
+  describe('Validation', () => {
+    it('shows required field errors', async () => {
+      await act(async () => render(<ContactPage />));
 
-      // Create a message that exceeds the max length
-      const maxLength = 2000;
-      const longMessage = 'a'.repeat(maxLength + 100);
-      const truncatedMessage = longMessage.substring(0, maxLength);
+      const form = screen.getByRole('form');
+      form.setAttribute('novalidate', 'true');
 
-      const messageField = screen.getByTestId('message');
-
-      // Simulate typing a very long message
-      fireEvent.change(messageField, {
-        target: { value: longMessage },
+      await act(async () => {
+        fireEvent.submit(form);
       });
 
-      // Check if the message was truncated
-      // This is harder to test directly since our mock doesn't update the DOM
-      // But we can verify that the onChange handler was called
-      expect(messageField).toBeInTheDocument();
+      expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
+      expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
+      expect(await screen.findByText(/please enter your message/i)).toBeInTheDocument();
+    });
+
+    it('triggers native email validation', async () => {
+      await act(async () => render(<ContactPage />));
+      const emailInput = screen.getByLabelText(/email/i);
+      fireEvent.change(emailInput, { target: { value: 'bad-email' } });
+
+      await act(async () => fireEvent.submit(screen.getByRole('form')));
+      expect(emailInput.validity.valid).toBe(false);
+    });
+
+    it('shows custom invalid email error', async () => {
+      await act(async () => render(<ContactPage />));
+
+      const form = screen.getByRole('form');
+      form.setAttribute('novalidate', 'true');
+
+      fillContactForm({ name: 'Jane', email: 'bad', message: 'Hello there!' });
+
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+
+      expect(await screen.findByText(/valid email/i)).toBeInTheDocument();
+    });
+
+    it('shows message length error if too short', async () => {
+      await act(async () => render(<ContactPage />));
+
+      const form = screen.getByRole('form');
+      form.setAttribute('novalidate', 'true');
+
+      fillContactForm({ name: 'John', email: 'john@example.com', message: 'Hi' });
+
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+
+      expect(await screen.findByText(/at least 10 characters/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('Form Submission', () => {
+    it('displays success UI after submit', async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm();
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+    });
+
+    it('removes form after submit', async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm();
+      expect(screen.queryByRole('form')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Post-Submission UI', () => {
+    beforeEach(async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm();
+    });
+
+    it('shows alert with thank you message', () => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/thanks for reaching out/i);
+    });
+
+    it('displays navigation buttons', () => {
+      expect(screen.getByTestId('return-home-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('go-to-login-btn')).toBeInTheDocument();
+    });
+
+    it('buttons have correct visual classes', () => {
+      const home = screen.getByTestId('return-home-btn');
+      const login = screen.getByTestId('go-to-login-btn');
+
+      expect(home).toHaveClass('bg-primary', 'text-white');
+      expect(login).toHaveClass('border-2', 'text-primary', 'bg-transparent');
+    });
+
+    it('navigates to / on click', async () => {
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('return-home-btn'));
+      });
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+
+    it('navigates to /login on click', async () => {
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('go-to-login-btn'));
+      });
+      expect(mockPush).toHaveBeenCalledWith('/login');
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('renders accessible email mailto link', async () => {
+      await act(async () => render(<ContactPage />));
+      const link = screen.getByRole('link', { name: /support@adventra.com/i });
+      expect(link).toHaveAttribute('href', 'mailto:support@adventra.com');
+    });
+
+    it('ensures all fields are labeled', async () => {
+      await act(async () => render(<ContactPage />));
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
+    });
+
+    it('renders the alert with appropriate role', async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm();
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('handles max-length valid inputs', async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm({
+        name: 'A'.repeat(50),
+        email: 'a'.repeat(20) + '@' + 'b'.repeat(20) + '.com',
+        message: 'A'.repeat(1999),
+      });
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+    });
+
+    it('accepts special characters in input', async () => {
+      await act(async () => render(<ContactPage />));
+      await submitForm({
+        name: "Jöhn O'Dóe-Smith (QA)",
+        email: 'john.doe+test@example.com',
+        message: '¡Hola! 你好 ありがとう éñçã ✓✓✓',
+      });
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+    });
+  });
+
+  describe('Performance (Realistic API Delay)', () => {
+    it('waits 1500ms before showing success message', async () => {
+      jest.useFakeTimers(); // Control time manually
+
+      const fetchMock = jest.fn(
+        () =>
+          new Promise((resolve) => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: () => Promise.resolve({ message: 'Simulated delayed success' }),
+              });
+            }, 1500);
+          })
+      );
+
+      global.fetch = fetchMock;
+
+      await act(async () => {
+        render(<ContactPage />);
+      });
+
+      await act(async () => {
+        fireEvent.change(screen.getByLabelText(/name/i), {
+          target: { value: 'Test User' },
+        });
+        fireEvent.change(screen.getByLabelText(/email/i), {
+          target: { value: 'test@example.com' },
+        });
+        fireEvent.change(screen.getByLabelText(/message/i), {
+          target: { value: 'This is a test message' },
+        });
+
+        fireEvent.submit(screen.getByRole('form'));
+      });
+
+      // At this point, fetch has been called, but setTimeout hasn't completed
+      expect(screen.queryByTestId('success-message')).not.toBeInTheDocument();
+
+      // Fast-forward time by 1500ms
+      await act(async () => {
+        jest.advanceTimersByTime(1500);
+      });
+
+      // Wait for fetch resolution + DOM update
+      await screen.findByTestId('success-message');
+
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+
+      jest.useRealTimers(); // Reset for other tests
     });
   });
 });
