@@ -12,11 +12,13 @@ describe('InfoCard', () => {
       title: 'Test Title',
       description: 'Test Description',
       buttonLabel: 'Test Button',
+      testId: 'test-infocard',
     });
 
-    expect(screen.getByText('Test Title')).toBeInTheDocument();
-    expect(screen.getByText('Test Description')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Test Button' })).toBeInTheDocument();
+    expect(screen.getByTestId('test-infocard')).toBeInTheDocument();
+    expect(screen.getByTestId('infocard-title')).toHaveTextContent('Test Title');
+    expect(screen.getByTestId('infocard-description')).toHaveTextContent('Test Description');
+    expect(screen.getByTestId('infocard-button-test-button')).toBeInTheDocument();
   });
 
   it('calls onClick when the button is clicked', async () => {
@@ -29,7 +31,7 @@ describe('InfoCard', () => {
       onClick,
     });
 
-    await user.click(screen.getByRole('button', { name: 'Test Button' }));
+    await user.click(screen.getByTestId('infocard-button-test-button'));
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
@@ -42,7 +44,7 @@ describe('InfoCard', () => {
       imgAlt: 'Test Image',
     });
 
-    const image = screen.getByAltText('Test Image');
+    const image = screen.getByTestId('infocard-image');
     expect(image).toBeInTheDocument();
     expect(image).toHaveAttribute('src');
   });
@@ -54,7 +56,7 @@ describe('InfoCard', () => {
       buttonLabel: 'Test Button',
     });
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('infocard-image')).not.toBeInTheDocument();
   });
 
   it('renders a button icon when buttonIcon is provided', () => {
@@ -65,8 +67,8 @@ describe('InfoCard', () => {
       buttonIcon: <FaEye className="mr-2" />,
     });
 
-    expect(screen.getByTestId('button')).toContainElement(
-      screen.getByTestId('button').querySelector('svg')
+    expect(screen.getByTestId('infocard-button-test-button')).toContainElement(
+      screen.getByTestId('infocard-button-test-button').querySelector('svg')
     );
   });
 
@@ -76,6 +78,6 @@ describe('InfoCard', () => {
       description: 'Test Description',
     });
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('infocard-button-')).not.toBeInTheDocument();
   });
 });
