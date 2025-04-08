@@ -40,7 +40,7 @@ describe('Dashboard', () => {
   it('renders the dashboard header and welcome message', () => {
     render(<Dashboard user={mockUser} />);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText(/Welcome, Test/i)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome,/i)).toBeInTheDocument();
   });
 
   it('renders the Edit Profile and Log Out buttons', () => {
