@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import Button from './Button';
+import { AiFillHeart } from 'react-icons/ai'; // Import the heart icon
 
 export default function Footer() {
   return (
@@ -16,16 +18,20 @@ export default function Footer() {
       </div>
       <div className="text-center mt-4 text-sm px-4">
         <p>&copy; {new Date().getFullYear()} Adventra. All rights reserved.</p>
-        <p className="mt-2">
-          Made with <span className="text-red-500">❤️ </span>
-          <a
+        <p className="mt-2 flex items-center justify-center gap-1 flex-wrap">
+          Made with <AiFillHeart className="text-red-500" />
+          <Button
+            as="a"
             href="https://www.kennesaw.edu/ccse/academics/software-engineering-and-game-development/index.php"
+            label="KSU SWE Dept"
+            variant="clean"
+            size="sm"
+            className="text-xs px-2 py-1"
+            aria-label="Go to KSU's Software & Game Development Dept"
+            testId="ksu-button"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-secondary underline"
-          >
-            KSU's Software & Game Development Dept
-          </a>
+          />
         </p>
       </div>
     </footer>

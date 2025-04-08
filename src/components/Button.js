@@ -44,7 +44,7 @@ export default function Button({
 
   const baseStyle = `
     inline-flex items-center justify-center gap-2
-    rounded-md font-heading font-semibold uppercase tracking-wide
+    rounded-md font-heading font-extrabold uppercase tracking-wide
     transition-all duration-200 ease-in-out
     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
     shadow-sm hover:shadow-md active:shadow-inner
