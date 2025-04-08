@@ -18,33 +18,33 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showMagicForm, setShowMagicForm] = useState(false);
 
-  // Handle standard login
+  // Helper to show contextual login error messages
+  const showLoginError = (error) => {
+    let message = error?.message || 'An unexpected error occurred. Please try again.';
+    let title = 'Login Error';
+
+    if (message.includes('Invalid login credentials')) {
+      title = 'Login Failed';
+      message =
+        'Invalid email or password. Please try again. Please contact support if this error persists';
+    } else if (message.includes('Email not confirmed')) {
+      title = 'Email Not Confirmed';
+    }
+
+    showErrorModal(message, title);
+  };
+
+  // Standard login
   const handleLogin = async ({ email, password }) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) {
-        const errorMsg =
-          error.message === 'Invalid login credentials'
-            ? 'Invalid email or password. Please try again.'
-            : error.message === 'Email not confirmed'
-              ? 'Please verify your email before logging in.'
-              : 'An unexpected error occurred. Please try again.';
-
-        const title =
-          error.message === 'Invalid login credentials'
-            ? 'Login Failed'
-            : error.message === 'Email not confirmed'
-              ? 'Email Not Confirmed'
-              : 'Login Error';
-
-        return showErrorModal(errorMsg, title);
+      if (error || !data?.user) {
+        return showLoginError(error);
       }
 
-      if (data?.user) {
-        await router.replace('/dashboard');
-      }
+      await router.replace('/dashboard');
     } catch (err) {
       console.error('Unexpected login error:', err);
       showErrorModal('An unexpected error occurred during login.', 'Login Error');
@@ -53,29 +53,26 @@ export default function LoginPage() {
     }
   };
 
-  // Handle magic link login
+  // Magic link login
   const handleMagicLinkLogin = async ({ email }) => {
-    const mlErrorText = 'Magic Link Error';
-    const mlSuccessText = 'Magic Link Sent';
-
+    const modalTitle = 'Magic Link Error';
     setLoading(true);
+
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
+        options: { redirectTo: `${window.location.origin}/dashboard` },
       });
 
       if (error) {
-        return showErrorModal('Unable to send magic link. Please try again.', mlErrorText);
+        return showErrorModal('Unable to send magic link. Please try again.', modalTitle);
       }
 
-      showSuccessModal('Check your email inbox for a secure login link!', mlSuccessText);
+      showSuccessModal('Check your email inbox for a secure login link!', 'Magic Link Sent');
       setShowMagicForm(false);
     } catch (err) {
       console.error('Magic link error:', err);
-      showErrorModal('Something went wrong. Please try again.', mlErrorText);
+      showErrorModal('Something went wrong. Please try again.', modalTitle);
     } finally {
       setLoading(false);
     }
@@ -133,7 +130,7 @@ export default function LoginPage() {
         <h2 className="text-3xl font-heading text-center mb-2">🏕️ Login to Adventra</h2>
         <hr className="border-t border-gray-300 mb-6" />
 
-        {/* Standard Email/Password Login Form */}
+        {/* Email/Password Form */}
         {!showMagicForm && (
           <FormWrapper
             validationSchema={loginSchema}
@@ -158,14 +155,12 @@ export default function LoginPage() {
           </FormWrapper>
         )}
 
-        {/* Magic Link Section */}
+        {/* Magic Link Option */}
         <div className="mt-6">
           {!showMagicForm ? (
             <Button
               label="Login with One-Time Email Link"
-              onClick={() => {
-                if (!loading) setShowMagicForm(true);
-              }}
+              onClick={() => !loading && setShowMagicForm(true)}
               variant="tertiary"
               className="text-sm w-full"
               size="base"
@@ -176,13 +171,12 @@ export default function LoginPage() {
             <MagicLinkForm
               loading={loading}
               onSubmit={handleMagicLinkLogin}
-              onCancel={() => {
-                if (!loading) setShowMagicForm(false);
-              }}
+              onCancel={() => !loading && setShowMagicForm(false)}
             />
           )}
         </div>
 
+        {/* Signup Prompt */}
         <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
           Don’t have an account?
           <Button
