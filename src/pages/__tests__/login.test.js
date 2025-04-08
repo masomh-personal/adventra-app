@@ -128,4 +128,38 @@ describe('LoginPage', () => {
       );
     });
   });
+
+  it('handles magic link request error and shows error modal', async () => {
+    supabase.auth.signInWithOtp.mockResolvedValueOnce({
+      error: { message: 'Some magic link error' },
+    });
+
+    renderPage();
+    const user = setupUser();
+
+    await user.click(screen.getByTestId('show-magic'));
+    await user.type(screen.getByLabelText(/email/i), 'magic@example.com');
+    await user.click(screen.getByTestId('submit-magic'));
+
+    await waitFor(() => {
+      expect(supabase.auth.signInWithOtp).toHaveBeenCalled();
+      expect(mockShowErrorModal).toHaveBeenCalledWith(
+        'Unable to send magic link. Please try again.',
+        'Magic Link Error'
+      );
+    });
+  });
+
+  it('shows SSO under development modal when SSO button is clicked', async () => {
+    renderPage();
+    const user = setupUser();
+    await user.click(screen.getByTestId('sso-google'));
+
+    await waitFor(() => {
+      expect(mockShowErrorModal).toHaveBeenCalledWith(
+        'We are so sorry, SSO login with Google is currently under development.',
+        'SSO Under Development'
+      );
+    });
+  });
 });
