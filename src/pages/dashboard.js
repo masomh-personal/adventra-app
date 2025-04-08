@@ -61,8 +61,9 @@ function Dashboard({ user }) {
         <hr className="border-t border-gray-300 mb-6" />
 
         <main>
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Welcome, {userFirstName}! Where does your next journey take you?
+          <h2 className="text-xl font-extrabold mb-4 text-center">
+            Welcome, <span className="text-secondary">{userFirstName}</span>! Where does your next
+            journey take you?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
