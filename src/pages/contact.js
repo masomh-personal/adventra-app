@@ -7,6 +7,7 @@ import { CharacterCounter } from '@/components/CharacterCounter';
 import InfoBox from '@/components/InfoBox';
 import Button from '@/components/Button';
 import { HiOutlineMailOpen } from 'react-icons/hi';
+import { LuArrowLeft } from 'react-icons/lu';
 
 const MESSAGE_MAX_LENGTH = 2000;
 
@@ -67,6 +68,7 @@ export default function ContactPage() {
             <div className="mt-6 flex justify-center gap-4">
               <Button
                 label="Return Home"
+                leftIcon={<LuArrowLeft className="h-4 w-4" />}
                 variant="primary"
                 size="base"
                 onClick={() => router.push('/')}
