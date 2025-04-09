@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import AboutPage from '../about';
+import AboutPage from '@/pages/about';
 
 describe('AboutPage', () => {
   it('renders main headings and intro text', () => {

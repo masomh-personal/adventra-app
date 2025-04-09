@@ -79,7 +79,7 @@ describe('ModalContext', () => {
     expect(screen.getByText('Dismiss')).toBeInTheDocument();
   });
 
-  it('closes modal using manual context call', () => {
+  it('closes modal using manual contexts call', () => {
     renderWithProvider();
 
     fireEvent.click(screen.getByText('Info'));

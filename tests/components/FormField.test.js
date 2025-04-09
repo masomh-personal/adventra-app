@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import FormField from '../FormField';
+import FormField from '@/components/FormField';
 
 describe('FormField', () => {
   const defaultProps = {

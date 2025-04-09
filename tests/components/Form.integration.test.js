@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
-import FormWrapper from '../FormWrapper';
-import FormField from '../FormField';
+import FormWrapper from '@/components/FormWrapper';
+import FormField from '@/components/FormField';
 
 describe('Form Integration', () => {
   const contactFormSchema = yup.object({

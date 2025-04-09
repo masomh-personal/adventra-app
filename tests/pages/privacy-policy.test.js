@@ -23,7 +23,7 @@ describe('PrivacyPolicyPage', () => {
           return MOCK_DATE;
         }
         // Fallback to original for other calls if necessary (though unlikely here)
-        // @ts-ignore - Allow calling original with 'this' context
+        // @ts-ignore - Allow calling original with 'this' contexts
         return originalToLocaleDateString.call(this, locales, options);
       }
     );
