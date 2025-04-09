@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
-import FormWrapper from '../FormWrapper';
+import FormWrapper from '@/components/FormWrapper';
 
 /**
- * Simple mock field to simulate form context usage
+ * Simple mock field to simulate form contexts usage
  */
 const FormField = ({ register, errors, id, label }) => (
   <div>

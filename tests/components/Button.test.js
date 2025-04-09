@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Button from '../Button';
+import Button from '@/components/Button';
 import { FaCheck, FaArrowRight } from 'react-icons/fa';
 
 describe('Button Component', () => {

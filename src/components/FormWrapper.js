@@ -10,7 +10,7 @@ import Button from '@/components/Button';
  * @param {object} validationSchema - Yup schema for validation.
  * @param {Function} onSubmit - Callback for successful form submission.
  * @param {Function} onError - Callback for validation errors.
- * @param {ReactNode|Function} children - Form children or render function with form context.
+ * @param {ReactNode|Function} children - Form children or render function with form contexts.
  * @param {object} defaultValues - Optional default values for the form.
  * @param {string} submitLabel - Submit button text.
  * @param {boolean} loading - Submit loading state.
