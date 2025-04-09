@@ -4,12 +4,14 @@ import { AiFillHeart } from 'react-icons/ai';
 import { FaCodeBranch } from 'react-icons/fa';
 
 export default function Footer() {
-  const gitSha = process.env.NEXT_PUBLIC_GIT_SHA || 'dev';
+  // 1. Get both SHA and Branch from environment variables
+  const gitSha = process.env.NEXT_PUBLIC_GIT_SHA || 'dev-sha';
+  const gitBranch = process.env.NEXT_PUBLIC_GIT_BRANCH || 'dev-branch';
   const repoUrl = 'https://github.com/masomh-personal/adventra-app';
 
-  // Styles for the build tag link - adjusted for inline flow
+  // Styles for the build tag link (comments removed)
   const buildTagStyle = `
-    inline-flex items-center gap-1       /* Use inline-flex for inline block behavior */
+    inline-flex items-center gap-1
     bg-gray-700 bg-opacity-75
     text-gray-300 hover:text-white
     text-xs
@@ -20,13 +22,11 @@ export default function Footer() {
     border border-gray-500 border-opacity-50
     transition-colors duration-200
     no-underline
-    mt-2                                /* Add margin-top to separate from line above */
+    mt-2
   `;
 
   return (
-    // Removed relative positioning as it's no longer needed for the tag
     <footer className="bg-primary text-white py-4 z-10 px-4">
-      {/* Main content container */}
       <div className="flex flex-col items-center">
         {/* Links */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8 font-body font-bold">
@@ -59,17 +59,19 @@ export default function Footer() {
               rel="noopener noreferrer"
             />
           </p>
-          {/* Build Tag moved here, wrapped in its own paragraph for block layout */}
+          {/* Build Tag */}
           <p>
             <a
               href={repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={buildTagStyle} // Apply the styles
-              title={`Build: ${gitSha} (View Repository)`}
+              className={buildTagStyle}
+              title={`Branch: ${gitBranch} | Build: ${gitSha} (View Repository)`}
             >
               <FaCodeBranch />
-              <span>main: v{gitSha}</span>
+              <span>
+                {gitBranch}: v{gitSha}
+              </span>
             </a>
           </p>
         </div>
