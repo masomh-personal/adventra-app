@@ -51,10 +51,7 @@ describe('Header Component', () => {
   it('renders logo and default links when logged out', async () => {
     await act(async () => render(<Header />));
     expect(screen.getByTestId('logo-link')).toBeInTheDocument();
-    expect(screen.getByTestId('logo-link').querySelector('img')).toHaveAttribute(
-      'src',
-      '/adventra-logo.png'
-    );
+    expect(screen.getByTestId('logo-link').querySelector('img')).toHaveAttribute('src');
     expect(screen.getByTestId('home-link')).toBeInTheDocument();
     expect(screen.getByTestId('home-link')).toHaveAttribute('href', '/');
     expect(screen.getByTestId('about-link')).toBeInTheDocument();

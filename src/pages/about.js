@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import Link from 'next/link';
 
 export default function AboutPage() {
-  // Generate UUIDs once for FAQ items
   const faqs = useMemo(
     () => [
       {
@@ -29,9 +29,9 @@ export default function AboutPage() {
         answer: (
           <>
             Yes. We take your privacy seriously. Data is encrypted and secured. See our{' '}
-            <a href="/privacy-policy" className="text-primary hover:underline">
+            <Link href="/privacy-policy/" className="text-primary hover:underline">
               Privacy Policy
-            </a>{' '}
+            </Link>{' '}
             for details.
           </>
         ),
@@ -41,16 +41,16 @@ export default function AboutPage() {
         question: 'How can I contact support?',
         answer: (
           <>
-            Reach us anytime at{' '}
+            Reach us anytime at {/* mailto: link correctly uses <a> */}
             <a href="mailto:support@adventra.com" className="text-primary hover:underline">
               support@adventra.com
             </a>
-            . We're here to help!
+            . We&rsquo;re here to help!
           </>
         ),
       },
     ],
-    [] // Generate UUIDs once
+    []
   );
 
   const [openFAQs, setOpenFAQs] = useState(new Set());
@@ -69,7 +69,6 @@ export default function AboutPage() {
         <h1 className="text-3xl font-heading text-primary text-center mb-2">About Adventra</h1>
         <hr className="border-t border-gray-300 mb-6" />
 
-        {/* --- About Content --- */}
         <p className="text-lg leading-relaxed mb-4">
           At <strong>Adventra</strong>, we believe the best memories are made outside — on trails,
           mountain tops, rivers, and around campfires. Adventra is a social platform built
@@ -79,9 +78,9 @@ export default function AboutPage() {
         <h2 className="text-2xl font-heading text-secondary mt-6 mb-2">Our Mission</h2>
         <p className="text-lg leading-relaxed mb-4">
           Our mission is simple: to make outdoor adventures more <strong>accessible</strong>, more{' '}
-          <strong>social</strong>, and more <strong>memorable</strong>. Whether you're hiking your
-          first trail or you're a seasoned backpacker, we help you find the right people to share
-          the journey.
+          <strong>social</strong>, and more <strong>memorable</strong>. Whether you&rsquo;re hiking
+          your first trail or you&rsquo;re a seasoned backpacker, we help you find the right people
+          to share the journey.
         </p>
 
         <h2 className="text-2xl font-heading text-secondary mt-6 mb-2">Why Adventra?</h2>
@@ -101,13 +100,12 @@ export default function AboutPage() {
 
         <h2 className="text-2xl font-heading text-secondary mt-6 mb-2">Our Future Vision</h2>
         <p className="text-lg leading-relaxed mb-8">
-          We're just getting started. In the future, expect features like{' '}
+          We&rsquo;re just getting started. In the future, expect features like{' '}
           <strong>real-time event planning</strong>, <strong>group challenges</strong>, and{' '}
-          <strong>AI-powered adventure recommendations</strong>. We're committed to growing with our
-          community, one trail at a time.
+          <strong>AI-powered adventure recommendations</strong>. We&rsquo;re committed to growing
+          with our community, one trail at a time.
         </p>
 
-        {/* --- Accordion FAQ Section --- */}
         <h2 className="text-2xl font-heading text-primary text-center mb-4">
           Frequently Asked Questions (FAQ)
         </h2>

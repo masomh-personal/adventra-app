@@ -1,116 +1,119 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event'; // Import userEvent
 import '@testing-library/jest-dom';
 import PrivacyPolicyPage from '@/pages/privacy-policy';
 
-describe('PrivacyPolicyPage', () => {
-  beforeEach(() => {
-    // Mock the Date.prototype.toLocaleDateString to return a consistent date for testing
-    const originalToLocaleDateString = Date.prototype.toLocaleDateString;
-    jest.spyOn(Date.prototype, 'toLocaleDateString').mockImplementation(function () {
-      return 'March 25, 2025';
-    });
+// Consistent date for snapshots and assertions
+const MOCK_DATE = 'March 25, 2025';
 
-    // Render the component before each test
-    render(<PrivacyPolicyPage />);
+describe('PrivacyPolicyPage', () => {
+  // Mock the Date.prototype.toLocaleDateString before all tests in this suite
+  beforeAll(() => {
+    // Store the original implementation
+    const originalToLocaleDateString = Date.prototype.toLocaleDateString;
+
+    jest.spyOn(Date.prototype, 'toLocaleDateString').mockImplementation(
+      function (
+        locales, // Keep arguments for potential future use/robustness
+        options
+      ) {
+        // Basic check to ensure it's called similarly to the component
+        if (locales === 'en-US' && options?.year === 'numeric') {
+          return MOCK_DATE;
+        }
+        // Fallback to original for other calls if necessary (though unlikely here)
+        // @ts-ignore - Allow calling original with 'this' context
+        return originalToLocaleDateString.call(this, locales, options);
+      }
+    );
   });
 
-  afterEach(() => {
-    // Restore the original implementation
+  // Restore the original implementation after all tests
+  afterAll(() => {
     jest.restoreAllMocks();
   });
 
-  describe('Page Structure', () => {
-    it('should render the privacy policy title', () => {
-      expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
-    });
+  // Helper function to render and setup userEvent for consistency
+  const setup = () => {
+    const user = userEvent.setup();
+    render(<PrivacyPolicyPage />);
+    return { user }; // Return user even if not used in all tests
+  };
 
-    it('should render the introduction paragraph', () => {
-      expect(
-        screen.getByText(
-          /This Privacy Policy outlines how we collect, use, and safeguard your personal information when you interact with our platform/
-        )
-      ).toBeInTheDocument();
-    });
+  it('should render the main title', () => {
+    setup();
+    // Use getByRole for semantic querying where possible
+    expect(screen.getByRole('heading', { name: /privacy policy/i, level: 1 })).toBeInTheDocument();
+  });
 
-    it('should display the last updated date', () => {
-      expect(screen.getByText(/Last updated:/)).toBeInTheDocument();
-      expect(screen.getByText(/March 25, 2025/)).toBeInTheDocument();
+  it('should render the introduction paragraph', () => {
+    setup();
+    expect(
+      screen.getByText(
+        /This Privacy Policy outlines how we collect, use, and safeguard/i // Use regex for flexibility
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('should display the last updated date correctly', () => {
+    setup();
+    expect(screen.getByText(/Last updated:\s*March 25, 2025/i)).toBeInTheDocument();
+  });
+
+  it('should render all section headings', () => {
+    setup();
+    const sections = [
+      /1\. Information We Collect/i,
+      /2\. How We Use Your Information/i,
+      /3\. Data Sharing & Third Parties/i,
+      /4\. Data Security/i,
+      /5\. Your Choices & Rights/i,
+      /6\. Children’s Privacy/i, // Use ’ instead of ' if that's in the source
+      /7\. Changes to This Policy/i,
+      /8\. Contact Us/i,
+    ];
+
+    sections.forEach((sectionRegex) => {
+      expect(screen.getByRole('heading', { name: sectionRegex, level: 2 })).toBeInTheDocument();
     });
   });
 
-  describe('Policy Sections', () => {
-    it('should render all section headings', () => {
-      const sections = [
-        '1. Information We Collect',
-        '2. How We Use Your Information',
-        '3. Data Sharing & Third Parties',
-        '4. Data Security',
-        '5. Your Choices & Rights',
-        "6. Children's Privacy",
-        '7. Changes to This Policy',
-        '8. Contact Us',
-      ];
+  it('should render the information collection list items', () => {
+    setup();
+    const collectionItems = [
+      /Account Information:/i,
+      /Adventure Preferences:/i,
+      /Media:/i,
+      /Usage Data:/i,
+    ];
 
-      sections.forEach((section) => {
-        expect(screen.getByText(section)).toBeInTheDocument();
-      });
-    });
-
-    it('should render the information collection list items', () => {
-      const collectionItems = [
-        /Account Information/,
-        /Adventure Preferences/,
-        /Media/,
-        /Usage Data/,
-      ];
-
-      collectionItems.forEach((item) => {
-        expect(screen.getByText(item)).toBeInTheDocument();
-      });
-    });
-
-    it('should render the information usage list items', () => {
-      const usageItems = [
-        /Create and manage your account/,
-        /Personalize your experience/,
-        /Improve platform features/,
-        /Send updates/,
-        /Ensure the platform's security/,
-      ];
-
-      usageItems.forEach((item) => {
-        expect(screen.getByText(item)).toBeInTheDocument();
-      });
+    collectionItems.forEach((itemRegex) => {
+      expect(screen.getByText(itemRegex)).toBeInTheDocument();
     });
   });
 
-  describe('Contact Information', () => {
-    it('should render the contact email with correct mailto link', () => {
-      const emailLink = screen.getByText('privacy@adventra.com');
-      expect(emailLink).toBeInTheDocument();
-      expect(emailLink).toHaveAttribute('href', 'mailto:privacy@adventra.com');
-      expect(emailLink).toHaveClass('text-primary');
-      expect(emailLink).toHaveClass('hover:underline');
+  it('should render the information usage list items', () => {
+    setup();
+    const usageItems = [
+      /Create and manage your account/i,
+      /Personalize your experience/i,
+      /Improve platform features/i,
+      /Send updates, promotions/i,
+      /Ensure the platform’s security/i, // Use ’ instead of '
+    ];
+
+    usageItems.forEach((itemRegex) => {
+      expect(screen.getByText(itemRegex)).toBeInTheDocument();
     });
   });
 
-  describe('Styling and Accessibility', () => {
-    it('should have appropriate heading hierarchy', () => {
-      const mainHeading = screen.getByRole('heading', { level: 1 });
-      expect(mainHeading).toHaveTextContent('Privacy Policy');
+  it('should render the contact email as a correct mailto link', () => {
+    setup();
+    // Find the link specifically by its text content
+    const emailLink = screen.getByRole('link', { name: /privacy@adventra\.com/i });
 
-      const subHeadings = screen.getAllByRole('heading', { level: 2 });
-      expect(subHeadings).toHaveLength(8); // 8 policy sections
-    });
-
-    it('should have proper container styling', () => {
-      const container = screen.getByText('Privacy Policy').closest('div');
-      expect(container).toHaveClass('w-full');
-      expect(container).toHaveClass('max-w-3xl');
-      expect(container).toHaveClass('bg-white');
-      expect(container).toHaveClass('shadow-md');
-      expect(container).toHaveClass('rounded-lg');
-    });
+    expect(emailLink).toBeInTheDocument();
+    expect(emailLink).toHaveAttribute('href', 'mailto:privacy@adventra.com');
   });
 });

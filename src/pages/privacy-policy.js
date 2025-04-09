@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
           <li>Personalize your experience and match you with other adventurers.</li>
           <li>Improve platform features and functionality.</li>
           <li>Send updates, promotions, and support (opt-out anytime).</li>
-          <li>Ensure the platform's security and integrity.</li>
+          <li>Ensure the platform&rsquo;s security and integrity.</li>
         </ul>
 
         {/* Section 3 */}
@@ -68,7 +68,9 @@ export default function PrivacyPolicyPage() {
         </ul>
 
         {/* Section 6 */}
-        <h2 className="text-2xl font-heading mt-8 mb-3 text-secondary">6. Children's Privacy</h2>
+        <h2 className="text-2xl font-heading mt-8 mb-3 text-secondary">
+          6. Children&rsquo;s Privacy
+        </h2>
         <p className="mb-4">
           Adventra is not intended for users under 18. We do not knowingly collect data from
           children. Contact us if you believe a minor has provided data.

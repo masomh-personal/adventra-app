@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
-import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -99,7 +100,13 @@ export default function Header() {
     <header className="flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30">
       {/* Logo + Text Link to Home */}
       <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
-        <img src="/adventra-logo.png" alt="Adventra Logo" className="h-12" />
+        <Image
+          src="/adventra-logo.png"
+          alt="Adventra Logo"
+          width={48} // Set width (adjust if logo isn't square)
+          height={48} // Set height based on h-12
+          priority // Add priority as it's likely above the fold (LCP)
+        />
         <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
           adventra
         </span>
@@ -113,9 +120,9 @@ export default function Header() {
         data-testid="mobile-menu-button"
       >
         {isMenuOpen ? (
-          <FaTimes className="w-6 h-6" data-testid="mobile-menu-times" /> // Close icon
+          <FaTimes className="w-6 h-6" data-testid="mobile-menu-times" />
         ) : (
-          <FaBars className="w-6 h-6" data-testid="mobile-menu-bars" /> // Hamburger icon
+          <FaBars className="w-6 h-6" data-testid="mobile-menu-bars" />
         )}
       </button>
 

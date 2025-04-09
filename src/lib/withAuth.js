@@ -5,49 +5,68 @@ import supabase from '@/lib/supabaseClient';
 export default function withAuth(Component, options = {}) {
   const { redirectIfAuthenticated = false } = options;
 
-  return function AuthProtected(props) {
+  // It's good practice to give HOCs a display name for debugging
+  const displayName = `WithAuth(${Component.displayName || Component.name || 'Component'})`;
+
+  function AuthProtected(props) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
-      (async () => {
+      // Using a flag to prevent state updates after unmount
+      let isMounted = true;
+
+      const checkAuth = async () => {
         try {
           const {
             data: { session },
             error,
           } = await supabase.auth.getSession();
 
+          if (!isMounted) return; // Don't proceed if unmounted
+
           // Check for any errors during session retrieval
           if (error) {
             console.error('Session retrieval error:', error);
-            // Optionally, you might want to set user to null or handle the error differently
             setUser(null);
+            setLoading(false); // Ensure loading stops on error
             return;
           }
 
           if (session) {
             setUser(session.user);
-
-            // Only redirect if redirectIfAuthenticated is true
+            // Only redirect if redirectIfAuthenticated is true and component is still mounted
             if (redirectIfAuthenticated) {
+              // No need to setLoading(false) here as the redirect will unmount
               await router.push('/dashboard');
-              return;
+              return; // Stop execution after initiating redirect
             }
-          }
-
-          // If no session and not redirecting, set user to null
-          if (!session) {
+          } else {
+            // If no session and not redirecting, set user to null
             setUser(null);
           }
         } catch (err) {
           console.error('Unexpected auth check error:', err);
-          setUser(null);
+          if (isMounted) {
+            setUser(null); // Ensure user is null on unexpected error
+          }
         } finally {
-          setLoading(false);
+          // Only set loading to false if the component is still mounted
+          if (isMounted) {
+            setLoading(false);
+          }
         }
-      })();
-    }, [router, redirectIfAuthenticated]);
+      };
+
+      checkAuth();
+
+      // Cleanup function to set the flag when the component unmounts
+      return () => {
+        isMounted = false;
+      };
+      // Only include router in the dependency array
+    }, [router]); // Removed redirectIfAuthenticated
 
     if (loading) {
       return (
@@ -57,6 +76,11 @@ export default function withAuth(Component, options = {}) {
       );
     }
 
+    // Pass the user prop down to the wrapped component
     return <Component {...props} user={user} />;
-  };
+  }
+
+  AuthProtected.displayName = displayName; // Assign the display name
+
+  return AuthProtected;
 }
