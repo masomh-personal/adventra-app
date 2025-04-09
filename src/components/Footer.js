@@ -69,7 +69,7 @@ export default function Footer() {
               title={`Build: ${gitSha} (View Repository)`}
             >
               <FaCodeBranch />
-              <span>build: v{gitSha}</span>
+              <span>main: v{gitSha}</span>
             </a>
           </p>
         </div>
