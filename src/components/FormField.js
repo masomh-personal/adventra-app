@@ -87,14 +87,41 @@ export default function FormField({
         return <textarea rows={4} {...getInputProps()} />;
 
       case 'checkbox':
+        if (options.length > 0) {
+          return (
+            <div className="space-y-2">
+              {options.map((option) => (
+                <div key={option.value} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`${id}-${option.value}`}
+                    value={option.value}
+                    {...registerFn(id, registerOptions)}
+                    className={`h-4 w-4 text-primary focus:ring-primary ${
+                      hasError ? 'border-red-500' : 'border-gray-300'
+                    } ${className}`}
+                    disabled={disabled}
+                  />
+                  <label htmlFor={`${id}-${option.value}`} className="ml-2 block text-sm">
+                    {option.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          );
+        }
+
+        // Single checkbox (like terms agreement)
         return (
           <div className="flex items-center">
             <input
               type="checkbox"
-              {...getInputProps()}
+              id={id}
+              {...registerFn(id, registerOptions)}
               className={`h-4 w-4 text-primary focus:ring-primary ${
                 hasError ? 'border-red-500' : 'border-gray-300'
               } ${className}`}
+              disabled={disabled}
             />
             <label htmlFor={id} className="ml-2 block text-sm">
               {label}
@@ -148,11 +175,9 @@ export default function FormField({
 
   return (
     <div className="form-field">
-      {type !== 'checkbox' && (
-        <label htmlFor={id} className="block font-heading mb-1 font-bold">
-          {label}
-        </label>
-      )}
+      <label htmlFor={id} className="block font-heading mb-1 font-bold">
+        {label}
+      </label>
 
       {renderInput()}
 
