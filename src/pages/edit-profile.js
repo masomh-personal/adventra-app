@@ -232,40 +232,65 @@ function EditProfile() {
               validationSchema={validationSchema}
               onSubmit={handleSave}
               defaultValues={profile}
-              submitLabel="Save Changes"
+              submitLabel={null} // disables the internal button rendering
             >
-              {({ register, errors }) => (
-                <>
-                  <FormField
-                    label="Bio"
-                    id="bio"
-                    type="textarea"
-                    placeholder="Tell us about yourself"
-                    register={register}
-                    errors={errors}
-                  />
-                  <CharacterCounter value={profile.bio} maxLength={500} />
+              {({ register, errors, watch, isSubmitting }) => {
+                const watchedBio = watch('bio');
+                const watchedAdventures = watch('adventurePreferences') || [];
+                const watchedSkill = watch('skillLevel');
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                const isDirty =
+                  watchedBio !== profile.bio ||
+                  JSON.stringify(watchedAdventures) !==
+                    JSON.stringify(profile.adventurePreferences) ||
+                  watchedSkill !== profile.skillLevel;
+
+                return (
+                  <>
                     <FormField
-                      label="Adventure Preferences"
-                      id="adventurePreferences"
-                      type="checkbox"
-                      options={adventureOptions}
+                      label="Bio"
+                      id="bio"
+                      type="textarea"
+                      placeholder="Tell us about yourself"
                       register={register}
                       errors={errors}
                     />
-                    <FormField
-                      label="Skill Level"
-                      id="skillLevel"
-                      type="radio"
-                      options={skillOptions}
-                      register={register}
-                      errors={errors}
-                    />
-                  </div>
-                </>
-              )}
+                    <CharacterCounter value={watchedBio} maxLength={500} />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        label="Adventure Preferences"
+                        id="adventurePreferences"
+                        type="checkbox"
+                        options={adventureOptions}
+                        register={register}
+                        errors={errors}
+                      />
+                      <FormField
+                        label="Skill Level"
+                        id="skillLevel"
+                        type="radio"
+                        options={skillOptions}
+                        register={register}
+                        errors={errors}
+                      />
+                    </div>
+
+                    {/* Submit Button Override */}
+                    <div className="pt-2">
+                      <Button
+                        type="submit"
+                        label="Save Changes"
+                        isLoading={isSubmitting}
+                        isValid={true}
+                        disabled={!isDirty || isSubmitting}
+                        className="w-full"
+                        size="lg"
+                      />
+                    </div>
+                  </>
+                );
+              }}
             </FormWrapper>
           </div>
 
