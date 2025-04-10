@@ -1,7 +1,21 @@
 import React from 'react';
 
 /**
- * Reusable Form Field that supports multiple input types with testability & accessibility
+ * Reusable Form Field component for various input types with accessibility and testability in mind.
+ *
+ * @param {string} label - The label for the input field.
+ * @param {string} type - The type of the input. Supports text, textarea, select, radio, checkbox, file (default is 'text').
+ * @param {string} id - Unique ID for the field, used for name and htmlFor.
+ * @param {function} register - React Hook Form register function for field validation and tracking.
+ * @param {object} errors - Validation error object from React Hook Form.
+ * @param {string} placeholder - Placeholder text for input fields.
+ * @param {array} options - Array of options for select, radio, or checkbox inputs (each with { value, label }).
+ * @param {object} registerOptions - Additional options passed to React Hook Form’s register method.
+ * @param {string} className - Extra CSS classes to apply to the input.
+ * @param {boolean} disabled - Whether the input is disabled.
+ * @param {string} helpText - Optional help or hint text displayed below the field.
+ * @param {function} onChange - Custom onChange handler.
+ * @param {function} onBlur - Custom onBlur handler.
  */
 export default function FormField({
   label,
@@ -19,32 +33,37 @@ export default function FormField({
   onBlur,
 }) {
   const hasError = errors?.[id];
-  const registerFn = register || (() => ({}));
   const errorId = `${id}-error`;
+
+  const shouldUseRegister = type !== 'file';
+  const registerFn = shouldUseRegister ? register || (() => ({})) : undefined;
 
   const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
 
-  const getInputProps = () => ({
-    id,
-    placeholder,
-    disabled,
-    className: inputClass,
-    'aria-invalid': hasError ? 'true' : undefined,
-    'aria-describedby': hasError ? errorId : undefined,
-    ...registerFn(id, {
-      ...registerOptions,
-      onChange: (e) => {
-        registerOptions?.onChange?.(e);
-        onChange?.(e);
-      },
-      onBlur: (e) => {
-        registerOptions?.onBlur?.(e);
-        onBlur?.(e);
-      },
-    }),
-  });
+  const getInputProps = () =>
+    shouldUseRegister
+      ? {
+          id,
+          placeholder,
+          disabled,
+          className: inputClass,
+          'aria-invalid': hasError ? 'true' : undefined,
+          'aria-describedby': hasError ? errorId : undefined,
+          ...registerFn(id, {
+            ...registerOptions,
+            onChange: (e) => {
+              registerOptions?.onChange?.(e);
+              onChange?.(e);
+            },
+            onBlur: (e) => {
+              registerOptions?.onBlur?.(e);
+              onBlur?.(e);
+            },
+          }),
+        }
+      : {};
 
   const renderInput = () => {
     switch (type) {
@@ -104,6 +123,22 @@ export default function FormField({
               </div>
             ))}
           </div>
+        );
+
+      case 'file':
+        return (
+          <input
+            type="file"
+            id={id}
+            name={id}
+            accept="image/png, image/jpeg"
+            className={inputClass}
+            disabled={disabled}
+            onChange={onChange}
+            onBlur={onBlur}
+            aria-invalid={hasError ? 'true' : undefined}
+            aria-describedby={hasError ? errorId : undefined}
+          />
         );
 
       default:

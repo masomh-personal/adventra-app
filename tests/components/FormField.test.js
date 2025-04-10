@@ -251,4 +251,60 @@ describe('FormField', () => {
       expect(input).toBeDisabled();
     });
   });
+
+  // Added this test as we need a new filed input type for the Edit Profile page
+  describe('file input type', () => {
+    it('renders a file input when type is "file"', () => {
+      const fileProps = {
+        ...defaultProps,
+        type: 'file',
+        label: 'Profile Photo',
+        id: 'profileImage',
+        onChange: jest.fn(),
+      };
+
+      render(<FormField {...fileProps} />);
+
+      const input = screen.getByLabelText('Profile Photo');
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveAttribute('type', 'file');
+    });
+
+    it('calls onChange when a file is selected', () => {
+      const mockChange = jest.fn();
+      const fileProps = {
+        ...defaultProps,
+        type: 'file',
+        label: 'Profile Photo',
+        id: 'profileImage',
+        onChange: mockChange,
+      };
+
+      render(<FormField {...fileProps} />);
+
+      const input = screen.getByLabelText('Profile Photo');
+      const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
+
+      // Simulate file selection
+      Object.defineProperty(input, 'files', {
+        value: [file],
+      });
+
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      expect(mockChange).toHaveBeenCalled();
+    });
+
+    it('does not register file input with react-hook-form', () => {
+      const fileProps = {
+        ...defaultProps,
+        type: 'file',
+        label: 'Upload',
+        id: 'fileUpload',
+        register: jest.fn(), // This should not be called for file inputs
+      };
+
+      render(<FormField {...fileProps} />);
+      expect(fileProps.register).not.toHaveBeenCalled();
+    });
+  });
 });
