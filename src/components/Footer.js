@@ -72,13 +72,11 @@ export default function Footer() {
               className={buildTagStyle}
               title={`Branch: ${gitBranch}\nFull SHA: ${gitSha}`}
             >
-              {/* GitHub Icon on the left */}
-              <FaGithub className="w-4 h-4 opacity-80" />
-
               {/* Branch and SHA */}
               <span className="flex items-center gap-1">
-                {gitBranch} | {gitSha.slice(0, 7)}
-                <FaCodeBranch className="w-3.5 h-3.5 opacity-70" />
+                <FaGithub className="w-4 h-4 opacity-80" />
+                {gitBranch} |
+                <FaCodeBranch className="w-3.5 h-3.5 opacity-70" /> {gitSha.slice(0, 7)}
               </span>
             </a>
           </p>
