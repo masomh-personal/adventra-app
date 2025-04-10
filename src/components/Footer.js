@@ -19,7 +19,7 @@ export default function Footer() {
     font-bold
     px-2 py-1
     rounded
-    border border-gray-500 border-opacity-50
+    border border-gray-300 border-opacity-50
     transition-colors duration-200
     no-underline
     mt-2
