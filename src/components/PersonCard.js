@@ -3,7 +3,11 @@ import Image from 'next/image';
 
 export default function PersonCard({ name, skillLevel, bio, adventurePreferences, imgSrc }) {
   const fallbackImgSrc = '/member_pictures/default.png';
-  const [source, setSource] = useState(imgSrc ?? fallbackImgSrc);
+
+  const [source, setSource] = useState(() => {
+    // Avoid setting "" as initial value, which throws a warning
+    return imgSrc?.trim() ? imgSrc : fallbackImgSrc;
+  });
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-300">
@@ -29,7 +33,7 @@ export default function PersonCard({ name, skillLevel, bio, adventurePreferences
       </div>
 
       <p className="text-gray-700 mb-4" data-testid="person-card-bio">
-        {bio || 'This adventurer hasn’t written a bio yet.'}
+        {bio?.trim() || 'This adventurer hasn’t written a bio yet.'}
       </p>
 
       <div>
@@ -38,7 +42,7 @@ export default function PersonCard({ name, skillLevel, bio, adventurePreferences
           {adventurePreferences?.length > 0 ? (
             adventurePreferences.map((pref) => <li key={pref}>{pref}</li>)
           ) : (
-            <li>None</li>
+            <li>None selected</li>
           )}
         </ul>
       </div>
