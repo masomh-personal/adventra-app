@@ -4,27 +4,16 @@ import Dashboard from '@/pages/dashboard';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 
-// Mock the withAuth higher-order component with displayName
+// Mock the withAuth HOC
 jest.mock('@/lib/withAuth', () => (Component) => {
-  // Define the mock wrapper component
   const MockWithAuth = (props) => <Component {...props} />;
-  // Assign a displayName
   MockWithAuth.displayName = `WithAuth(${Component.displayName || Component.name || 'Component'})`;
-  // Return the mock wrapper
   return MockWithAuth;
 });
 
-// Mock useRouter
+// Mock router
 jest.mock('next/router', () => ({
-  useRouter: jest.fn(), // Mock the useRouter function itself
-}));
-
-// Mock useModal
-jest.mock('@/contexts/ModalContext', () => ({
-  useModal: () => ({
-    showErrorModal: jest.fn(),
-    showSuccessModal: jest.fn(),
-  }),
+  useRouter: jest.fn(),
 }));
 
 // Mock supabase
@@ -34,20 +23,31 @@ jest.mock('@/lib/supabaseClient', () => ({
   },
 }));
 
+// Optional: mock modal context if used
+jest.mock('@/contexts/ModalContext', () => ({
+  useModal: () => ({
+    showErrorModal: jest.fn(),
+    showSuccessModal: jest.fn(),
+  }),
+}));
+
 describe('Dashboard', () => {
   const setup = () => userEvent.setup();
   const mockUser = {
     user_metadata: { full_name: 'Test User' },
   };
 
+  let mockPush;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPush = jest.fn();
+    useRouter.mockReturnValue({ push: mockPush });
   });
 
   it('renders the dashboard header and welcome message', () => {
     render(<Dashboard user={mockUser} />);
     expect(screen.getByText(/Welcome,/i)).toBeInTheDocument();
-    // Adjusted this to match the actual text in the component if 'someone new' isn't correct
     expect(screen.getByText(/Test/i)).toBeInTheDocument();
   });
 
@@ -66,8 +66,6 @@ describe('Dashboard', () => {
 
   it('calls signOut and redirects to login when Log Out is clicked', async () => {
     const user = setup();
-    const push = jest.fn(); // Create a mock push function
-    useRouter.mockReturnValue({ push }); // Mock the useRouter hook to return our mock push function
     supabase.auth.signOut.mockResolvedValueOnce({ error: null });
 
     render(<Dashboard user={mockUser} />);
@@ -75,7 +73,7 @@ describe('Dashboard', () => {
 
     await waitFor(() => {
       expect(supabase.auth.signOut).toHaveBeenCalled();
-      expect(push).toHaveBeenCalledWith('/login'); // Use the mock push function
+      expect(mockPush).toHaveBeenCalledWith('/login');
     });
   });
 
@@ -97,32 +95,27 @@ describe('Dashboard', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('calls handleEditProfile when Edit Profile is clicked', async () => {
+  it('calls router.push when Edit Profile is clicked', async () => {
     const user = setup();
+
     render(<Dashboard user={mockUser} />);
     const editProfileButton = screen.getByTestId('edit-profile-button');
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     await user.click(editProfileButton);
 
     await waitFor(() => {
-      // Assuming the actual implementation logs this. Adjust if needed.
-      expect(consoleLogSpy).toHaveBeenCalledWith('Edit Profile clicked');
+      expect(mockPush).toHaveBeenCalledWith('/edit-profile');
     });
-
-    consoleLogSpy.mockRestore();
   });
 
   it('calls onClick when the Matches button is clicked', async () => {
     const user = setup();
-    render(<Dashboard user={mockUser} />);
-    const matchesButton = screen.getByTestId('infocard-button-matches');
     const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-    await user.click(matchesButton);
+    render(<Dashboard user={mockUser} />);
+    await user.click(screen.getByTestId('infocard-button-matches'));
 
     await waitFor(() => {
-      // Assuming the actual implementation logs this. Adjust if needed.
       expect(consoleLogSpy).toHaveBeenCalledWith('View Matches clicked');
     });
 
@@ -131,14 +124,12 @@ describe('Dashboard', () => {
 
   it('calls onClick when the Adventurers button is clicked', async () => {
     const user = setup();
-    render(<Dashboard user={mockUser} />);
-    const adventurersButton = screen.getByTestId('infocard-button-adventurers');
     const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-    await user.click(adventurersButton);
+    render(<Dashboard user={mockUser} />);
+    await user.click(screen.getByTestId('infocard-button-adventurers'));
 
     await waitFor(() => {
-      // Assuming the actual implementation logs this. Adjust if needed.
       expect(consoleLogSpy).toHaveBeenCalledWith('Browse Adventures clicked');
     });
 
@@ -147,14 +138,12 @@ describe('Dashboard', () => {
 
   it('calls onClick when the Messages button is clicked', async () => {
     const user = setup();
-    render(<Dashboard user={mockUser} />);
-    const messagesButton = screen.getByTestId('infocard-button-messages');
     const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-    await user.click(messagesButton);
+    render(<Dashboard user={mockUser} />);
+    await user.click(screen.getByTestId('infocard-button-messages'));
 
     await waitFor(() => {
-      // Assuming the actual implementation logs this. Adjust if needed.
       expect(consoleLogSpy).toHaveBeenCalledWith('View Messages clicked');
     });
 
