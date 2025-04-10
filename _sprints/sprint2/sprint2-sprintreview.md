@@ -64,7 +64,7 @@
 
 ## What Could Be Improved
 
-- Plan buffer time for more complex features like profile creation
+- Plan buffer time for more complex features like profile editing
 - Consider breaking larger stories into smaller tasks to improve delivery
 
 ---
