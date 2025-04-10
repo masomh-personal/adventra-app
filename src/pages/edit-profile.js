@@ -1,32 +1,24 @@
-/**
- * TODO
- * 1) have the photo upload completely separate from the main form
- * 2) Add 4 different checkboxes for adenture preferences
- * 3) Style the radio buttons and checkboxes
- * 4) The photo is being uploaded fine, but it's not showing up in the live preview
- * 5) Add a erturn to dashboard button with left arrow
- * 6) Check styling on everything including the upload file text area
- * 7) Have validation in teh validation folder
- * 8) Check InfoBox styling and make sure it makes sense where the placement is, or maybe use a modal?
- * 9) Use proper label for the skill and adventure preference
- */
-
+import { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
-import { useState, useEffect, useRef } from 'react';
+
+// Utilities
 import supabase from '@/lib/supabaseClient';
-import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import withAuth from '@/lib/withAuth';
+import { getCurrentUserId } from '@/lib/getCurrentUserId';
+import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
+
+// Components
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 import InfoBox from '@/components/InfoBox';
-import PersonCard from '@/components/PersonCard';
 import { CharacterCounter } from '@/components/CharacterCounter';
+import PersonCard from '@/components/PersonCard';
+import Button from '@/components/Button';
 
+// Form validation schema
 const validationSchema = Yup.object().shape({
   bio: Yup.string().max(500, 'Bio must be at most 500 characters'),
-  adventurePreferences: Yup.array()
-    .of(Yup.string())
-    .min(1, 'Select at least one adventure preference'),
+  adventurePreferences: Yup.array().of(Yup.string()).min(1, 'Select at least one preference'),
   skillLevel: Yup.string().required('Skill level is required'),
 });
 
@@ -46,20 +38,19 @@ const skillOptions = [
 
 function EditProfile() {
   const [userId, setUserId] = useState(null);
-  const [profile, setProfile] = useState({
-    bio: '',
-    adventurePreferences: [],
-    skillLevel: '',
-    profileImageUrl: '',
-  });
-
+  const [profile, setProfile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [infoBox, setInfoBox] = useState({ message: '', variant: 'info' });
+
   const fileInputRef = useRef(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfile = async () => {
       const uid = await getCurrentUserId();
       if (!uid) return;
+
       setUserId(uid);
 
       const { data, error } = await supabase
@@ -73,36 +64,28 @@ function EditProfile() {
         return;
       }
 
-      if (data?.profile_image_url) {
-        const { data: signedUrlData, error: urlError } = await supabase.storage
-          .from('profile-photos')
-          .createSignedUrl(`user-${uid}.jpg`, 3600);
+      const publicUrl = data?.profile_image_url
+        ? getPublicProfileImageUrl(uid, { bustCache: true })
+        : '';
 
-        if (!urlError && signedUrlData?.signedUrl) {
-          setProfile({
-            bio: data.bio || '',
-            adventurePreferences: data.adventure_preferences || [],
-            skillLevel: data.skill_summary || '',
-            profileImageUrl: signedUrlData.signedUrl,
-          });
-        }
-      } else {
-        setProfile({
-          bio: data?.bio || '',
-          adventurePreferences: data?.adventure_preferences || [],
-          skillLevel: data?.skill_summary || '',
-          profileImageUrl: '',
-        });
-      }
+      const hydratedProfile = {
+        bio: data?.bio || '',
+        adventurePreferences: data?.adventure_preferences || [],
+        skillLevel: data?.skill_summary || '',
+        profileImageUrl: publicUrl,
+      };
+
+      setProfile(hydratedProfile);
+      formRef.current?.reset(hydratedProfile); // Sync with React Hook Form
     };
 
-    fetchData();
+    fetchProfile();
   }, []);
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !userId) return;
+  const handleImageUpload = async () => {
+    if (!selectedFile || !userId) return;
 
+    const file = selectedFile;
     const maxSize = 2 * 1024 * 1024;
     const allowedTypes = ['image/jpeg', 'image/png'];
 
@@ -116,67 +99,57 @@ function EditProfile() {
       return;
     }
 
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    img.onload = async () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 300;
-      canvas.height = 400;
-
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, 300, 400);
-
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-
-        const filePath = `user-${userId}.jpg`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('profile-photos')
-          .upload(filePath, blob, {
-            contentType: 'image/jpeg',
-            upsert: true,
-            metadata: { owner: userId },
-          });
-
-        if (uploadError) {
-          console.error('Image upload error:', uploadError);
-          setInfoBox({ message: 'Image upload failed.', variant: 'error' });
-          return;
-        }
-
-        const { data: signedUrlData, error: urlError } = await supabase.storage
-          .from('profile-photos')
-          .createSignedUrl(filePath, 3600);
-
-        if (!urlError && signedUrlData?.signedUrl) {
-          setProfile((prev) => ({
-            ...prev,
-            profileImageUrl: signedUrlData.signedUrl,
-          }));
-          setInfoBox({ message: 'Image uploaded successfully!', variant: 'success' });
-        }
-      }, 'image/jpeg');
-    };
-  };
-
-  const handleRemovePhoto = async () => {
-    if (!userId) return;
+    setIsUploading(true);
 
     const filePath = `user-${userId}.jpg`;
-    const { error } = await supabase.storage.from('profile-photos').remove([filePath]);
 
-    if (error) {
-      console.error('Error deleting profile photo:', error);
-      setInfoBox({ message: 'Failed to delete photo.', variant: 'error' });
-    } else {
-      setProfile((prev) => ({ ...prev, profileImageUrl: '' }));
-      setInfoBox({ message: 'Profile photo removed.', variant: 'success' });
+    const { error: uploadError } = await supabase.storage
+      .from('profile-photos')
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: true,
+        cacheControl: 'public, max-age=0, must-revalidate',
+        metadata: { owner: userId },
+      });
+
+    if (uploadError) {
+      console.error('Upload failed:', uploadError);
+      setInfoBox({ message: 'Image upload failed.', variant: 'error' });
+      setIsUploading(false);
+      return;
     }
+
+    const publicUrl = getPublicProfileImageUrl(userId, { bustCache: true });
+
+    const { error: updateError } = await supabase.from('userprofile').upsert(
+      {
+        user_id: userId,
+        profile_image_url: publicUrl,
+      },
+      { onConflict: 'user_id' }
+    );
+
+    if (updateError) {
+      console.error('Error saving image URL to userprofile:', updateError);
+      setInfoBox({ message: 'Image uploaded, but profile was not updated.', variant: 'error' });
+    } else {
+      setProfile((prev) => ({
+        ...prev,
+        profileImageUrl: publicUrl,
+      }));
+
+      setInfoBox({ message: 'Profile image uploaded successfully!', variant: 'success' });
+    }
+
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setIsUploading(false);
   };
 
   const handleSave = async (data) => {
     if (!userId) return;
+
+    console.log(`handleSave():data:>>`, data);
 
     try {
       const { error } = await supabase.from('userprofile').upsert(
@@ -191,16 +164,28 @@ function EditProfile() {
       );
 
       if (error) throw error;
+
+      setProfile((prev) => ({
+        ...prev,
+        bio: data.bio,
+        adventurePreferences: data.adventurePreferences,
+        skillLevel: data.skillLevel,
+      }));
+
       setInfoBox({ message: 'Profile updated successfully!', variant: 'success' });
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      setInfoBox({ message: 'Failed to save profile. Please try again.', variant: 'error' });
+    } catch (err) {
+      console.error('Save failed:', err);
+      setInfoBox({ message: 'Failed to save profile.', variant: 'error' });
     }
   };
 
+  if (!profile) {
+    return <div className="p-8 text-center">Loading...</div>;
+  }
+
   return (
-    <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
-      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8 my-8">
+    <div className="w-full flex-grow bg-background text-foreground flex justify-center p-6 font-body">
+      <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-8 my-8">
         {infoBox.message && (
           <InfoBox
             message={infoBox.message}
@@ -210,81 +195,89 @@ function EditProfile() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <FormWrapper
-            title="Edit Profile"
-            validationSchema={validationSchema}
-            onSubmit={handleSave}
-            defaultValues={profile}
-            submitLabel="Save Changes"
-          >
-            <FormField
-              label="Bio"
-              id="bio"
-              type="textarea"
-              placeholder="Tell us about yourself"
-              onChange={(e) => setProfile((prev) => ({ ...prev, bio: e.target.value }))}
-            />
-            <CharacterCounter value={profile.bio} maxLength={500} />
-
-            <FormField
-              label="Adventure Preferences"
-              id="adventurePreferences"
-              type="checkbox"
-              options={adventureOptions}
-              onChange={(e) => {
-                const value = e.target.value;
-                setProfile((prev) => ({
-                  ...prev,
-                  adventurePreferences: prev.adventurePreferences.includes(value)
-                    ? prev.adventurePreferences.filter((pref) => pref !== value)
-                    : [...prev.adventurePreferences, value],
-                }));
-              }}
-            />
-
-            <FormField
-              label="Skill Level"
-              id="skillLevel"
-              type="radio"
-              options={skillOptions}
-              onChange={(e) =>
-                setProfile((prev) => ({
-                  ...prev,
-                  skillLevel: e.target.value,
-                }))
-              }
-            />
-
-            <div className="mt-4">
+          <div>
+            <div className="mb-8">
+              <h4 className="font-bold text-base mb-2">Profile Photo</h4>
               <label htmlFor="profileImage" className="block font-medium mb-1">
-                Upload Profile Photo (300×400, max 2MB)
+                Upload (max 2MB, JPG or PNG)
               </label>
               <input
                 ref={fileInputRef}
                 type="file"
                 accept="image/png, image/jpeg"
                 id="profileImage"
-                onChange={handleImageUpload}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setSelectedFile(file);
+                }}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               />
-              {profile.profileImageUrl && (
-                <button
-                  type="button"
-                  onClick={handleRemovePhoto}
-                  className="mt-2 text-sm text-red-600 underline"
-                >
-                  Remove uploaded photo
-                </button>
+
+              {selectedFile && (
+                <div className="mt-3 flex gap-4">
+                  <Button
+                    label="Upload"
+                    variant="primary"
+                    isLoading={isUploading}
+                    onClick={handleImageUpload}
+                  />
+                  <Button
+                    label="Clear"
+                    variant="muted"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                  />
+                </div>
               )}
             </div>
-          </FormWrapper>
+
+            <FormWrapper
+              ref={formRef}
+              validationSchema={validationSchema}
+              onSubmit={handleSave}
+              defaultValues={profile}
+              submitLabel="Save Changes"
+            >
+              {({ register }) => (
+                <>
+                  <FormField
+                    label="Bio"
+                    id="bio"
+                    type="textarea"
+                    placeholder="Tell us about yourself"
+                    register={register}
+                  />
+                  <CharacterCounter value={profile.bio} maxLength={500} />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      label="Adventure Preferences"
+                      id="adventurePreferences"
+                      type="checkbox"
+                      options={adventureOptions}
+                      register={register}
+                    />
+                    <FormField
+                      label="Skill Level"
+                      id="skillLevel"
+                      type="radio"
+                      options={skillOptions}
+                      register={register}
+                    />
+                  </div>
+                </>
+              )}
+            </FormWrapper>
+          </div>
 
           <div>
             <h3 className="text-lg font-bold mb-4">Live Preview</h3>
             <PersonCard
               name="Your Profile"
-              skillLevel={profile.skillLevel ?? 'N/A'}
-              bio={profile.bio ?? 'N/A'}
+              bio={profile.bio}
+              skillLevel={profile.skillLevel}
               adventurePreferences={profile.adventurePreferences}
               imgSrc={profile.profileImageUrl}
             />
