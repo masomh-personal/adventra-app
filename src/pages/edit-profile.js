@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 
-// Utilities
 import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
 
-// Components
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 import InfoBox from '@/components/InfoBox';
@@ -15,7 +13,6 @@ import { CharacterCounter } from '@/components/CharacterCounter';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
 
-// Form validation schema
 const validationSchema = Yup.object().shape({
   bio: Yup.string().max(500, 'Bio must be at most 500 characters'),
   adventurePreferences: Yup.array().of(Yup.string()).min(1, 'Select at least one preference'),
@@ -76,7 +73,7 @@ function EditProfile() {
       };
 
       setProfile(hydratedProfile);
-      formRef.current?.reset(hydratedProfile); // Sync with React Hook Form
+      formRef.current?.reset(hydratedProfile);
     };
 
     fetchProfile();
@@ -149,8 +146,6 @@ function EditProfile() {
   const handleSave = async (data) => {
     if (!userId) return;
 
-    console.log(`handleSave():data:>>`, data);
-
     try {
       const { error } = await supabase.from('userprofile').upsert(
         {
@@ -213,24 +208,23 @@ function EditProfile() {
                 className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               />
 
-              {selectedFile && (
-                <div className="mt-3 flex gap-4">
-                  <Button
-                    label="Upload"
-                    variant="primary"
-                    isLoading={isUploading}
-                    onClick={handleImageUpload}
-                  />
-                  <Button
-                    label="Clear"
-                    variant="muted"
-                    onClick={() => {
-                      setSelectedFile(null);
-                      if (fileInputRef.current) fileInputRef.current.value = '';
-                    }}
-                  />
-                </div>
-              )}
+              <div className="mt-3 flex gap-4">
+                <Button
+                  label="Upload"
+                  variant="primary"
+                  isLoading={isUploading}
+                  onClick={handleImageUpload}
+                  disabled={!selectedFile}
+                />
+                <Button
+                  label="Clear"
+                  variant="muted"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = '';
+                  }}
+                />
+              </div>
             </div>
 
             <FormWrapper
@@ -240,7 +234,7 @@ function EditProfile() {
               defaultValues={profile}
               submitLabel="Save Changes"
             >
-              {({ register }) => (
+              {({ register, errors }) => (
                 <>
                   <FormField
                     label="Bio"
@@ -248,6 +242,7 @@ function EditProfile() {
                     type="textarea"
                     placeholder="Tell us about yourself"
                     register={register}
+                    errors={errors}
                   />
                   <CharacterCounter value={profile.bio} maxLength={500} />
 
@@ -258,6 +253,7 @@ function EditProfile() {
                       type="checkbox"
                       options={adventureOptions}
                       register={register}
+                      errors={errors}
                     />
                     <FormField
                       label="Skill Level"
@@ -265,6 +261,7 @@ function EditProfile() {
                       type="radio"
                       options={skillOptions}
                       register={register}
+                      errors={errors}
                     />
                   </div>
                 </>
