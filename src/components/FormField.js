@@ -175,9 +175,15 @@ export default function FormField({
 
   return (
     <div className="form-field">
-      <label htmlFor={id} className="block font-heading mb-1 font-bold">
-        {label}
-      </label>
+      {type !== 'checkbox' && type !== 'radio' && (
+        <label htmlFor={id} className="block font-heading mb-1 font-bold">
+          {label}
+        </label>
+      )}
+
+      {(type === 'checkbox' || type === 'radio') && (
+        <p className="block font-heading mb-1 font-bold">{label}</p>
+      )}
 
       {renderInput()}
 
