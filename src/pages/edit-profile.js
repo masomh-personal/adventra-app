@@ -210,7 +210,7 @@ function EditProfile() {
 
               <div className="mt-3 flex gap-4">
                 <Button
-                  label="Upload"
+                  label="Upload Photo"
                   variant="primary"
                   isLoading={isUploading}
                   onClick={handleImageUpload}
