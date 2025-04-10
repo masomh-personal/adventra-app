@@ -1,9 +1,13 @@
 import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
+
+// NOTE:The submit button will be disabled initially because the form is invalid.
+// To trigger validation errors, we simulate blurring (e.g., via tabbing) or fill fields with invalid values.
 
 describe('Form Integration', () => {
   const contactFormSchema = yup.object({
@@ -28,12 +32,12 @@ describe('Form Integration', () => {
   });
 
   const fillField = async (label, value) => {
-    await act(async () => {
-      fireEvent.change(screen.getByLabelText(label), { target: { value } });
-    });
+    const input = screen.getByLabelText(label);
+    await userEvent.clear(input);
+    await userEvent.type(input, value);
   };
 
-  it('renders all field types and submit button', () => {
+  it('renders all fields and submit button', () => {
     render(
       <FormWrapper
         title="Contact Form"
@@ -84,10 +88,14 @@ describe('Form Integration', () => {
       </FormWrapper>
     );
 
-    await act(async () => {
-      fireEvent.submit(screen.getByRole('form'));
-    });
+    // Simulate tabbing through each field to trigger blur
+    await userEvent.tab(); // focus Full Name
+    await userEvent.tab(); // blur Full Name, focus Email
+    await userEvent.tab(); // blur Email, focus Subject
+    await userEvent.tab(); // blur Subject, focus Message
+    await userEvent.tab(); // blur Message
 
+    // Now check for validation errors
     expect(await screen.findByText('Name is required')).toBeInTheDocument();
     expect(await screen.findByText('Email is required')).toBeInTheDocument();
     expect(await screen.findByText('Subject is required')).toBeInTheDocument();
@@ -115,12 +123,9 @@ describe('Form Integration', () => {
     await fillField('Email Address', 'john@example.com');
     await fillField('Subject', 'Bug report');
     await fillField('Message', 'This is a complete message for testing.');
-    await fillField('How did you find us?', 'search');
-    fireEvent.click(screen.getByLabelText('Subscribe to newsletter'));
-
-    await act(async () => {
-      fireEvent.submit(screen.getByRole('form'));
-    });
+    await userEvent.selectOptions(screen.getByLabelText('How did you find us?'), 'search');
+    await userEvent.click(screen.getByLabelText('Subscribe to newsletter'));
+    await userEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith(
@@ -145,8 +150,7 @@ describe('Form Integration', () => {
             <FormField
               label="Username"
               id="username"
-              errors={form.errors}
-              register={form.register}
+              {...form}
               registerOptions={{
                 required: 'Username is required',
                 minLength: { value: 3, message: 'Username must be at least 3 characters' },
@@ -156,8 +160,7 @@ describe('Form Integration', () => {
               label="Password"
               type="password"
               id="password"
-              errors={form.errors}
-              register={form.register}
+              {...form}
               registerOptions={{
                 required: 'Password is required',
                 minLength: { value: 8, message: 'Password must be at least 8 characters' },
@@ -168,19 +171,16 @@ describe('Form Integration', () => {
       </FormWrapper>
     );
 
-    await act(async () => {
-      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
-    });
+    await userEvent.tab(); // focus username
+    await userEvent.tab(); // blur username, focus password
+    await userEvent.tab(); // blur password
 
     expect(await screen.findByText('Username is required')).toBeInTheDocument();
     expect(await screen.findByText('Password is required')).toBeInTheDocument();
 
-    await fillField('Username', 'ab');
-    await fillField('Password', '1234');
-
-    await act(async () => {
-      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
-    });
+    await fillField('Username', 'ab'); // too short
+    await fillField('Password', '1234'); // too short
+    await userEvent.tab(); // blur again to trigger error
 
     expect(await screen.findByText(/at least 3 characters/i)).toBeInTheDocument();
     expect(await screen.findByText(/at least 8 characters/i)).toBeInTheDocument();
@@ -197,9 +197,7 @@ describe('Form Integration', () => {
     expect(screen.getByLabelText('First Name')).toHaveValue('Jane');
     expect(screen.getByLabelText('Last Name')).toHaveValue('Doe');
 
-    await act(async () => {
-      fireEvent.submit(screen.getByRole('form')); // ensures form-level submit is fired
-    });
+    await userEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith(
@@ -207,5 +205,23 @@ describe('Form Integration', () => {
         expect.anything()
       );
     });
+  });
+
+  it('renders file input and allows file selection', async () => {
+    const file = new File(['file contents'], 'example.png', { type: 'image/png' });
+    const mockOnChange = jest.fn();
+
+    render(
+      <FormWrapper onSubmit={mockSubmit}>
+        <FormField label="Upload File" id="upload" type="file" onChange={mockOnChange} />
+      </FormWrapper>
+    );
+
+    const input = screen.getByLabelText('Upload File');
+    await userEvent.upload(input, file);
+
+    expect(input.files[0]).toBe(file);
+    expect(input.files).toHaveLength(1);
+    expect(mockOnChange).toHaveBeenCalled();
   });
 });
