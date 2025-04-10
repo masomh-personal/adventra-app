@@ -31,8 +31,8 @@
 | Updating/Redesigning Database             | 1      | ✅ Done     |
 | Add Modal/Error Window                    | 3      | ✅ Done     |
 | Add 20 Users to Supabase                  | 3      | ✅ Done     |
-| View Profile Page                         | 5      | ❌ Not Done |
-| Implement Create Profile Functionality    | 5      | ❌ Not Done |
+| Edit Profile Page                         | 5      | ❌ Not Done |
+| Implement Edit Profile Functionality      | 5      | ❌ Not Done |
 
 ---
 
@@ -71,8 +71,8 @@
 
 ## Incomplete/Deferred Work
 
-- View Profile Page
-- Implement Create Profile Functionality
+- Edit Profile Page
+- Implement Edit Profile Functionality
 
 ---
 
