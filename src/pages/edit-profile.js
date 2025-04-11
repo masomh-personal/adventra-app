@@ -208,7 +208,7 @@ function EditProfile() {
                     <div className="flex items-center gap-4">
                       <label
                         htmlFor="profileImage"
-                        className="cursor-pointer inline-flex items-center justify-center px-5 py-2 rounded-xl font-semibold text-sm text-white bg-secondary hover:bg-primary transition-all border border-gray-300 shadow-sm"
+                        className="cursor-pointer inline-flex items-center justify-center px-3 py-1 rounded-md font-semibold text-sm text-white bg-secondary hover:bg-primary transition-all border border-gray-300 shadow-sm"
                       >
                         Choose File
                       </label>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CharacterCounter } from '@/components/CharacterCounter';
 
 export default function FormField({
@@ -59,46 +58,69 @@ export default function FormField({
 
       case 'checkbox':
         return (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             {options.map((option) => (
-              <div key={option.value} className="flex items-center">
+              <label
+                key={option.value}
+                htmlFor={`${id}-${option.value}`}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold
+            transition-all
+            hover:bg-secondary/10
+            peer-checked:bg-secondary/10
+            peer-checked:border-primary
+            peer-checked:text-primary"
+              >
                 <input
                   type="checkbox"
                   id={`${id}-${option.value}`}
                   value={option.value}
                   {...register(id)}
-                  className={`h-4 w-4 text-primary focus:ring-primary ${
-                    hasError ? 'border-red-500' : 'border-gray-300'
-                  } ${className}`}
+                  className="hidden peer"
                   disabled={disabled}
                 />
-                <label htmlFor={`${id}-${option.value}`} className="ml-2 block text-sm">
-                  {option.label}
-                </label>
-              </div>
+                <span
+                  className="w-4 h-4 flex items-center justify-center border-2 rounded-sm
+              border-gray-400 peer-checked:border-primary peer-checked:bg-primary
+              peer-checked:shadow-inner"
+                >
+                  <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
+                </span>
+                {option.label}
+              </label>
             ))}
           </div>
         );
 
       case 'radio':
         return (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {options.map((option) => (
-              <div key={option.value} className="flex items-center">
+              <label
+                key={option.value}
+                htmlFor={`${id}-${option.value}`}
+                className="flex items-center gap-1.5 cursor-pointer select-none"
+              >
                 <input
                   type="radio"
                   id={`${id}-${option.value}`}
                   value={option.value}
                   {...register(id)}
-                  className={`h-4 w-4 text-primary focus:ring-primary ${
-                    hasError ? 'border-red-500' : 'border-gray-300'
-                  } ${className}`}
+                  className="peer sr-only"
                   disabled={disabled}
                 />
-                <label htmlFor={`${id}-${option.value}`} className="ml-2 block text-sm">
-                  {option.label}
-                </label>
-              </div>
+
+                <span
+                  className={`
+              w-5 h-5 flex items-center justify-center
+              rounded-full border-2 border-gray-400
+              transition-all duration-200
+              peer-checked:border-primary peer-checked:bg-primary/20
+              peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary
+            `}
+                />
+
+                <span className="text-sm font-semibold uppercase">{option.label}</span>
+              </label>
             ))}
           </div>
         );
