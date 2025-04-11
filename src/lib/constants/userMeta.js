@@ -42,3 +42,30 @@ export const skillLevels = [
   { value: 'advanced', label: 'Advanced' },
   { value: 'expert', label: 'Expert' },
 ];
+
+export const skillColors = {
+  novice: {
+    label: 'Novice',
+    border: 'border-gray-500',
+    text: 'text-gray-800',
+    bg: 'bg-gray-100',
+  },
+  intermediate: {
+    label: 'Intermediate',
+    border: 'border-blue-500',
+    text: 'text-blue-800',
+    bg: 'bg-blue-100',
+  },
+  advanced: {
+    label: 'Advanced',
+    border: 'border-purple-500',
+    text: 'text-purple-800',
+    bg: 'bg-purple-100',
+  },
+  expert: {
+    label: 'Expert',
+    border: 'border-red-500',
+    text: 'text-red-800',
+    bg: 'bg-red-100',
+  },
+};
