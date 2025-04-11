@@ -1,4 +1,5 @@
 import React from 'react';
+import { CharacterCounter } from '@/components/CharacterCounter';
 
 export default function FormField({
   label,
@@ -14,6 +15,9 @@ export default function FormField({
   helpText,
   onChange,
   onBlur,
+  maxHeight, // Optional: Tailwind class for max height
+  maxWidth, // Optional: Tailwind class for wrapper width
+  characterCountOptions, // Optional: { value, maxLength }
 }) {
   const hasError = errors?.[id];
   const errorId = `${id}-error`;
@@ -45,7 +49,13 @@ export default function FormField({
   const renderInput = () => {
     switch (type) {
       case 'textarea':
-        return <textarea rows={4} {...getInputProps()} />;
+        return (
+          <textarea
+            rows={4}
+            {...getInputProps()}
+            className={`${inputClass} resize-none ${maxHeight || 'max-h-48'}`}
+          />
+        );
 
       case 'checkbox':
         return (
@@ -99,10 +109,18 @@ export default function FormField({
   };
 
   return (
-    <div className="form-field">
-      <label htmlFor={id} className="block font-heading mb-1 font-bold">
-        {label}
-      </label>
+    <div className={`form-field ${maxWidth || ''}`}>
+      <div className="flex items-center justify-between mb-1">
+        <label htmlFor={id} className="block font-heading font-bold">
+          {label}
+        </label>
+        {characterCountOptions && (
+          <CharacterCounter
+            value={characterCountOptions.value}
+            maxLength={characterCountOptions.maxLength}
+          />
+        )}
+      </div>
 
       {renderInput()}
 
