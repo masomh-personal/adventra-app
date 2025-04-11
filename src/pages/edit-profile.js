@@ -7,6 +7,7 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
 import getFullUserProfile from '@/lib/getFullUserProfile';
 import useRunOnce from '@/hooks/useRunOnce';
+import { adventurePreferences, skillLevels } from '@/lib/constants/userMeta';
 
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
@@ -21,20 +22,6 @@ const validationSchema = Yup.object().shape({
   adventurePreferences: Yup.array().of(Yup.string()).min(1, 'Select at least one preference'),
   skillLevel: Yup.string().required('Skill level is required'),
 });
-
-const adventureOptions = [
-  { value: 'hiking', label: 'Hiking' },
-  { value: 'camping', label: 'Camping' },
-  { value: 'rock_climbing', label: 'Rock Climbing' },
-  { value: 'photography', label: 'Photography' },
-];
-
-const skillOptions = [
-  { value: 'novice', label: 'Novice' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'advanced', label: 'Advanced' },
-  { value: 'expert', label: 'Expert' },
-];
 
 function EditProfile() {
   const [userId, setUserId] = useState(null);
@@ -57,11 +44,12 @@ function EditProfile() {
       if (!data) return;
 
       const hydratedProfile = {
+        name: data.user?.name || '',
+        age: data.age || null,
         bio: data.bio || '',
         adventurePreferences: data.adventure_preferences || [],
         skillLevel: data.skill_summary || '',
         profileImageUrl: data.profile_image_url || '',
-        name: data.user?.name || '',
       };
 
       setProfile(hydratedProfile);
@@ -148,7 +136,9 @@ function EditProfile() {
         { onConflict: 'user_id' }
       );
 
-      if (error) throw error;
+      if (error) {
+        console.error(error);
+      }
 
       setProfile((prev) => ({
         ...prev,
@@ -259,15 +249,16 @@ function EditProfile() {
                         label="Adventure Preferences"
                         id="adventurePreferences"
                         type="checkbox"
-                        options={adventureOptions}
+                        options={adventurePreferences.map(({ value, label }) => ({ value, label }))}
                         register={register}
                         errors={errors}
                       />
+
                       <FormField
                         label="Skill Level"
                         id="skillLevel"
                         type="radio"
-                        options={skillOptions}
+                        options={skillLevels}
                         register={register}
                         errors={errors}
                       />
@@ -299,6 +290,7 @@ function EditProfile() {
             <h3 className="text-lg font-bold mb-4">Live Preview</h3>
             <PersonCard
               name={profile.name}
+              age={profile.age}
               bio={profile.bio}
               skillLevel={profile.skillLevel}
               adventurePreferences={profile.adventurePreferences}

@@ -53,3 +53,9 @@ export const messageValidation = yup
   .required('Please enter your message')
   .min(10, 'Message must be at least 10 characters')
   .max(2000, 'Message cannot exceed 2000 characters');
+
+export const birthdateValidation = yup
+  .date()
+  .nullable()
+  .max(new Date(), 'Birthdate cannot be in the future')
+  .typeError('Please select a valid date');

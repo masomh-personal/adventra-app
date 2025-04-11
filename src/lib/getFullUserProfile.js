@@ -1,7 +1,8 @@
 import supabase from '@/lib/supabaseClient';
+import calcAgeFromBirthdate from '@/lib/calcAgeFromBirthdate';
 
 /**
- * Fetches the full user profile including profile data and name/email from the related user table.
+ * Fetches the full user profile including profile data and user info (name, email, birthdate).
  * Requires a foreign key from `userprofile.user_id` → `user.user_id`
  *
  * @param {string} uid - Supabase Auth UUID (user_id)
@@ -18,6 +19,7 @@ export default async function getFullUserProfile(uid) {
       adventure_preferences,
       skill_summary,
       profile_image_url,
+      birthdate,
       user:user_id (
         name,
         email
@@ -32,5 +34,11 @@ export default async function getFullUserProfile(uid) {
     return null;
   }
 
-  return data;
+  // Compute age from birthdate in userprofile table
+  const age = data?.birthdate ? calcAgeFromBirthdate(data.birthdate) : null;
+
+  return {
+    ...data,
+    age, // Add it at the root level for easy consumption
+  };
 }
