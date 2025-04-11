@@ -32,6 +32,28 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 ---
 
+## Continuous Integration (CI)
+
+Our project uses a combination of **Vercel** and **GitHub Actions** to implement a robust Continuous Integration (CI) workflow.
+
+### Vercel Deployment
+We use **Vercel** for automatic deployments. Every time code is pushed to the `main` branch (or a feature branch with an open pull request), Vercel:
+- Builds the application
+- Runs basic checks
+- Deploys to a preview or production environment
+
+This allows for continuous feedback and seamless collaboration with live previews.
+
+### GitHub Actions for Testing
+We use **GitHub Actions** to automate testing. Whenever code is pushed or a pull request is opened:
+- GitHub Actions runs our test suite
+- Ensures that all tests pass before changes are merged
+- Helps maintain code quality and catch bugs early
+
+This setup helps us ensure that both our application functionality and deployment workflows remain stable throughout development.
+
+---
+
 ## **Team Members & Scrum Roles**
 
 | **Name** | **Role**      |
