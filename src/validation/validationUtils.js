@@ -54,8 +54,14 @@ export const messageValidation = yup
   .min(10, 'Message must be at least 10 characters')
   .max(2000, 'Message cannot exceed 2000 characters');
 
+const today = new Date();
+const minBirthdate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
 export const birthdateValidation = yup
   .date()
-  .nullable()
-  .max(new Date(), 'Birthdate cannot be in the future')
-  .typeError('Please select a valid date');
+  .transform((value, originalValue) => {
+    // Handle "" as undefined (so it triggers .required())
+    return originalValue === '' ? undefined : value;
+  })
+  .required('Date of birth is required')
+  .max(minBirthdate, 'You must be at least 18 years old');

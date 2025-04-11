@@ -14,9 +14,9 @@ export default function FormField({
   helpText,
   onChange,
   onBlur,
-  maxHeight, // Optional: Tailwind class for max height
-  maxWidth, // Optional: Tailwind class for wrapper width
-  characterCountOptions, // Optional: { value, maxLength }
+  maxHeight,
+  maxWidth,
+  characterCountOptions,
 }) {
   const hasError = errors?.[id];
   const errorId = `${id}-error`;
@@ -64,11 +64,11 @@ export default function FormField({
                 key={option.value}
                 htmlFor={`${id}-${option.value}`}
                 className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold
-            transition-all
-            hover:bg-secondary/10
-            peer-checked:bg-secondary/10
-            peer-checked:border-primary
-            peer-checked:text-primary"
+                transition-all
+                hover:bg-secondary/10
+                peer-checked:bg-secondary/10
+                peer-checked:border-primary
+                peer-checked:text-primary"
               >
                 <input
                   type="checkbox"
@@ -78,11 +78,7 @@ export default function FormField({
                   className="hidden peer"
                   disabled={disabled}
                 />
-                <span
-                  className="w-4 h-4 flex items-center justify-center border-2 rounded-sm
-              border-gray-400 peer-checked:border-primary peer-checked:bg-primary
-              peer-checked:shadow-inner"
-                >
+                <span className="w-4 h-4 flex items-center justify-center border-2 rounded-sm border-gray-400 peer-checked:border-primary peer-checked:bg-primary peer-checked:shadow-inner">
                   <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
                 </span>
                 {option.label}
@@ -108,21 +104,20 @@ export default function FormField({
                   className="peer sr-only"
                   disabled={disabled}
                 />
-
-                <span
-                  className={`
-              w-5 h-5 flex items-center justify-center
-              rounded-full border-2 border-gray-400
-              transition-all duration-200
-              peer-checked:border-primary peer-checked:bg-primary/20
-              peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary
-            `}
-                />
-
+                <span className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-400 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary/20 peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary" />
                 <span className="text-sm font-semibold uppercase">{option.label}</span>
               </label>
             ))}
           </div>
+        );
+
+      case 'date':
+        return (
+          <input
+            type="date"
+            {...getInputProps()}
+            className={`${inputClass} text-sm bg-white text-gray-800`}
+          />
         );
 
       default:
