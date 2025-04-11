@@ -57,33 +57,47 @@ export default function FormField({
         );
 
       case 'checkbox':
+        // If options are provided, render a list of checkboxes
+        if (options.length > 0) {
+          return (
+            <div className="flex flex-col gap-2">
+              {options.map((option) => (
+                <label
+                  key={option.value}
+                  htmlFor={`${id}-${option.value}`}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold transition-all hover:bg-secondary/10 peer-checked:bg-secondary/10 peer-checked:border-primary peer-checked:text-primary"
+                >
+                  <input
+                    type="checkbox"
+                    id={`${id}-${option.value}`}
+                    value={option.value}
+                    {...register(id)}
+                    className="hidden peer"
+                    disabled={disabled}
+                  />
+                  <span className="w-4 h-4 flex items-center justify-center border-2 rounded-sm border-gray-400 peer-checked:border-primary peer-checked:bg-primary peer-checked:shadow-inner">
+                    <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
+                  </span>
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          );
+        }
+
+        // Single checkbox (boolean)
         return (
-          <div className="flex flex-col gap-2">
-            {options.map((option) => (
-              <label
-                key={option.value}
-                htmlFor={`${id}-${option.value}`}
-                className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold
-                transition-all
-                hover:bg-secondary/10
-                peer-checked:bg-secondary/10
-                peer-checked:border-primary
-                peer-checked:text-primary"
-              >
-                <input
-                  type="checkbox"
-                  id={`${id}-${option.value}`}
-                  value={option.value}
-                  {...register(id)}
-                  className="hidden peer"
-                  disabled={disabled}
-                />
-                <span className="w-4 h-4 flex items-center justify-center border-2 rounded-sm border-gray-400 peer-checked:border-primary peer-checked:bg-primary peer-checked:shadow-inner">
-                  <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
-                </span>
-                {option.label}
-              </label>
-            ))}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={id}
+              {...register(id)}
+              disabled={disabled}
+              className="w-4 h-4 border-gray-300 rounded focus:ring-2 focus:ring-primary"
+            />
+            <label htmlFor={id} className="text-sm font-semibold">
+              {label}
+            </label>
           </div>
         );
 
@@ -128,9 +142,11 @@ export default function FormField({
   return (
     <div className={`form-field ${maxWidth || ''}`}>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="block font-heading font-bold">
-          {label}
-        </label>
+        {type !== 'checkbox' && (
+          <label htmlFor={id} className="block font-heading font-bold">
+            {label}
+          </label>
+        )}
         {characterCountOptions && (
           <CharacterCounter
             value={characterCountOptions.value}

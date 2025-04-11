@@ -4,74 +4,82 @@ import PersonCard from '@/components/PersonCard';
 describe('PersonCard', () => {
   const baseProps = {
     name: 'Alex Explorer',
+    age: 28,
     skillLevel: 'Intermediate',
     bio: 'Loves hiking and finding hidden waterfalls.',
-    adventurePreferences: ['Hiking', 'Photography'],
+    adventurePreferences: ['hiking', 'photography'],
     imgSrc: '/custom-image.jpg',
   };
 
-  describe('renders core content correctly', () => {
-    it('displays the provided name', () => {
+  describe('Core Content Rendering', () => {
+    it('renders the user name and age', () => {
       render(<PersonCard {...baseProps} />);
       const name = screen.getByTestId('person-card-name');
-      expect(name).toHaveTextContent('Alex Explorer');
+      expect(name).toHaveTextContent('28 | Alex Explorer');
     });
 
-    it('displays the provided skill level', () => {
+    it('renders the skill level with proper badge styling', () => {
       render(<PersonCard {...baseProps} />);
-      const skill = screen.getByTestId('person-card-skill-level');
-      expect(skill).toHaveTextContent('Skill Level: Intermediate');
+      const skillBadge = screen.getByText(/Intermediate/i);
+      expect(skillBadge).toBeInTheDocument();
     });
 
-    it('displays the provided bio', () => {
+    it('renders the user bio', () => {
       render(<PersonCard {...baseProps} />);
       const bio = screen.getByTestId('person-card-bio');
       expect(bio).toHaveTextContent('Loves hiking and finding hidden waterfalls.');
     });
 
-    it('renders all provided adventure preferences', () => {
+    it('renders the adventure preferences correctly', () => {
       render(<PersonCard {...baseProps} />);
-      const preferences = screen.getByTestId('person-card-preferences');
-      expect(preferences).toHaveTextContent('Hiking');
-      expect(preferences).toHaveTextContent('Photography');
+      const prefs = screen.getByTestId('person-card-preferences');
+      expect(prefs).toHaveTextContent('Hiking');
+      expect(prefs).toHaveTextContent('Photography');
     });
 
-    it('renders the image with the correct src', () => {
+    it('renders an image element for the user', () => {
       render(<PersonCard {...baseProps} />);
-      const img = screen.getByTestId('person-card-image');
-      expect(img).toBeInTheDocument();
+      const image = screen.getByTestId('person-card-image');
+      expect(image).toBeInTheDocument();
     });
   });
 
-  describe('renders fallbacks when props are missing', () => {
-    it('uses default name when none is provided', () => {
+  describe('Fallback Rendering', () => {
+    it('displays "Unnamed Explorer" if name is missing', () => {
       render(<PersonCard {...baseProps} name={null} />);
-      expect(screen.getByTestId('person-card-name')).toHaveTextContent('Unnamed Explorer');
+      const name = screen.getByTestId('person-card-name');
+      expect(name).toHaveTextContent('Unnamed Explorer');
     });
 
-    it('shows N/A when skill level is missing', () => {
+    it('displays "Not specified" if skillLevel is null', () => {
       render(<PersonCard {...baseProps} skillLevel={null} />);
-      expect(screen.getByTestId('person-card-skill-level')).toHaveTextContent('Skill Level: N/A');
+      expect(screen.getByText(/Not specified/i)).toBeInTheDocument();
     });
 
-    it('shows fallback bio when none is provided', () => {
+    it('shows fallback bio if bio is null or empty', () => {
       render(<PersonCard {...baseProps} bio={null} />);
-      expect(screen.getByTestId('person-card-bio')).toHaveTextContent(
-        'This adventurer hasn’t written a bio yet.'
-      );
+      const bio = screen.getByTestId('person-card-bio');
+      expect(bio).toHaveTextContent('This adventurer hasn’t written a bio yet.');
     });
 
-    it('displays "None" if no adventure preferences are provided', () => {
+    it('displays "None selected" when no preferences are given', () => {
       render(<PersonCard {...baseProps} adventurePreferences={[]} />);
-      expect(screen.getByTestId('person-card-preferences')).toHaveTextContent('None');
+      const prefs = screen.getByTestId('person-card-preferences');
+      expect(prefs).toHaveTextContent('None selected');
     });
   });
 
-  describe('image fallback logic', () => {
-    it('renders the image element even if src is missing', () => {
+  describe('Image Handling', () => {
+    it('renders fallback image if imgSrc is missing', () => {
       render(<PersonCard {...baseProps} imgSrc={null} />);
-      const img = screen.getByTestId('person-card-image');
-      expect(img).toBeInTheDocument();
+      const image = screen.getByTestId('person-card-image');
+      expect(image).toBeInTheDocument();
+    });
+
+    it('renders a loading spinner for fallback img with useNextImage = false', () => {
+      render(<PersonCard {...baseProps} useNextImage={false} />);
+      const image = screen.getByTestId('person-card-image');
+      expect(image).toBeInTheDocument();
     });
   });
 });

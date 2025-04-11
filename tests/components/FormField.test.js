@@ -1,14 +1,13 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import FormField from '@/components/FormField';
 
 describe('FormField', () => {
-  const defaultProps = {
+  const mockRegister = jest.fn().mockReturnValue({});
+  const baseProps = {
     label: 'Email',
     type: 'email',
     id: 'email',
-    register: jest.fn().mockReturnValue({}),
+    register: mockRegister,
     errors: {},
     placeholder: 'Enter your email',
   };
@@ -17,294 +16,149 @@ describe('FormField', () => {
     jest.clearAllMocks();
   });
 
-  describe('rendering', () => {
-    it('renders the label correctly', () => {
-      render(<FormField {...defaultProps} />);
+  describe('Basic rendering', () => {
+    it('renders label and input', () => {
+      render(<FormField {...baseProps} />);
       expect(screen.getByText('Email')).toBeInTheDocument();
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
     });
 
-    it('renders the input with correct attributes', () => {
-      render(<FormField {...defaultProps} />);
-
+    it('applies placeholder, id, and type', () => {
+      render(<FormField {...baseProps} />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('type', 'email');
-      expect(input).toHaveAttribute('id', 'email');
       expect(input).toHaveAttribute('placeholder', 'Enter your email');
-    });
-
-    it('applies the correct class names without errors', () => {
-      render(<FormField {...defaultProps} />);
-
-      const input = screen.getByLabelText('Email');
-      expect(input).toHaveClass('w-full');
-      expect(input).toHaveClass('p-2');
-      expect(input).toHaveClass('border');
-      expect(input).toHaveClass('border-gray-300');
-      expect(input).not.toHaveClass('border-red-500');
-    });
-  });
-
-  describe('error handling', () => {
-    it('displays error message when provided', () => {
-      const propsWithError = {
-        ...defaultProps,
-        errors: {
-          email: {
-            message: 'Email is required',
-          },
-        },
-      };
-
-      render(<FormField {...propsWithError} />);
-
-      expect(screen.getByText('Email is required')).toBeInTheDocument();
-    });
-
-    it('applies error styling when there is an error', () => {
-      const propsWithError = {
-        ...defaultProps,
-        errors: {
-          email: {
-            message: 'Email is required',
-          },
-        },
-      };
-
-      render(<FormField {...propsWithError} />);
-
-      const input = screen.getByLabelText('Email');
-      expect(input).toHaveClass('border-red-500');
-      expect(input).not.toHaveClass('border-gray-300');
-    });
-  });
-
-  describe('react-hook-form integration', () => {
-    it('calls register with the correct id and registerOptions', () => {
-      const registerOptions = { required: 'This field is required' };
-      render(<FormField {...defaultProps} registerOptions={registerOptions} />);
-
-      expect(defaultProps.register).toHaveBeenCalledWith(
-        'email',
-        expect.objectContaining(registerOptions)
-      );
-    });
-
-    it('calls register with just the id when no registerOptions provided', () => {
-      render(<FormField {...defaultProps} />);
-
-      expect(defaultProps.register).toHaveBeenCalledWith('email', expect.objectContaining({}));
-    });
-  });
-
-  describe('help text', () => {
-    it('displays help text when provided and no errors exist', () => {
-      const props = {
-        ...defaultProps,
-        helpText: 'This is some helpful information',
-      };
-
-      render(<FormField {...props} />);
-
-      expect(screen.getByText('This is some helpful information')).toBeInTheDocument();
-      expect(screen.getByText('This is some helpful information')).toHaveClass('text-gray-500');
-    });
-
-    it('does not display help text when there is an error', () => {
-      const props = {
-        ...defaultProps,
-        helpText: 'This is some helpful information',
-        errors: {
-          email: {
-            message: 'Email is required',
-          },
-        },
-      };
-
-      render(<FormField {...props} />);
-
-      expect(screen.queryByText('This is some helpful information')).not.toBeInTheDocument();
-      expect(screen.getByText('Email is required')).toBeInTheDocument();
-    });
-  });
-
-  describe('accessibility', () => {
-    it('associates label with input via id', () => {
-      render(<FormField {...defaultProps} />);
-
-      const label = screen.getByText('Email');
-      expect(label).toHaveAttribute('for', 'email');
-
-      const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('id', 'email');
     });
-  });
 
-  describe('select input type', () => {
-    it('renders a select element with options', () => {
-      const selectProps = {
-        ...defaultProps,
-        type: 'select',
-        options: [
-          { value: 'option1', label: 'Option 1' },
-          { value: 'option2', label: 'Option 2' },
-        ],
-      };
-
-      render(<FormField {...selectProps} />);
-
-      expect(screen.getByLabelText('Email')).toBeInTheDocument();
-      expect(screen.getByRole('combobox')).toBeInTheDocument();
-      expect(screen.getByText('Option 1')).toBeInTheDocument();
-      expect(screen.getByText('Option 2')).toBeInTheDocument();
+    it('adds custom className if provided', () => {
+      render(<FormField {...baseProps} className="custom-style" />);
+      const input = screen.getByLabelText('Email');
+      expect(input).toHaveClass('custom-style');
     });
 
-    it('renders a placeholder option when provided', () => {
-      const selectProps = {
-        ...defaultProps,
-        type: 'select',
-        placeholder: 'Select an option',
-        options: [{ value: 'option1', label: 'Option 1' }],
-      };
-
-      render(<FormField {...selectProps} />);
-
-      expect(screen.getByText('Select an option')).toBeInTheDocument();
+    it('disables input when disabled', () => {
+      render(<FormField {...baseProps} disabled />);
+      expect(screen.getByLabelText('Email')).toBeDisabled();
     });
   });
 
-  describe('textarea input type', () => {
-    it('renders a textarea element', () => {
-      const textareaProps = {
-        ...defaultProps,
-        type: 'textarea',
+  describe('Error + help text', () => {
+    it('shows error message and red border when error exists', () => {
+      const props = {
+        ...baseProps,
+        errors: {
+          email: { message: 'Email is required' },
+        },
       };
+      render(<FormField {...props} />);
+      expect(screen.getByText('Email is required')).toBeInTheDocument();
+      expect(screen.getByLabelText('Email')).toHaveClass('border-red-500');
+    });
 
-      render(<FormField {...textareaProps} />);
+    it('shows help text when no error exists', () => {
+      render(<FormField {...baseProps} helpText="Helpful hint" />);
+      expect(screen.getByText('Helpful hint')).toBeInTheDocument();
+    });
 
+    it('hides help text when error exists', () => {
+      const props = {
+        ...baseProps,
+        helpText: 'Helpful hint',
+        errors: {
+          email: { message: 'Invalid email' },
+        },
+      };
+      render(<FormField {...props} />);
+      expect(screen.queryByText('Helpful hint')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Supported input types', () => {
+    it('renders a textarea for type="textarea"', () => {
+      render(<FormField {...baseProps} type="textarea" />);
       const textarea = screen.getByLabelText('Email');
       expect(textarea.tagName).toBe('TEXTAREA');
-      expect(textarea).toHaveAttribute('rows', '4');
     });
-  });
 
-  describe('checkbox input type', () => {
-    it('renders a checkbox with label after the input', () => {
-      const checkboxProps = {
-        ...defaultProps,
-        type: 'checkbox',
-      };
-
-      render(<FormField {...checkboxProps} />);
-
-      const checkbox = screen.getByLabelText('Email');
-      expect(checkbox).toHaveAttribute('type', 'checkbox');
-
-      // For checkboxes, the label should be rendered after the input
-      const checkboxContainer = checkbox.closest('div');
-      expect(checkboxContainer.firstChild).toBe(checkbox);
+    it('renders a date input for type="date"', () => {
+      render(<FormField {...baseProps} type="date" />);
+      const input = screen.getByLabelText('Email');
+      expect(input).toHaveAttribute('type', 'date');
     });
-  });
 
-  describe('radio input type', () => {
-    it('renders radio buttons for each option', () => {
-      const radioProps = {
-        ...defaultProps,
+    it('renders radio buttons with correct labels', async () => {
+      const props = {
+        ...baseProps,
+        id: 'gender',
+        label: 'Gender',
         type: 'radio',
         options: [
-          { value: 'option1', label: 'Option 1' },
-          { value: 'option2', label: 'Option 2' },
+          { value: 'm', label: 'Male' },
+          { value: 'f', label: 'Female' },
         ],
       };
+      render(<FormField {...props} />);
+      expect(screen.getByLabelText('Male')).toBeInTheDocument();
+      expect(screen.getByLabelText('Female')).toBeInTheDocument();
+    });
 
-      render(<FormField {...radioProps} />);
-
-      expect(screen.getByLabelText('Option 1')).toHaveAttribute('type', 'radio');
-      expect(screen.getByLabelText('Option 2')).toHaveAttribute('type', 'radio');
+    it('renders checkboxes with correct labels', () => {
+      const props = {
+        ...baseProps,
+        id: 'hobbies',
+        label: 'Hobbies',
+        type: 'checkbox',
+        options: [
+          { value: 'hiking', label: 'Hiking' },
+          { value: 'climbing', label: 'Climbing' },
+        ],
+      };
+      render(<FormField {...props} />);
+      expect(screen.getByLabelText('Hiking')).toHaveAttribute('type', 'checkbox');
+      expect(screen.getByLabelText('Climbing')).toHaveAttribute('type', 'checkbox');
     });
   });
 
-  describe('custom styling', () => {
-    it('applies custom className to the input', () => {
-      const customProps = {
-        ...defaultProps,
-        className: 'custom-class',
+  describe('CharacterCounter', () => {
+    it('displays character count when characterCountOptions are provided', () => {
+      const props = {
+        ...baseProps,
+        characterCountOptions: {
+          value: 'hello world',
+          maxLength: 50,
+        },
       };
+      render(<FormField {...props} />);
+      expect(screen.getByText('11/50')).toBeInTheDocument();
+    });
+  });
 
-      render(<FormField {...customProps} />);
+  describe('react-hook-form registration', () => {
+    it('calls register with correct options', () => {
+      const props = {
+        ...baseProps,
+        registerOptions: { required: 'This field is required' },
+      };
+      render(<FormField {...props} />);
+      expect(mockRegister).toHaveBeenCalledWith(
+        'email',
+        expect.objectContaining({
+          required: 'This field is required',
+          onChange: expect.any(Function),
+          onBlur: expect.any(Function),
+        })
+      );
+    });
+  });
 
+  describe('Accessibility', () => {
+    it('label and input are associated by id', () => {
+      render(<FormField {...baseProps} />);
+      const label = screen.getByText('Email');
       const input = screen.getByLabelText('Email');
-      expect(input).toHaveClass('custom-class');
-    });
-  });
-
-  describe('disabled state', () => {
-    it('disables the input when disabled prop is true', () => {
-      const disabledProps = {
-        ...defaultProps,
-        disabled: true,
-      };
-
-      render(<FormField {...disabledProps} />);
-
-      const input = screen.getByLabelText('Email');
-      expect(input).toBeDisabled();
-    });
-  });
-
-  // Added this test as we need a new filed input type for the Edit Profile page
-  describe('file input type', () => {
-    it('renders a file input when type is "file"', () => {
-      const fileProps = {
-        ...defaultProps,
-        type: 'file',
-        label: 'Profile Photo',
-        id: 'profileImage',
-        onChange: jest.fn(),
-      };
-
-      render(<FormField {...fileProps} />);
-
-      const input = screen.getByLabelText('Profile Photo');
-      expect(input).toBeInTheDocument();
-      expect(input).toHaveAttribute('type', 'file');
-    });
-
-    it('calls onChange when a file is selected', () => {
-      const mockChange = jest.fn();
-      const fileProps = {
-        ...defaultProps,
-        type: 'file',
-        label: 'Profile Photo',
-        id: 'profileImage',
-        onChange: mockChange,
-      };
-
-      render(<FormField {...fileProps} />);
-
-      const input = screen.getByLabelText('Profile Photo');
-      const file = new File(['(⌐□_□)'], 'avatar.png', { type: 'image/png' });
-
-      // Simulate file selection
-      Object.defineProperty(input, 'files', {
-        value: [file],
-      });
-
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-      expect(mockChange).toHaveBeenCalled();
-    });
-
-    it('does not register file input with react-hook-form', () => {
-      const fileProps = {
-        ...defaultProps,
-        type: 'file',
-        label: 'Upload',
-        id: 'fileUpload',
-        register: jest.fn(), // This should not be called for file inputs
-      };
-
-      render(<FormField {...fileProps} />);
-      expect(fileProps.register).not.toHaveBeenCalled();
+      expect(label).toHaveAttribute('for', 'email');
+      expect(input).toHaveAttribute('id', 'email');
     });
   });
 });

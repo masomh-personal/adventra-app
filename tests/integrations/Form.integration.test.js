@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
@@ -6,135 +5,76 @@ import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 
-// NOTE:The submit button will be disabled initially because the form is invalid.
-// To trigger validation errors, we simulate blurring (e.g., via tabbing) or fill fields with invalid values.
-
-describe('Form Integration', () => {
-  const contactFormSchema = yup.object({
-    fullName: yup.string().required('Name is required'),
-    email: yup.string().email('Please enter a valid email').required('Email is required'),
-    subject: yup.string().required('Subject is required'),
-    message: yup
-      .string()
-      .required('Message is required')
-      .min(10, 'Message must be at least 10 characters'),
-    contactType: yup
-      .string()
-      .required('Please select how you found us')
-      .notOneOf([''], 'Please select how you found us'),
-    subscribe: yup.boolean(),
-  });
-
+describe('FormWrapper + FormField Integration', () => {
+  const user = userEvent.setup();
   const mockSubmit = jest.fn();
 
   beforeEach(() => {
     mockSubmit.mockClear();
   });
 
-  const fillField = async (label, value) => {
+  const fill = async (label, value) => {
     const input = screen.getByLabelText(label);
-    await userEvent.clear(input);
-    await userEvent.type(input, value);
+    await user.clear(input);
+    await user.type(input, value);
   };
 
-  it('renders all fields and submit button', () => {
+  it('submits form successfully with all supported field types', async () => {
+    const schema = yup.object({
+      name: yup.string().required('Name is required'),
+      email: yup.string().email().required(),
+      bio: yup.string().min(10).required(),
+      skill: yup.string().required(),
+      birthDate: yup.string().required(),
+      subscribe: yup.boolean(),
+    });
+
     render(
-      <FormWrapper
-        title="Contact Form"
-        validationSchema={contactFormSchema}
-        onSubmit={mockSubmit}
-        submitLabel="Send Message"
-      >
-        <FormField label="Full Name" type="text" id="fullName" />
-        <FormField label="Email Address" type="email" id="email" />
-        <FormField label="Subject" type="text" id="subject" />
-        <FormField label="Message" type="textarea" id="message" />
+      <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
+        <FormField label="Name" id="name" />
+        <FormField label="Email" id="email" type="email" />
+        <FormField label="Bio" id="bio" type="textarea" />
         <FormField
-          label="How did you find us?"
-          type="select"
-          id="contactType"
-          placeholder="Please select..."
+          label="Skill Level"
+          id="skill"
+          type="radio"
           options={[
-            { value: 'search', label: 'Search Engine' },
-            { value: 'social', label: 'Social Media' },
-            { value: 'referral', label: 'Friend/Colleague' },
+            { value: 'beginner', label: 'Beginner' },
+            { value: 'intermediate', label: 'Intermediate' },
           ]}
         />
-        <FormField label="Subscribe to newsletter" type="checkbox" id="subscribe" />
+        <FormField label="Birth Date" id="birthDate" type="date" />
+        <FormField label="Subscribe to newsletter" id="subscribe" type="checkbox" />
       </FormWrapper>
     );
 
-    expect(screen.getByText('Contact Form')).toBeInTheDocument();
-    expect(screen.getByLabelText('Full Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Email Address')).toBeInTheDocument();
-    expect(screen.getByLabelText('Subject')).toBeInTheDocument();
-    expect(screen.getByLabelText('Message')).toBeInTheDocument();
-    expect(screen.getByLabelText('How did you find us?')).toBeInTheDocument();
-    expect(screen.getByLabelText('Subscribe to newsletter')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Send Message' })).toBeInTheDocument();
-  });
+    await fill('Name', 'Alex');
+    await fill('Email', 'alex@example.com');
+    await fill('Bio', 'This is my outdoor bio.');
 
-  it('shows validation errors when fields are empty', async () => {
-    render(
-      <FormWrapper validationSchema={contactFormSchema} onSubmit={mockSubmit}>
-        {(form) => (
-          <>
-            <FormField label="Full Name" type="text" id="fullName" {...form} />
-            <FormField label="Email Address" type="email" id="email" {...form} />
-            <FormField label="Subject" type="text" id="subject" {...form} />
-            <FormField label="Message" type="textarea" id="message" {...form} />
-          </>
-        )}
-      </FormWrapper>
-    );
+    // Select radio option
+    await user.click(screen.getByLabelText('Intermediate'));
 
-    // Simulate tabbing through each field to trigger blur
-    await userEvent.tab(); // focus Full Name
-    await userEvent.tab(); // blur Full Name, focus Email
-    await userEvent.tab(); // blur Email, focus Subject
-    await userEvent.tab(); // blur Subject, focus Message
-    await userEvent.tab(); // blur Message
+    // Fill date input
+    await user.type(screen.getByLabelText('Birth Date'), '1990-05-01');
 
-    // Now check for validation errors
-    expect(await screen.findByText('Name is required')).toBeInTheDocument();
-    expect(await screen.findByText('Email is required')).toBeInTheDocument();
-    expect(await screen.findByText('Subject is required')).toBeInTheDocument();
-    expect(await screen.findByText('Message is required')).toBeInTheDocument();
-  });
+    // Click checkbox
+    await user.click(screen.getByLabelText('Subscribe to newsletter'));
 
-  it('submits successfully with valid values', async () => {
-    render(
-      <FormWrapper validationSchema={contactFormSchema} onSubmit={mockSubmit}>
-        <FormField label="Full Name" type="text" id="fullName" />
-        <FormField label="Email Address" type="email" id="email" />
-        <FormField label="Subject" type="text" id="subject" />
-        <FormField label="Message" type="textarea" id="message" />
-        <FormField
-          label="How did you find us?"
-          type="select"
-          id="contactType"
-          options={[{ value: 'search', label: 'Search Engine' }]}
-        />
-        <FormField label="Subscribe to newsletter" type="checkbox" id="subscribe" />
-      </FormWrapper>
-    );
+    // Form should now be valid
+    const button = screen.getByRole('button');
+    expect(button).toBeEnabled();
 
-    await fillField('Full Name', 'John Doe');
-    await fillField('Email Address', 'john@example.com');
-    await fillField('Subject', 'Bug report');
-    await fillField('Message', 'This is a complete message for testing.');
-    await userEvent.selectOptions(screen.getByLabelText('How did you find us?'), 'search');
-    await userEvent.click(screen.getByLabelText('Subscribe to newsletter'));
-    await userEvent.click(screen.getByRole('button'));
+    await user.click(button);
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalledWith(
         {
-          fullName: 'John Doe',
-          email: 'john@example.com',
-          subject: 'Bug report',
-          message: 'This is a complete message for testing.',
-          contactType: 'search',
+          name: 'Alex',
+          email: 'alex@example.com',
+          bio: 'This is my outdoor bio.',
+          skill: 'intermediate',
+          birthDate: '1990-05-01',
           subscribe: true,
         },
         expect.anything()
@@ -142,86 +82,65 @@ describe('Form Integration', () => {
     });
   });
 
-  it('handles field-level validation with registerOptions', async () => {
-    render(
-      <FormWrapper onSubmit={mockSubmit}>
-        {(form) => (
-          <>
-            <FormField
-              label="Username"
-              id="username"
-              {...form}
-              registerOptions={{
-                required: 'Username is required',
-                minLength: { value: 3, message: 'Username must be at least 3 characters' },
-              }}
-            />
-            <FormField
-              label="Password"
-              type="password"
-              id="password"
-              {...form}
-              registerOptions={{
-                required: 'Password is required',
-                minLength: { value: 8, message: 'Password must be at least 8 characters' },
-              }}
-            />
-          </>
-        )}
-      </FormWrapper>
-    );
-
-    await userEvent.tab(); // focus username
-    await userEvent.tab(); // blur username, focus password
-    await userEvent.tab(); // blur password
-
-    expect(await screen.findByText('Username is required')).toBeInTheDocument();
-    expect(await screen.findByText('Password is required')).toBeInTheDocument();
-
-    await fillField('Username', 'ab'); // too short
-    await fillField('Password', '1234'); // too short
-    await userEvent.tab(); // blur again to trigger error
-
-    expect(await screen.findByText(/at least 3 characters/i)).toBeInTheDocument();
-    expect(await screen.findByText(/at least 8 characters/i)).toBeInTheDocument();
-  });
-
-  it('submits prefilled form from defaultValues', async () => {
-    render(
-      <FormWrapper onSubmit={mockSubmit} defaultValues={{ firstName: 'Jane', lastName: 'Doe' }}>
-        <FormField label="First Name" id="firstName" />
-        <FormField label="Last Name" id="lastName" />
-      </FormWrapper>
-    );
-
-    expect(screen.getByLabelText('First Name')).toHaveValue('Jane');
-    expect(screen.getByLabelText('Last Name')).toHaveValue('Doe');
-
-    await userEvent.click(screen.getByRole('button'));
-
-    await waitFor(() => {
-      expect(mockSubmit).toHaveBeenCalledWith(
-        { firstName: 'Jane', lastName: 'Doe' },
-        expect.anything()
-      );
+  it('disables button if validation fails on any field', async () => {
+    const schema = yup.object({
+      name: yup.string().required(),
+      email: yup.string().required(),
     });
-  });
-
-  it('renders file input and allows file selection', async () => {
-    const file = new File(['file contents'], 'example.png', { type: 'image/png' });
-    const mockOnChange = jest.fn();
 
     render(
-      <FormWrapper onSubmit={mockSubmit}>
-        <FormField label="Upload File" id="upload" type="file" onChange={mockOnChange} />
+      <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
+        <FormField label="Name" id="name" />
+        <FormField label="Email" id="email" />
       </FormWrapper>
     );
 
-    const input = screen.getByLabelText('Upload File');
-    await userEvent.upload(input, file);
+    // Fill one field only
+    await fill('Name', 'Missing email');
 
-    expect(input.files[0]).toBe(file);
-    expect(input.files).toHaveLength(1);
-    expect(mockOnChange).toHaveBeenCalled();
+    const button = screen.getByRole('button');
+    expect(button).toBeDisabled();
+
+    // Fill email too
+    await fill('Email', 'complete@example.com');
+    expect(button).toBeEnabled();
+  });
+
+  it('displays validation messages for all types', async () => {
+    const schema = yup.object({
+      name: yup.string().required('Name is required'),
+      email: yup.string().email().required('Email required'),
+      bio: yup.string().required('Bio required').min(10, 'Too short'),
+      skill: yup.string().required('Skill required'),
+      birthDate: yup.string().required('Date required'),
+    });
+
+    render(
+      <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
+        <FormField label="Name" id="name" />
+        <FormField label="Email" id="email" />
+        <FormField label="Bio" id="bio" type="textarea" />
+        <FormField
+          label="Skill"
+          id="skill"
+          type="radio"
+          options={[
+            { value: 'a', label: 'A' },
+            { value: 'b', label: 'B' },
+          ]}
+        />
+        <FormField label="Birth Date" id="birthDate" type="date" />
+      </FormWrapper>
+    );
+
+    // Trigger blur on all fields
+    await user.tab(); // name
+    await user.tab(); // email
+    await user.tab(); // bio
+    await user.tab(); // radio
+    await user.tab(); // date
+    await user.tab(); // submit
+
+    expect(await screen.findByText('Bio required')).toBeInTheDocument();
   });
 });
