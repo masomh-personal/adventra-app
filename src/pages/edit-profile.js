@@ -14,7 +14,7 @@ import FormField from '@/components/FormField';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { FiSave, FiUpload, FiArrowLeft, FiXCircle } from 'react-icons/fi';
+import { FiSave, FiUpload, FiArrowLeft, FiXCircle, FiFolder } from 'react-icons/fi';
 import { useModal } from '@/contexts/ModalContext';
 
 function EditProfile() {
@@ -211,13 +211,39 @@ function EditProfile() {
                     </label>
 
                     <div className="flex items-center gap-3">
-                      <label
-                        htmlFor="profileImage"
-                        className="cursor-pointer inline-flex items-center justify-center px-3 py-1 rounded-md font-semibold text-sm text-white bg-tertiary hover:bg-tertiary/90 transition-all border border-gray-300 shadow-sm"
-                      >
-                        Choose File
-                      </label>
+                      {/* Dynamic Button */}
+                      <Button
+                        label={
+                          <span className="flex items-center justify-center gap-2">
+                            {selectedFile ? (
+                              <>
+                                <FiUpload className="transition-transform duration-200 group-hover:scale-110" />
+                                Upload Photo
+                              </>
+                            ) : (
+                              <>
+                                <FiFolder className="transition-transform duration-200 group-hover:scale-110" />
+                                Choose File
+                              </>
+                            )}
+                          </span>
+                        }
+                        variant={selectedFile ? 'primary' : 'tertiary'}
+                        onClick={async () => {
+                          if (selectedFile) {
+                            await handleImageUpload(); // ✅ await this
+                          } else {
+                            fileInputRef.current?.click();
+                          }
+                        }}
+                        isLoading={isUploading}
+                        loadingLabel="Uploading..."
+                        disabled={isUploading}
+                        className="group"
+                        size="base"
+                      />
 
+                      {/* File Name + Clear */}
                       <div className="flex items-center gap-1 max-w-[220px] truncate text-sm font-bold text-gray-700">
                         <span className="truncate">
                           {selectedFile ? selectedFile.name : 'No file chosen'}
@@ -240,6 +266,7 @@ function EditProfile() {
                       </div>
                     </div>
 
+                    {/* Hidden File Input */}
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -251,39 +278,6 @@ function EditProfile() {
                       }}
                       className="hidden"
                     />
-
-                    <div className="mt-3 flex gap-4">
-                      <Button
-                        label={
-                          <span className="flex items-center justify-center gap-2">
-                            <FiUpload className="transition-transform duration-200 group-hover:scale-110" />
-                            Upload
-                          </span>
-                        }
-                        variant="primary"
-                        onClick={handleImageUpload}
-                        isLoading={isUploading}
-                        disabled={!selectedFile}
-                        className="group"
-                        size="base"
-                      />
-
-                      {/*{selectedFile && (*/}
-                      {/*  <Button*/}
-                      {/*    label={*/}
-                      {/*      <span className="flex items-center justify-center gap-1">*/}
-                      {/*        <FiXCircle className="text-base" />*/}
-                      {/*        Clear*/}
-                      {/*      </span>*/}
-                      {/*    }*/}
-                      {/*    variant="tertiary"*/}
-                      {/*    onClick={() => {*/}
-                      {/*      setSelectedFile(null);*/}
-                      {/*      if (fileInputRef.current) fileInputRef.current.value = '';*/}
-                      {/*    }}*/}
-                      {/*  />*/}
-                      {/*)}*/}
-                    </div>
                   </div>
 
                   <FormField
