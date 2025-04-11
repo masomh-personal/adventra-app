@@ -106,6 +106,7 @@ describe('SignupPage', () => {
     await user.click(button);
 
     await waitFor(() => {
+      // Assert correct supabase call
       expect(mockSignUp).toHaveBeenCalledWith({
         email: 'alex@example.com',
         password: 'Password123!',
@@ -115,14 +116,22 @@ describe('SignupPage', () => {
         },
       });
 
-      // Pull out the birthdate for ISO string comparison
-      const createdUserArgs = mockCreateUser.mock.calls[0][0];
-      expect(createdUserArgs.name).toBe('Alex Example');
-      expect(createdUserArgs.email).toBe('alex@example.com');
-      expect(createdUserArgs.user_id).toBe('fake-user-id');
-      expect(createdUserArgs.birthdate).toBeInstanceOf(Date);
-      expect(createdUserArgs.birthdate.toISOString().slice(0, 10)).toBe('1990-01-01');
+      // Extract args passed to dbCreateUser and assert key fields
+      const createArgs = mockCreateUser.mock.calls[0][0];
 
+      expect(createArgs).toEqual(
+        expect.objectContaining({
+          user_id: 'fake-user-id',
+          name: 'Alex Example',
+          email: 'alex@example.com',
+        })
+      );
+
+      // Ensure the birthdate is a Date and matches ISO string
+      expect(createArgs.birthdate).toBeInstanceOf(Date);
+      expect(createArgs.birthdate.toISOString().slice(0, 10)).toBe('1990-01-01');
+
+      // Confirm success modal triggered
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         expect.stringContaining('Your account is all set'),
         'Signup Successful!',
@@ -161,6 +170,10 @@ describe('SignupPage', () => {
 
     mockCreateUser.mockRejectedValue(new Error('DB insert failed'));
 
+    // Suppress expected error log in this test only
+    const originalConsoleError = console.error;
+    console.error = jest.fn();
+
     render(<SignupPage />);
     await fillSignupForm(user);
     await user.click(screen.getByRole('button', { name: /Sign Up/i }));
@@ -171,5 +184,8 @@ describe('SignupPage', () => {
         'Signup Incomplete'
       );
     });
+
+    // Restore after test to avoid hiding unexpected errors elsewhere
+    console.error = originalConsoleError;
   });
 });
