@@ -14,7 +14,7 @@ import FormField from '@/components/FormField';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { FiSave, FiUpload, FiArrowLeft } from 'react-icons/fi';
+import { FiSave, FiUpload, FiArrowLeft, FiXCircle } from 'react-icons/fi';
 import { useModal } from '@/contexts/ModalContext';
 
 function EditProfile() {
@@ -210,17 +210,34 @@ function EditProfile() {
                       Upload (max 2MB, JPG or PNG)
                     </label>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       <label
                         htmlFor="profileImage"
-                        className="cursor-pointer inline-flex items-center justify-center px-3 py-1 rounded-md font-semibold text-sm text-white bg-secondary hover:bg-primary transition-all border border-gray-300 shadow-sm"
+                        className="cursor-pointer inline-flex items-center justify-center px-3 py-1 rounded-md font-semibold text-sm text-white bg-tertiary hover:bg-tertiary/90 transition-all border border-gray-300 shadow-sm"
                       >
                         Choose File
                       </label>
 
-                      <span className="text-sm text-gray-700 truncate max-w-[220px]">
-                        {selectedFile ? selectedFile.name : 'No file chosen'}
-                      </span>
+                      <div className="flex items-center gap-1 max-w-[220px] truncate text-sm font-bold text-gray-700">
+                        <span className="truncate">
+                          {selectedFile ? selectedFile.name : 'No file chosen'}
+                        </span>
+
+                        {selectedFile && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                            className="text-gray-500 hover:text-red-600 transition"
+                            title="Clear selected file"
+                            aria-label="Clear selected file"
+                          >
+                            <FiXCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <input
@@ -240,7 +257,7 @@ function EditProfile() {
                         label={
                           <span className="flex items-center justify-center gap-2">
                             <FiUpload className="transition-transform duration-200 group-hover:scale-110" />
-                            Upload Photo
+                            Upload
                           </span>
                         }
                         variant="primary"
@@ -248,16 +265,24 @@ function EditProfile() {
                         isLoading={isUploading}
                         disabled={!selectedFile}
                         className="group"
+                        size="base"
                       />
 
-                      <Button
-                        label="Clear"
-                        variant="muted"
-                        onClick={() => {
-                          setSelectedFile(null);
-                          if (fileInputRef.current) fileInputRef.current.value = '';
-                        }}
-                      />
+                      {/*{selectedFile && (*/}
+                      {/*  <Button*/}
+                      {/*    label={*/}
+                      {/*      <span className="flex items-center justify-center gap-1">*/}
+                      {/*        <FiXCircle className="text-base" />*/}
+                      {/*        Clear*/}
+                      {/*      </span>*/}
+                      {/*    }*/}
+                      {/*    variant="tertiary"*/}
+                      {/*    onClick={() => {*/}
+                      {/*      setSelectedFile(null);*/}
+                      {/*      if (fileInputRef.current) fileInputRef.current.value = '';*/}
+                      {/*    }}*/}
+                      {/*  />*/}
+                      {/*)}*/}
                     </div>
                   </div>
 
