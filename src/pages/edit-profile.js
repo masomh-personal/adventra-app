@@ -188,7 +188,7 @@ function EditProfile() {
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <div className="mb-8">
+                  <div className="mb-4">
                     <h4 className="font-bold text-base mb-2">Profile Photo</h4>
                     <label htmlFor="profileImage" className="block font-medium mb-1">
                       Upload (max 2MB, JPG or PNG)
@@ -244,8 +244,6 @@ function EditProfile() {
                       />
                     </div>
                   </div>
-
-                  <hr className="my-6 border-t border-gray-300" />
 
                   <FormField
                     label="Bio"
