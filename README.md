@@ -49,6 +49,7 @@ We use **GitHub Actions** to automate testing. Whenever code is pushed or a pull
 - GitHub Actions runs our test suite
 - Ensures that all tests pass before changes are merged
 - Helps maintain code quality and catch bugs early
+- https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml
 
 This setup helps us ensure that both our application functionality and deployment workflows remain stable throughout development.
 
