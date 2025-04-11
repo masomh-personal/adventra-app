@@ -1,6 +1,4 @@
 import { useRef, useState } from 'react';
-import * as Yup from 'yup';
-
 import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
@@ -8,6 +6,7 @@ import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
 import getFullUserProfile from '@/lib/getFullUserProfile';
 import useRunOnce from '@/hooks/useRunOnce';
 import { adventurePreferences, skillLevels } from '@/lib/constants/userMeta';
+import { editProfileSchema as validationSchema } from '@/validation/editProfileSchema';
 
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
@@ -16,12 +15,6 @@ import { CharacterCounter } from '@/components/CharacterCounter';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
 import { FiSave, FiUpload } from 'react-icons/fi';
-
-const validationSchema = Yup.object().shape({
-  bio: Yup.string().max(500, 'Bio must be at most 500 characters'),
-  adventurePreferences: Yup.array().of(Yup.string()).min(1, 'Select at least one preference'),
-  skillLevel: Yup.string().required('Skill level is required'),
-});
 
 function EditProfile() {
   const [userId, setUserId] = useState(null);

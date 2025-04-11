@@ -7,6 +7,7 @@ export const adventurePreferences = [
     icon: FaHiking,
     border: 'border-green-600',
     text: 'text-green-700',
+    bg: 'bg-green-100',
   },
   {
     value: 'camping',
@@ -14,6 +15,7 @@ export const adventurePreferences = [
     icon: FaCampground,
     border: 'border-yellow-600',
     text: 'text-yellow-700',
+    bg: 'bg-yellow-100',
   },
   {
     value: 'rock_climbing',
@@ -21,6 +23,7 @@ export const adventurePreferences = [
     icon: FaMountain,
     border: 'border-red-600',
     text: 'text-red-700',
+    bg: 'bg-red-100',
   },
   {
     value: 'photography',
@@ -28,8 +31,9 @@ export const adventurePreferences = [
     icon: FaCamera,
     border: 'border-blue-600',
     text: 'text-blue-700',
+    bg: 'bg-blue-100',
   },
-  // Add more here in the future...
+  // Add more adventures here...
 ];
 
 export const skillLevels = [

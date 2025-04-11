@@ -57,8 +57,11 @@ export default function PersonCard({ name, age, skillLevel, bio, adventurePrefer
               return (
                 <span
                   key={pref}
-                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold border transition-transform duration-200 transform hover:scale-105
-          bg-white ${config.border} ${config.text}`}
+                  className={`
+                    flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase
+                    border ${config.border} ${config.text} ${config.bg}
+                    transition-transform duration-200 transform hover:scale-105
+                  `}
                 >
                   <Icon className={`text-sm ${config.text}`} />
                   {config.label}
