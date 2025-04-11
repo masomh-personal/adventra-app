@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
+import { ImSpinner9 } from 'react-icons/im';
 import { adventurePreferences as preferenceConfig, skillColors } from '@/lib/constants/userMeta';
 
 export default function PersonCard({
@@ -14,10 +15,14 @@ export default function PersonCard({
 }) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
+  const [isImgLoading, setIsImgLoading] = useState(true);
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
 
   return (
-    <div className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] hover:shadow-lg transition-all duration-300 group overflow-hidden">
+    <div
+      className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full
+      max-w-[22rem] transition-all duration-300 group overflow-hidden hover:scale-[1.01] hover:shadow-xl"
+    >
       {/* Banner Strip */}
       <div className="h-2 w-full bg-primary rounded-t-xl" />
 
@@ -36,17 +41,26 @@ export default function PersonCard({
               data-testid="person-card-image"
             />
           ) : (
-            <img
-              key={source} // Forces React to remount the image when source changes
-              src={source}
-              alt={name || 'Adventra user profile'}
-              width={220}
-              height={290}
-              onError={() => setSource(fallbackImgSrc)}
-              className="rounded-md object-cover border border-gray-200 shadow-sm"
-              loading="lazy"
-              data-testid="person-card-image"
-            />
+            <div className="relative max-w-[220px] w-full">
+              {isImgLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-md z-10">
+                  <ImSpinner9 className="w-6 h-6 text-primary animate-spin" aria-hidden="true" />
+                </div>
+              )}
+              <img
+                key={source}
+                src={source}
+                alt={name || 'Adventra user profile'}
+                onLoad={() => setIsImgLoading(false)}
+                onError={() => {
+                  setSource(fallbackImgSrc);
+                  setIsImgLoading(false);
+                }}
+                className="w-full h-auto rounded-md object-cover border border-gray-200 shadow-sm"
+                loading="lazy"
+                data-testid="person-card-image"
+              />
+            </div>
           )}
         </div>
 
