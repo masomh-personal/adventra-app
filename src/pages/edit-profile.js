@@ -315,6 +315,7 @@ function EditProfile() {
                 <div>
                   <h4 className="text-lg font-bold mb-2">Live Preview</h4>
                   <PersonCard
+                    key={previewImageUrl}
                     name={profile.name}
                     age={profile.age}
                     bio={watchedBio}

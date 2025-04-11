@@ -37,6 +37,7 @@ export default function PersonCard({
             />
           ) : (
             <img
+              key={source} // Forces React to remount the image when source changes
               src={source}
               alt={name || 'Adventra user profile'}
               width={220}
@@ -61,7 +62,7 @@ export default function PersonCard({
           {skill ? (
             <span
               className={clsx(
-                'inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase border',
+                'inline-block px-3 py-0.5 rounded text-xs font-bold uppercase border',
                 skill.border,
                 skill.text,
                 skill.bg
@@ -91,7 +92,7 @@ export default function PersonCard({
             Adventure Preferences
           </h4>
           <div
-            className="flex flex-wrap justify-center gap-1.5"
+            className="flex flex-wrap justify-center gap-2"
             data-testid="person-card-preferences"
           >
             {adventurePreferences?.length > 0 ? (
@@ -105,7 +106,7 @@ export default function PersonCard({
                   <span
                     key={pref}
                     className={clsx(
-                      'flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase border',
+                      'flex items-center gap-1 px-3 py-1 rounded-md text-xs font-bold uppercase border',
                       config.bg,
                       config.border,
                       config.text,
