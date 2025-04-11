@@ -128,3 +128,5 @@ jest # run all tests
 
 jest --coverage # run coverage script
 ```
+
+![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
