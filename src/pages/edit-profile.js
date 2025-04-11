@@ -163,7 +163,7 @@ function EditProfile() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center min-h-screen p-4 font-body">
+    <div className="flex-1 flex flex-col items-center justify-center p-4 font-body w-full">
       <div className="w-full max-w-[53rem] bg-white shadow-md rounded-lg p-6 mx-auto">
         <FormWrapper
           ref={formRef}
