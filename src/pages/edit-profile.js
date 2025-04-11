@@ -12,6 +12,7 @@ import InfoBox from '@/components/InfoBox';
 import { CharacterCounter } from '@/components/CharacterCounter';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
+import { FiSave, FiUpload } from 'react-icons/fi';
 
 const validationSchema = Yup.object().shape({
   bio: Yup.string().max(500, 'Bio must be at most 500 characters'),
@@ -210,12 +211,19 @@ function EditProfile() {
 
               <div className="mt-3 flex gap-4">
                 <Button
-                  label="Upload Photo"
+                  label={
+                    <span className="flex items-center justify-center gap-2">
+                      <FiUpload className="transition-transform duration-200 group-hover:scale-110" />
+                      Upload Photo
+                    </span>
+                  }
                   variant="primary"
-                  isLoading={isUploading}
                   onClick={handleImageUpload}
+                  isLoading={isUploading}
                   disabled={!selectedFile}
+                  className="group"
                 />
+
                 <Button
                   label="Clear"
                   variant="muted"
@@ -279,13 +287,17 @@ function EditProfile() {
                     {/* Submit Button Override */}
                     <div className="pt-2">
                       <Button
+                        label={
+                          <span className="flex items-center justify-center gap-2">
+                            <FiSave className="transition-transform duration-200 group-hover:scale-110" />
+                            Save Changes
+                          </span>
+                        }
+                        variant="primary"
                         type="submit"
-                        label="Save Changes"
+                        disabled={!isDirty}
                         isLoading={isSubmitting}
-                        isValid={true}
-                        disabled={!isDirty || isSubmitting}
-                        className="w-full"
-                        size="lg"
+                        className="mt-4 w-full group"
                       />
                     </div>
                   </>
