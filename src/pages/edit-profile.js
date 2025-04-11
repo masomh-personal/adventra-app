@@ -117,11 +117,8 @@ function EditProfile() {
       console.error('Error saving image URL to userprofile:', updateError);
       showErrorModal('Image uploaded, but profile was not updated.', 'Save Error');
     } else {
-      setProfile((prev) => ({
-        ...prev,
-        profileImageUrl: cleanUrl,
-      }));
-      setPreviewImageUrl(bustedUrl); // ✅ Use cache-busted version for display
+      setProfile((prev) => ({ ...prev, profileImageUrl: cleanUrl }));
+      setPreviewImageUrl(bustedUrl);
       showSuccessModal('Profile image uploaded successfully!', 'Upload Successful');
     }
 
@@ -184,13 +181,14 @@ function EditProfile() {
           ref={formRef}
           validationSchema={validationSchema}
           onSubmit={handleSave}
-          onError={() =>
-            showErrorModal('Form submission failed due to validation errors.', 'Validation Error')
-          }
+          onError={(errors) => {
+            console.error('[FORM ERROR]', errors);
+            showErrorModal('Form submission failed due to validation errors.', 'Validation Error');
+          }}
           defaultValues={profile}
           submitLabel={null}
         >
-          {({ register, errors, watch, isSubmitting }) => {
+          {({ register, errors, watch, isSubmitting, isValid }) => {
             const watchedBio = watch('bio');
             const watchedAdventures = watch('adventurePreferences') || [];
             const watchedSkill = watch('skillLevel');
@@ -211,30 +209,24 @@ function EditProfile() {
                     </label>
 
                     <div className="flex items-center gap-3">
-                      {/* Dynamic Button */}
                       <Button
                         label={
                           <span className="flex items-center justify-center gap-2">
                             {selectedFile ? (
                               <>
-                                <FiUpload className="transition-transform duration-200 group-hover:scale-110" />
-                                Upload Photo
+                                <FiUpload /> Upload Photo
                               </>
                             ) : (
                               <>
-                                <FiFolder className="transition-transform duration-200 group-hover:scale-110" />
-                                Choose File
+                                <FiFolder /> Choose File
                               </>
                             )}
                           </span>
                         }
                         variant={selectedFile ? 'primary' : 'tertiary'}
                         onClick={async () => {
-                          if (selectedFile) {
-                            await handleImageUpload(); // ✅ await this
-                          } else {
-                            fileInputRef.current?.click();
-                          }
+                          if (selectedFile) await handleImageUpload();
+                          else fileInputRef.current?.click();
                         }}
                         isLoading={isUploading}
                         loadingLabel="Uploading..."
@@ -242,13 +234,10 @@ function EditProfile() {
                         className="group"
                         size="base"
                       />
-
-                      {/* File Name + Clear */}
                       <div className="flex items-center gap-1 max-w-[220px] truncate text-sm font-bold text-gray-700">
                         <span className="truncate">
                           {selectedFile ? selectedFile.name : 'No file chosen'}
                         </span>
-
                         {selectedFile && (
                           <button
                             type="button"
@@ -265,17 +254,12 @@ function EditProfile() {
                         )}
                       </div>
                     </div>
-
-                    {/* Hidden File Input */}
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept="image/png, image/jpeg"
                       id="profileImage"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        setSelectedFile(file);
-                      }}
+                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                       className="hidden"
                     />
                   </div>
@@ -317,14 +301,13 @@ function EditProfile() {
                   <div className="pt-4">
                     <Button
                       label={
-                        <span className="flex items-center justify-center gap-2">
-                          <FiSave className="transition-transform duration-200 group-hover:scale-110" />
-                          Save Changes
-                        </span>
+                        <>
+                          <FiSave /> Save Changes
+                        </>
                       }
                       variant="primary"
                       type="submit"
-                      disabled={!isDirty}
+                      disabled={!isDirty || !isValid}
                       isLoading={isSubmitting}
                       className="mt-4 w-full group"
                     />
@@ -353,10 +336,9 @@ function EditProfile() {
       <div className="mt-4 mx-auto">
         <Button
           label={
-            <span className="flex items-center justify-center gap-2">
-              <FiArrowLeft className="text-sm" />
-              Back to Dashboard
-            </span>
+            <>
+              <FiArrowLeft className="text-sm" /> Back to Dashboard
+            </>
           }
           variant="secondary"
           onClick={() => router.push('/dashboard')}
