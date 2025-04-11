@@ -11,18 +11,18 @@ import { editProfileSchema as validationSchema } from '@/validation/editProfileS
 
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
-import InfoBox from '@/components/InfoBox';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
-import { FiSave, FiUpload } from 'react-icons/fi';
+import { FiSave, FiUpload, FiArrowLeft } from 'react-icons/fi';
+import { useModal } from '@/contexts/ModalContext';
 
 function EditProfile() {
   const router = useRouter();
+  const { showErrorModal, showSuccessModal } = useModal();
   const [userId, setUserId] = useState(null);
   const [profile, setProfile] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [infoBox, setInfoBox] = useState({ message: '', variant: 'info' });
 
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
@@ -31,7 +31,7 @@ function EditProfile() {
     (async () => {
       const uid = await getCurrentUserId();
       if (!uid) {
-        setInfoBox({ message: 'Unable to detect user session.', variant: 'error' });
+        showErrorModal('Unable to detect user session.', 'Session Error');
         return;
       }
 
@@ -56,7 +56,7 @@ function EditProfile() {
 
   const handleImageUpload = async () => {
     if (!selectedFile || !userId) {
-      setInfoBox({ message: 'Please select a photo first.', variant: 'error' });
+      showErrorModal('Please select a photo first.', 'Missing File');
       return;
     }
 
@@ -65,12 +65,12 @@ function EditProfile() {
     const allowedTypes = ['image/jpeg', 'image/png'];
 
     if (!allowedTypes.includes(file.type)) {
-      setInfoBox({ message: 'Only PNG or JPEG images allowed.', variant: 'error' });
+      showErrorModal('Only PNG or JPEG images allowed.', 'Invalid Format');
       return;
     }
 
     if (file.size > maxSize) {
-      setInfoBox({ message: 'Image must be under 2MB.', variant: 'error' });
+      showErrorModal('Image must be under 2MB.', 'File Too Large');
       return;
     }
 
@@ -88,7 +88,7 @@ function EditProfile() {
 
     if (uploadError) {
       console.error('Upload failed:', uploadError);
-      setInfoBox({ message: 'Image upload failed.', variant: 'error' });
+      showErrorModal('Image upload failed.', 'Upload Error');
       setIsUploading(false);
       return;
     }
@@ -105,13 +105,13 @@ function EditProfile() {
 
     if (updateError) {
       console.error('Error saving image URL to userprofile:', updateError);
-      setInfoBox({ message: 'Image uploaded, but profile was not updated.', variant: 'error' });
+      showErrorModal('Image uploaded, but profile was not updated.', 'Save Error');
     } else {
       setProfile((prev) => ({
         ...prev,
         profileImageUrl: publicUrl,
       }));
-      setInfoBox({ message: 'Profile image uploaded successfully!', variant: 'success' });
+      showSuccessModal('Profile image uploaded successfully!', 'Upload Successful');
     }
 
     setSelectedFile(null);
@@ -121,7 +121,7 @@ function EditProfile() {
 
   const handleSave = async (data) => {
     if (!userId) {
-      setInfoBox({ message: 'Unable to detect user session.', variant: 'error' });
+      showErrorModal('Unable to detect user session.', 'Session Error');
       return;
     }
 
@@ -139,7 +139,7 @@ function EditProfile() {
 
       if (error) {
         console.error(error);
-        setInfoBox({ message: 'Failed to save profile.', variant: 'error' });
+        showErrorModal('Failed to save profile.', 'Save Error');
         return;
       }
 
@@ -150,11 +150,11 @@ function EditProfile() {
         skillLevel: data.skillLevel,
       }));
 
-      setInfoBox({ message: 'Profile updated successfully!', variant: 'success' });
+      showSuccessModal('Profile updated successfully!', 'Saved');
       formRef.current?.reset(data);
     } catch (err) {
       console.error('Save failed:', err);
-      setInfoBox({ message: 'Failed to save profile.', variant: 'error' });
+      showErrorModal('Failed to save profile.', 'Save Error');
     }
   };
 
@@ -163,25 +163,14 @@ function EditProfile() {
   }
 
   return (
-    <div className="w-full flex-grow bg-background text-foreground flex justify-center p-2 font-body">
-      <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 my-8">
-        {infoBox.message && (
-          <InfoBox
-            message={infoBox.message}
-            variant={infoBox.variant}
-            testId="edit-profile-infobox"
-          />
-        )}
-
+    <div className="w-full flex flex-col items-center justify-center min-h-screen p-4 font-body">
+      <div className="w-full max-w-[53rem] bg-white shadow-md rounded-lg p-6 mx-auto">
         <FormWrapper
           ref={formRef}
           validationSchema={validationSchema}
           onSubmit={handleSave}
           onError={() =>
-            setInfoBox({
-              message: 'Form submission failed due to validation errors.',
-              variant: 'error',
-            })
+            showErrorModal('Form submission failed due to validation errors.', 'Validation Error')
           }
           defaultValues={profile}
           submitLabel={null}
@@ -307,15 +296,6 @@ function EditProfile() {
                       className="mt-4 w-full group"
                     />
                   </div>
-
-                  <div className="mt-8 text-center">
-                    <Button
-                      label="Back to Dashboard"
-                      variant="outline"
-                      onClick={() => router.push('/dashboard')}
-                      className="mx-auto"
-                    />
-                  </div>
                 </div>
 
                 <div>
@@ -333,6 +313,19 @@ function EditProfile() {
             );
           }}
         </FormWrapper>
+      </div>
+
+      <div className="mt-4 mx-auto">
+        <Button
+          label={
+            <span className="flex items-center justify-center gap-2">
+              <FiArrowLeft className="text-sm" />
+              Back to Dashboard
+            </span>
+          }
+          variant="secondary"
+          onClick={() => router.push('/dashboard')}
+        />
       </div>
     </div>
   );
