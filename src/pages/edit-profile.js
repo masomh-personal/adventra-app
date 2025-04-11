@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
@@ -13,6 +13,7 @@ import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { FiSave, FiUpload, FiArrowLeft } from 'react-icons/fi';
 import { useModal } from '@/contexts/ModalContext';
 
@@ -23,12 +24,16 @@ function EditProfile() {
   const [profile, setProfile] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
   useRunOnce(() => {
     (async () => {
+      // simulate network delay
+      // await new Promise((res) => setTimeout(res, 2000));
+
       const uid = await getCurrentUserId();
       if (!uid) {
         showErrorModal('Unable to detect user session.', 'Session Error');
@@ -53,6 +58,11 @@ function EditProfile() {
       formRef.current?.reset(hydratedProfile);
     })();
   });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setShowSpinner(true), 300);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleImageUpload = async () => {
     if (!selectedFile || !userId) {
@@ -159,7 +169,11 @@ function EditProfile() {
   };
 
   if (!profile) {
-    return <div className="p-8 text-center">Loading...</div>;
+    return showSpinner ? (
+      <div className="flex-1 flex items-center justify-center w-full">
+        <LoadingSpinner label="Fetching profile details..." />
+      </div>
+    ) : null;
   }
 
   return (
@@ -188,6 +202,7 @@ function EditProfile() {
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
+                  {/* Profile Image Upload */}
                   <div className="mb-4">
                     <h4 className="font-bold text-base mb-2">Profile Photo</h4>
                     <label htmlFor="profileImage" className="block font-medium mb-1">
