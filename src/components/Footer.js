@@ -13,8 +13,8 @@ export default function Footer() {
     group inline-flex items-center gap-2
     bg-[#161b22]
     text-[#c9d1d9] hover:text-white
-    text-xs font-mono font-medium
-    px-3 py-1.5 rounded-md
+    text-[0.7rem] font-mono font-medium
+    px-2.5 py-1.5 rounded-md
     border border-white/60 hover:border-white/90
     shadow-sm hover:shadow-md
     transition-colors duration-200
@@ -24,10 +24,10 @@ export default function Footer() {
   `;
 
   return (
-    <footer className="bg-primary text-white py-6 px-4 z-10">
+    <footer className="bg-primary text-white py-4 px-4 z-10">
       <div className="flex flex-col items-center">
         {/* Footer Links */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 font-body font-bold">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-7 font-body font-bold">
           <Link href="/about" className="hover:text-secondary transition-colors duration-200">
             About
           </Link>
@@ -43,7 +43,7 @@ export default function Footer() {
         </div>
 
         {/* Attribution & Build Info */}
-        <div className="text-center mt-5 text-sm space-y-2">
+        <div className="text-center mt-2 text-sm space-y-2">
           <p className="font-extrabold">
             &copy; {new Date().getFullYear()} Adventra. All rights reserved.
           </p>
