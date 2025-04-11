@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { ImSpinner9 } from 'react-icons/im';
@@ -18,6 +18,10 @@ export default function PersonCard({
   const [isImgLoading, setIsImgLoading] = useState(true);
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
 
+  useEffect(() => {
+    setIsImgLoading(true);
+  }, [source]);
+
   return (
     <div
       className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full
@@ -28,7 +32,7 @@ export default function PersonCard({
 
       <div className="p-4 flex flex-col items-center text-center space-y-4">
         {/* Profile Image */}
-        <div className="relative">
+        <div className="relative w-[220px] aspect-[11/14]">
           {useNextImage ? (
             <Image
               src={source}
@@ -41,7 +45,7 @@ export default function PersonCard({
               data-testid="person-card-image"
             />
           ) : (
-            <div className="relative max-w-[220px] w-full">
+            <>
               {isImgLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-md z-10">
                   <ImSpinner9 className="w-6 h-6 text-primary animate-spin" aria-hidden="true" />
@@ -56,11 +60,14 @@ export default function PersonCard({
                   setSource(fallbackImgSrc);
                   setIsImgLoading(false);
                 }}
-                className="w-full h-auto rounded-md object-cover border border-gray-200 shadow-sm"
+                className={clsx(
+                  'w-full h-full object-cover rounded-md border border-gray-200 shadow-sm transition-opacity duration-500',
+                  isImgLoading ? 'opacity-0' : 'opacity-100'
+                )}
                 loading="lazy"
                 data-testid="person-card-image"
               />
-            </div>
+            </>
           )}
         </div>
 
