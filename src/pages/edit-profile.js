@@ -51,30 +51,44 @@ function EditProfile() {
 
       setUserId(uid);
 
-      const { data, error } = await supabase
+      // Fetch userprofile data
+      const { data: profileData, error: profileError } = await supabase
         .from('userprofile')
         .select('*')
         .eq('user_id', uid)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
         return;
       }
 
-      const publicUrl = data?.profile_image_url
+      // Fetch user name from 'user' table
+      const { data: userData, error: userError } = await supabase
+        .from('user')
+        .select('name')
+        .eq('user_id', uid)
+        .single();
+
+      if (userError) {
+        console.error('Error fetching user name:', userError);
+        return;
+      }
+
+      const publicUrl = profileData?.profile_image_url
         ? getPublicProfileImageUrl(uid, { bustCache: true })
         : '';
 
       const hydratedProfile = {
-        bio: data?.bio || '',
-        adventurePreferences: data?.adventure_preferences || [],
-        skillLevel: data?.skill_summary || '',
+        fullName: userData?.name || '', // 💡 Add this
+        bio: profileData?.bio || '',
+        adventurePreferences: profileData?.adventure_preferences || [],
+        skillLevel: profileData?.skill_summary || '',
         profileImageUrl: publicUrl,
       };
 
       setProfile(hydratedProfile);
-      formRef.current?.reset(hydratedProfile);
+      formRef.current?.reset(hydratedProfile); // sync form
     };
 
     fetchProfile();
@@ -309,7 +323,7 @@ function EditProfile() {
           <div>
             <h3 className="text-lg font-bold mb-4">Live Preview</h3>
             <PersonCard
-              name="Your Profile"
+              name={profile.fullName}
               bio={profile.bio}
               skillLevel={profile.skillLevel}
               adventurePreferences={profile.adventurePreferences}
