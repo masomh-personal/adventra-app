@@ -35,8 +35,8 @@ export default function PersonCard({ name, age, skillLevel, bio, adventurePrefer
         </h3>
 
         {/* Skill Level - Compact + Inline */}
-        <div className="w-full flex justify-center items-center gap-2 text-sm text-gray-600">
-          <span className="font-extrabold uppercase">Skill Level:</span>
+        <div className="w-full flex justify-center items-center gap-2 text-xs text-gray-600">
+          <span className="font-semibold uppercase">Skill Level:</span>
           {skill ? (
             <span
               className={clsx(
