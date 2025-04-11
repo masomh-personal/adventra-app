@@ -22,6 +22,7 @@ function EditProfile() {
   const { showErrorModal, showSuccessModal } = useModal();
   const [userId, setUserId] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
@@ -31,9 +32,6 @@ function EditProfile() {
 
   useRunOnce(() => {
     (async () => {
-      // simulate network delay
-      // await new Promise((res) => setTimeout(res, 2000));
-
       const uid = await getCurrentUserId();
       if (!uid) {
         showErrorModal('Unable to detect user session.', 'Session Error');
@@ -55,6 +53,7 @@ function EditProfile() {
       };
 
       setProfile(hydratedProfile);
+      setPreviewImageUrl(getPublicProfileImageUrl(uid, { bustCache: true }));
       formRef.current?.reset(hydratedProfile);
     })();
   });
@@ -103,12 +102,13 @@ function EditProfile() {
       return;
     }
 
-    const publicUrl = getPublicProfileImageUrl(userId, { bustCache: true });
+    const cleanUrl = getPublicProfileImageUrl(userId);
+    const bustedUrl = getPublicProfileImageUrl(userId, { bustCache: true });
 
     const { error: updateError } = await supabase.from('userprofile').upsert(
       {
         user_id: userId,
-        profile_image_url: publicUrl,
+        profile_image_url: cleanUrl,
       },
       { onConflict: 'user_id' }
     );
@@ -119,8 +119,9 @@ function EditProfile() {
     } else {
       setProfile((prev) => ({
         ...prev,
-        profileImageUrl: publicUrl,
+        profileImageUrl: cleanUrl,
       }));
+      setPreviewImageUrl(bustedUrl); // ✅ Use cache-busted version for display
       showSuccessModal('Profile image uploaded successfully!', 'Upload Successful');
     }
 
@@ -319,7 +320,8 @@ function EditProfile() {
                     bio={watchedBio}
                     skillLevel={watchedSkill}
                     adventurePreferences={watchedAdventures}
-                    imgSrc={profile.profileImageUrl}
+                    imgSrc={previewImageUrl}
+                    useNextImage={false}
                   />
                 </div>
               </div>

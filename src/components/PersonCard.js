@@ -3,7 +3,15 @@ import Image from 'next/image';
 import clsx from 'clsx';
 import { adventurePreferences as preferenceConfig, skillColors } from '@/lib/constants/userMeta';
 
-export default function PersonCard({ name, age, skillLevel, bio, adventurePreferences, imgSrc }) {
+export default function PersonCard({
+  name,
+  age,
+  skillLevel,
+  bio,
+  adventurePreferences,
+  imgSrc,
+  useNextImage = true, // Toggle for optimized vs. live preview
+}) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
@@ -16,16 +24,29 @@ export default function PersonCard({ name, age, skillLevel, bio, adventurePrefer
       <div className="p-4 flex flex-col items-center text-center space-y-4">
         {/* Profile Image */}
         <div className="relative">
-          <Image
-            src={source}
-            alt={name || 'Adventra user profile'}
-            width={220}
-            height={290}
-            onError={() => setSource(fallbackImgSrc)}
-            className="rounded-md object-cover border border-gray-200 shadow-sm"
-            loading="lazy"
-            data-testid="person-card-image"
-          />
+          {useNextImage ? (
+            <Image
+              src={source}
+              alt={name || 'Adventra user profile'}
+              width={220}
+              height={290}
+              onError={() => setSource(fallbackImgSrc)}
+              className="rounded-md object-cover border border-gray-200 shadow-sm"
+              loading="lazy"
+              data-testid="person-card-image"
+            />
+          ) : (
+            <img
+              src={source}
+              alt={name || 'Adventra user profile'}
+              width={220}
+              height={290}
+              onError={() => setSource(fallbackImgSrc)}
+              className="rounded-md object-cover border border-gray-200 shadow-sm"
+              loading="lazy"
+              data-testid="person-card-image"
+            />
+          )}
         </div>
 
         {/* Name + Age */}
@@ -34,7 +55,7 @@ export default function PersonCard({ name, age, skillLevel, bio, adventurePrefer
           {name || 'Unnamed Explorer'}
         </h3>
 
-        {/* Skill Level - Compact + Inline */}
+        {/* Skill Level */}
         <div className="w-full flex justify-center items-center gap-2 text-xs text-gray-600">
           <span className="font-semibold uppercase">Skill Level:</span>
           {skill ? (
