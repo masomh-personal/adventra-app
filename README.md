@@ -32,6 +32,31 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 ---
 
+## Continuous Integration (CI)
+
+Our project uses a combination of **Vercel** and **GitHub Actions** to implement a robust Continuous Integration (CI) workflow.
+
+![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
+
+### Vercel Deployment
+We use **Vercel** for automatic deployments. Every time code is pushed to the `main` branch (or a feature branch with an open pull request), Vercel:
+- Builds the application
+- Runs basic checks
+- Deploys to a preview or production environment
+
+This allows for continuous feedback and seamless collaboration with live previews.
+
+### GitHub Actions for Testing
+We use **GitHub Actions** to automate testing. Whenever code is pushed or a pull request is opened:
+- GitHub Actions runs our test suite
+- Ensures that all tests pass before changes are merged
+- Helps maintain code quality and catch bugs early
+- https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml
+
+This setup helps us ensure that both our application functionality and deployment workflows remain stable throughout development.
+
+---
+
 ## **Team Members & Scrum Roles**
 
 | **Name** | **Role**      |
@@ -87,7 +112,7 @@ Each Product Backlog Item (PBI) must include:
 - **User Story** (Follows the format: "As a user, I want to…")
 - **Additional Details** (API integration, UI requirements, dependencies, etc.)
 - **Story Point Estimation**
-- **Acceptance Criteria** 
+- **Acceptance Criteria**
 ---
 
 ## **Useful Links**
@@ -128,5 +153,3 @@ jest # run all tests
 
 jest --coverage # run coverage script
 ```
-
-![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
