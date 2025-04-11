@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import * as Yup from 'yup';
 
 import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
+import getFullUserProfile from '@/lib/getFullUserProfile';
+import useRunOnce from '@/hooks/useRunOnce';
 
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
@@ -44,55 +46,28 @@ function EditProfile() {
   const fileInputRef = useRef(null);
   const formRef = useRef(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
+  useRunOnce(() => {
+    (async () => {
       const uid = await getCurrentUserId();
       if (!uid) return;
 
       setUserId(uid);
 
-      // Fetch userprofile data
-      const { data: profileData, error: profileError } = await supabase
-        .from('userprofile')
-        .select('*')
-        .eq('user_id', uid)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
-        return;
-      }
-
-      // Fetch user name from 'user' table
-      const { data: userData, error: userError } = await supabase
-        .from('user')
-        .select('name')
-        .eq('user_id', uid)
-        .single();
-
-      if (userError) {
-        console.error('Error fetching user name:', userError);
-        return;
-      }
-
-      const publicUrl = profileData?.profile_image_url
-        ? getPublicProfileImageUrl(uid, { bustCache: true })
-        : '';
+      const data = await getFullUserProfile(uid);
+      if (!data) return;
 
       const hydratedProfile = {
-        fullName: userData?.name || '', // 💡 Add this
-        bio: profileData?.bio || '',
-        adventurePreferences: profileData?.adventure_preferences || [],
-        skillLevel: profileData?.skill_summary || '',
-        profileImageUrl: publicUrl,
+        bio: data.bio || '',
+        adventurePreferences: data.adventure_preferences || [],
+        skillLevel: data.skill_summary || '',
+        profileImageUrl: data.profile_image_url || '',
+        name: data.user?.name || '',
       };
 
       setProfile(hydratedProfile);
-      formRef.current?.reset(hydratedProfile); // sync form
-    };
-
-    fetchProfile();
-  }, []);
+      formRef.current?.reset(hydratedProfile);
+    })();
+  });
 
   const handleImageUpload = async () => {
     if (!selectedFile || !userId) return;
@@ -323,7 +298,7 @@ function EditProfile() {
           <div>
             <h3 className="text-lg font-bold mb-4">Live Preview</h3>
             <PersonCard
-              name={profile.fullName}
+              name={profile.name}
               bio={profile.bio}
               skillLevel={profile.skillLevel}
               adventurePreferences={profile.adventurePreferences}
