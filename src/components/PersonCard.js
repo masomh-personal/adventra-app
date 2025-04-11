@@ -10,7 +10,7 @@ export default function PersonCard({ name, age, skillLevel, bio, adventurePrefer
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-300 flex flex-col items-center text-center">
+    <div className="bg-gray-100 p-4 rounded-md shadow-lg border-2 border-gray-300 flex flex-col items-center text-center">
       <Image
         src={source}
         alt={name || 'Adventra user profile'}

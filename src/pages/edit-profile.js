@@ -152,8 +152,8 @@ function EditProfile() {
   }
 
   return (
-    <div className="w-full flex-grow bg-background text-foreground flex justify-center p-6 font-body">
-      <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-8 my-8">
+    <div className="w-full flex-grow bg-background text-foreground flex justify-center p-2 font-body">
+      <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 my-8">
         {infoBox.message && (
           <InfoBox
             message={infoBox.message}
@@ -280,7 +280,7 @@ function EditProfile() {
           </div>
 
           <div>
-            <h3 className="text-lg font-bold mb-4">Live Preview</h3>
+            <h4 className="text-lg font-bold mb-2">Live Preview</h4>
             <PersonCard
               name={profile.name}
               age={profile.age}
