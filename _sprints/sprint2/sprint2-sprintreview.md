@@ -19,28 +19,28 @@
 
 ## Completed Work
 
-| Story                                     | Points | Status      |
-| ----------------------------------------- | ------ | ----------- |
-| Implement Login Functionality             | 5      | ✅ Done     |
-| Create User Login Page                    | 5      | ✅ Done     |
-| Create Welcome / Dashboard Page           | 3      | ✅ Done     |
-| Add Sitewide Authentication Check         | 5      | ✅ Done     |
-| Connect Database to Local Dev Environment | 3      | ✅ Done     |
-| Create "Forgot Password" Placeholder Page | 2      | ✅ Done     |
-| Update Header to Show Logged-in State     | 2      | ✅ Done     |
-| Updating/Redesigning Database             | 1      | ✅ Done     |
-| Add Modal/Error Window                    | 3      | ✅ Done     |
-| Add 20 Users to Supabase                  | 3      | ✅ Done     |
-| Edit Profile Page                         | 5      | ❌ Not Done |
-| Implement Edit Profile Functionality      | 5      | ❌ Not Done |
+| Story                                     | Points | Status  |
+| ----------------------------------------- | ------ | ------- |
+| Implement Login Functionality             | 5      | ✅ Done |
+| Create User Login Page                    | 5      | ✅ Done |
+| Create Welcome / Dashboard Page           | 3      | ✅ Done |
+| Add Sitewide Authentication Check         | 5      | ✅ Done |
+| Connect Database to Local Dev Environment | 3      | ✅ Done |
+| Create "Forgot Password" Placeholder Page | 2      | ✅ Done |
+| Update Header to Show Logged-in State     | 2      | ✅ Done |
+| Updating/Redesigning Database             | 1      | ✅ Done |
+| Add Modal/Error Window                    | 3      | ✅ Done |
+| Add 20 Users to Supabase                  | 3      | ✅ Done |
+| Edit Profile Page                         | 5      | ✅ Done |
+| Implement Edit Profile Functionality      | 5      | ✅ Done |
 
 ---
 
 ## Metrics
 
 - **Forecasted Points:** 42
-- **Completed Points:** 32
-- **Velocity:** 32 story points
+- **Completed Points:** 42
+- **Velocity:** 42 story points
 
 ---
 
@@ -64,15 +64,13 @@
 
 ## What Could Be Improved
 
-- Plan buffer time for more complex features like profile editing
 - Consider breaking larger stories into smaller tasks to improve delivery
 
 ---
 
 ## Incomplete/Deferred Work
 
-- Edit Profile Page
-- Implement Edit Profile Functionality
+- **N/A** (All planned stories were completed this sprint)
 
 ---
 
