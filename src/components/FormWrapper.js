@@ -1,34 +1,26 @@
-import React from 'react';
+import React, { forwardRef, useImperativeHandle } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Button from '@/components/Button';
 
 /**
  * FormWrapper component for managing forms using React Hook Form and Yup validation.
- *
- * @param {string} title - Optional form title.
- * @param {object} validationSchema - Yup schema for validation.
- * @param {Function} onSubmit - Callback for successful form submission.
- * @param {Function} onError - Callback for validation errors.
- * @param {ReactNode|Function} children - Form children or render function with form contexts.
- * @param {object} defaultValues - Optional default values for the form.
- * @param {string} submitLabel - Submit button text.
- * @param {boolean} loading - Submit loading state.
- * @param {string} className - Additional class names for the form wrapper.
- * @param {object} formProps - Additional props to pass to the <form> element.
  */
-export default function FormWrapper({
-  title,
-  validationSchema,
-  onSubmit,
-  onError,
-  children,
-  defaultValues = {},
-  submitLabel = 'Submit',
-  loading = false,
-  className = '',
-  formProps = {},
-}) {
+const FormWrapper = forwardRef(function FormWrapper(
+  {
+    title,
+    validationSchema,
+    onSubmit,
+    onError,
+    children,
+    defaultValues = {},
+    submitLabel = 'Submit',
+    loading = false,
+    className = '',
+    formProps = {},
+  },
+  ref
+) {
   const {
     register,
     handleSubmit,
@@ -44,6 +36,9 @@ export default function FormWrapper({
     mode: 'onTouched',
     reValidateMode: 'onChange',
   });
+
+  // Expose reset() to parent via ref
+  useImperativeHandle(ref, () => ({ reset }));
 
   const formContext = {
     register,
@@ -84,7 +79,6 @@ export default function FormWrapper({
           ? children(formContext)
           : React.Children.map(children, (child) => {
               if (!React.isValidElement(child)) return child;
-
               const isCustomComponent = typeof child.type === 'function';
               return isCustomComponent
                 ? React.cloneElement(child, { ...formContext, ...child.props })
@@ -107,4 +101,6 @@ export default function FormWrapper({
       )}
     </form>
   );
-}
+});
+
+export default FormWrapper;

@@ -22,14 +22,9 @@ describe('Footer', () => {
     const ksuButton = screen.getByTestId('ksu-button');
     expect(ksuButton).toBeInTheDocument();
     expect(ksuButton).toHaveAttribute('href', expect.stringContaining('kennesaw.edu'));
-    expect(ksuButton).toHaveClass('text-xs');
     expect(ksuButton).toHaveClass('px-2');
     expect(ksuButton).toHaveClass('py-1');
-    expect(ksuButton).toHaveClass('bg-white');
-    expect(ksuButton).toHaveClass('text-primary');
-    expect(ksuButton).toHaveClass('border');
-    expect(ksuButton).toHaveClass('border-gray-300');
-    expect(ksuButton).toHaveClass('hover:bg-gray-100');
+    expect(ksuButton).toHaveClass(`bg-[#ffcb05]`);
     expect(ksuButton).toHaveAttribute('target', '_blank');
     expect(ksuButton).toHaveAttribute('rel', 'noopener noreferrer');
     expect(ksuButton).toHaveAttribute('aria-label', "Go to KSU's Software & Game Development Dept");

@@ -22,7 +22,7 @@ export default function Button({
   const isButtonDisabled = disabled || isLoading || !isValid;
 
   const sizeStyles = {
-    sm: 'px-3 py-1 text-[10px]',
+    sm: 'px-2 py-1 text-[10px]',
     base: 'px-4 py-2 text-xs',
     lg: 'px-6 py-3 text-sm',
   };
@@ -40,6 +40,7 @@ export default function Button({
     muted: 'bg-[#e2e2e2] text-gray-700 hover:bg-[#d0d0d0]',
     clean: 'bg-white text-primary border border-gray-300 hover:bg-gray-100',
     inverse: 'bg-white text-primary hover:text-white hover:bg-primary border border-primary',
+    ksu: `bg-[#ffcb05] text-black border border-[#ffcb05] hover:bg-[#ffe585] hover:text-black/90`,
   };
 
   const baseStyle = `

@@ -1,28 +1,35 @@
 import supabase from '@/lib/supabaseClient';
 
 /**
- * Inserts a new user into the custom `public.user` table.
- * Call this right after successful Supabase auth signup.
+ * Inserts a user into `public.user` and a matching profile into `public.userprofile`.
  *
- * NOTE: This intentionally does not insert bio, status, etc. — those can be handled later on the profile page.
- *
- * @param {Object} userData - Data to insert
- * @param {string} userData.user_id - UUID from Supabase Auth
+ * @param {Object} userData
+ * @param {string} userData.user_id - Supabase Auth UUID
  * @param {string} userData.name - Full name
- * @param {string} userData.email - Email address
- * @returns {Promise<Object>} Inserted user record
+ * @param {string} userData.email - Email
+ * @param {string} [userData.birthdate] - Optional ISO string
+ * @returns {Promise<Object>} - The inserted user record
  */
-export async function dbCreateUser({ user_id, name, email }) {
-  const { data, error } = await supabase
+export async function dbCreateUser({ user_id, name, email, birthdate }) {
+  const { data: userData, error: userError } = await supabase
     .from('user')
     .insert([{ user_id, name, email }])
     .select()
     .single();
 
-  if (error) {
-    console.error('[DB Insert Error] Failed to create user:', error.message);
+  if (userError) {
+    console.error('[DB Insert Error] Failed to create user:', userError.message);
     throw new Error('Failed to create user in database');
   }
 
-  return data;
+  const { error: profileError } = await supabase
+    .from('userprofile')
+    .upsert([{ user_id, birthdate }], { onConflict: 'user_id' });
+
+  if (profileError) {
+    console.error('[DB Insert Error] Failed to create userprofile:', profileError.message);
+    throw new Error('Failed to create user profile in database');
+  }
+
+  return userData;
 }

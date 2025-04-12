@@ -1,8 +1,5 @@
-import React from 'react';
+import { CharacterCounter } from '@/components/CharacterCounter';
 
-/**
- * Reusable Form Field that supports multiple input types with testability & accessibility
- */
 export default function FormField({
   label,
   type = 'text',
@@ -17,10 +14,14 @@ export default function FormField({
   helpText,
   onChange,
   onBlur,
+  maxHeight,
+  maxWidth,
+  characterCountOptions,
 }) {
   const hasError = errors?.[id];
-  const registerFn = register || (() => ({}));
   const errorId = `${id}-error`;
+
+  const isSingleCheckbox = type === 'checkbox' && options.length === 0;
 
   const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
@@ -33,7 +34,7 @@ export default function FormField({
     className: inputClass,
     'aria-invalid': hasError ? 'true' : undefined,
     'aria-describedby': hasError ? errorId : undefined,
-    ...registerFn(id, {
+    ...register(id, {
       ...registerOptions,
       onChange: (e) => {
         registerOptions?.onChange?.(e);
@@ -48,36 +49,53 @@ export default function FormField({
 
   const renderInput = () => {
     switch (type) {
-      case 'select':
+      case 'textarea':
         return (
-          <select {...getInputProps()}>
-            {placeholder && (
-              <option value="" disabled>
-                {placeholder}
-              </option>
-            )}
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <textarea
+            rows={4}
+            {...getInputProps()}
+            className={`${inputClass} resize-none ${maxHeight || 'max-h-48'}`}
+          />
         );
 
-      case 'textarea':
-        return <textarea rows={4} {...getInputProps()} />;
-
       case 'checkbox':
+        if (options.length > 0) {
+          return (
+            <div className="flex flex-col gap-2">
+              {options.map((option) => (
+                <label
+                  key={option.value}
+                  htmlFor={`${id}-${option.value}`}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold transition-all hover:bg-secondary/10 peer-checked:bg-secondary/10 peer-checked:border-primary peer-checked:text-primary"
+                >
+                  <input
+                    type="checkbox"
+                    id={`${id}-${option.value}`}
+                    value={option.value}
+                    {...register(id)}
+                    className="hidden peer"
+                    disabled={disabled}
+                  />
+                  <span className="w-4 h-4 flex items-center justify-center border-2 rounded-sm border-gray-400 peer-checked:border-primary peer-checked:bg-primary peer-checked:shadow-inner">
+                    <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
+                  </span>
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          );
+        }
+
         return (
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              {...getInputProps()}
-              className={`h-4 w-4 text-primary focus:ring-primary ${
-                hasError ? 'border-red-500' : 'border-gray-300'
-              } ${className}`}
+              id={id}
+              {...register(id)}
+              disabled={disabled}
+              className="w-4 h-4 border-gray-300 rounded focus:ring-2 focus:ring-primary"
             />
-            <label htmlFor={id} className="ml-2 block text-sm">
+            <label htmlFor={id} className="text-sm font-semibold">
               {label}
             </label>
           </div>
@@ -85,25 +103,35 @@ export default function FormField({
 
       case 'radio':
         return (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {options.map((option) => (
-              <div key={option.value} className="flex items-center">
+              <label
+                key={option.value}
+                htmlFor={`${id}-${option.value}`}
+                className="flex items-center gap-1.5 cursor-pointer select-none"
+              >
                 <input
                   type="radio"
                   id={`${id}-${option.value}`}
                   value={option.value}
-                  {...registerFn(id, registerOptions)}
-                  className={`h-4 w-4 text-primary focus:ring-primary ${
-                    hasError ? 'border-red-500' : 'border-gray-300'
-                  } ${className}`}
+                  {...register(id)}
+                  className="peer sr-only"
                   disabled={disabled}
                 />
-                <label htmlFor={`${id}-${option.value}`} className="ml-2 block text-sm">
-                  {option.label}
-                </label>
-              </div>
+                <span className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-400 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary/20 peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary" />
+                <span className="text-sm font-semibold uppercase">{option.label}</span>
+              </label>
             ))}
           </div>
+        );
+
+      case 'date':
+        return (
+          <input
+            type="date"
+            {...getInputProps()}
+            className={`${inputClass} text-sm bg-white text-gray-800`}
+          />
         );
 
       default:
@@ -112,12 +140,24 @@ export default function FormField({
   };
 
   return (
-    <div className="form-field">
-      {type !== 'checkbox' && (
-        <label htmlFor={id} className="block font-heading mb-1 font-bold">
-          {label}
-        </label>
-      )}
+    <div className={`form-field ${maxWidth || ''}`}>
+      <div className="flex items-center justify-between mb-1">
+        {label && (
+          <label
+            htmlFor={id}
+            className={`block font-heading font-bold ${isSingleCheckbox ? 'sr-only' : ''}`}
+          >
+            {label}
+          </label>
+        )}
+
+        {characterCountOptions && (
+          <CharacterCounter
+            value={characterCountOptions.value}
+            maxLength={characterCountOptions.maxLength}
+          />
+        )}
+      </div>
 
       {renderInput()}
 

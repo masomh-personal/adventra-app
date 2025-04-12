@@ -15,7 +15,7 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState('');
 
-  const handleSignup = async ({ name, email, password }) => {
+  const handleSignup = async ({ name, email, password, birthdate }) => {
     setIsSubmitting(true);
 
     try {
@@ -48,6 +48,7 @@ export default function SignupPage() {
           user_id: data.user.id,
           name,
           email,
+          birthdate,
         });
       } catch (dbError) {
         console.error('User created in auth but failed in custom DB:', dbError.message);
@@ -90,6 +91,17 @@ export default function SignupPage() {
           loading={isSubmitting}
         >
           <FormField label="Full Name" type="text" id="name" placeholder="Your name" />
+
+          <FormField
+            label="Date of Birth"
+            id="birthdate"
+            type="date"
+            registerOptions={{
+              max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+                .toISOString()
+                .split('T')[0],
+            }}
+          />
 
           <FormField
             label="Email Address"

@@ -28,11 +28,8 @@ function Dashboard({ user }) {
     }
   };
 
-  const handleEditProfile = () => {
-    // Add profile edit logic here
-    console.log('Edit Profile clicked');
-    // Example: router.push('/profile/edit');
-    router.push('/profile/edit');
+  const handleEditProfile = async () => {
+    await router.push('/edit-profile');
   };
 
   return (
