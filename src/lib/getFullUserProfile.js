@@ -8,7 +8,7 @@ import calcAgeFromBirthdate from '@/lib/calcAgeFromBirthdate';
  * @param {string} uid - Supabase Auth UUID (user_id)
  * @returns {Promise<object|null>} Full user profile or null on error
  */
-export default async function getFullUserProfile(uid) {
+export async function getFullUserProfile(uid) {
   if (!uid) return null;
 
   const { data, error } = await supabase

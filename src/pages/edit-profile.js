@@ -4,7 +4,7 @@ import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
-import getFullUserProfile from '@/lib/getFullUserProfile';
+import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import useRunOnce from '@/hooks/useRunOnce';
 import { adventurePreferences, skillLevels } from '@/lib/constants/userMeta';
 import { editProfileSchema as validationSchema } from '@/validation/editProfileSchema';
@@ -214,11 +214,13 @@ function EditProfile() {
                           <span className="flex items-center justify-center gap-2">
                             {selectedFile ? (
                               <>
-                                <FiUpload /> Upload Photo
+                                <FiUpload />
+                                Upload Photo
                               </>
                             ) : (
                               <>
-                                <FiFolder /> Choose File
+                                <FiFolder />
+                                Choose File
                               </>
                             )}
                           </span>
@@ -302,7 +304,8 @@ function EditProfile() {
                     <Button
                       label={
                         <>
-                          <FiSave /> Save Changes
+                          <FiSave />
+                          Save Changes
                         </>
                       }
                       variant="primary"
