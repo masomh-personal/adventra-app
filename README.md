@@ -36,8 +36,6 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 Our project uses a combination of **Vercel** and **GitHub Actions** to implement a robust Continuous Integration (CI) workflow.
 
-![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
-
 ### Vercel Deployment
 We use **Vercel** for automatic deployments. Every time code is pushed to the `main` branch (or a feature branch with an open pull request), Vercel:
 - Builds the application
@@ -112,7 +110,7 @@ Each Product Backlog Item (PBI) must include:
 - **User Story** (Follows the format: "As a user, I want to…")
 - **Additional Details** (API integration, UI requirements, dependencies, etc.)
 - **Story Point Estimation**
-- **Acceptance Criteria**
+- **Acceptance Criteria** 
 ---
 
 ## **Useful Links**
