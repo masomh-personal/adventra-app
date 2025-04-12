@@ -21,6 +21,8 @@ export default function FormField({
   const hasError = errors?.[id];
   const errorId = `${id}-error`;
 
+  const isSingleCheckbox = type === 'checkbox' && options.length === 0;
+
   const inputClass = `w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary ${
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${className}`;
@@ -57,7 +59,6 @@ export default function FormField({
         );
 
       case 'checkbox':
-        // If options are provided, render a list of checkboxes
         if (options.length > 0) {
           return (
             <div className="flex flex-col gap-2">
@@ -85,7 +86,6 @@ export default function FormField({
           );
         }
 
-        // Single checkbox (boolean)
         return (
           <div className="flex items-center gap-2">
             <input
@@ -142,11 +142,15 @@ export default function FormField({
   return (
     <div className={`form-field ${maxWidth || ''}`}>
       <div className="flex items-center justify-between mb-1">
-        {type !== 'checkbox' && (
-          <label htmlFor={id} className="block font-heading font-bold">
+        {label && (
+          <label
+            htmlFor={id}
+            className={`block font-heading font-bold ${isSingleCheckbox ? 'sr-only' : ''}`}
+          >
             {label}
           </label>
         )}
+
         {characterCountOptions && (
           <CharacterCounter
             value={characterCountOptions.value}
