@@ -3,7 +3,7 @@
  * @param {string|Date} birthdate
  * @returns {number|null} Age or null if invalid
  */
-export default function calcAgeFromBirthdate(birthdate) {
+export function calcAgeFromBirthdate(birthdate) {
   if (!birthdate) return null;
 
   const dob = new Date(birthdate);

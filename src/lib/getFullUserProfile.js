@@ -1,5 +1,5 @@
 import supabase from '@/lib/supabaseClient';
-import calcAgeFromBirthdate from '@/lib/calcAgeFromBirthdate';
+import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 
 /**
  * Fetches the full user profile including profile data and user info (name, email, birthdate).
