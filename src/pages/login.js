@@ -7,7 +7,7 @@ import FormField from '@/components/FormField';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
 import { FcGoogle } from 'react-icons/fc';
-import { FaFacebook, FaInstagram, FaApple } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaApple, FaGoogle } from 'react-icons/fa';
 import Button from '@/components/Button';
 import DividerWithText from '@/components/DividerWithText';
 import MagicLinkForm from '@/components/MagicLinkForm';
@@ -92,32 +92,32 @@ export default function LoginPage() {
   const ssoProviders = [
     {
       name: 'Google',
-      icon: <FcGoogle className="h-5 w-5 mr-2" />,
+      icon: <FcGoogle className="h-5 w-5 mr-2 group-hover:hidden" />,
+      hoverIcon: <FaGoogle className="h-5 w-5 mr-2 hidden group-hover:inline text-red-500" />,
       bg: 'bg-white',
       text: 'text-gray-700',
       border: 'border border-gray-300',
-      hover: 'hover:shadow-md',
     },
     {
       name: 'Facebook',
-      icon: <FaFacebook className="h-5 w-5 mr-2" />,
+      icon: <FaFacebook className="h-5 w-5 mr-2 group-hover:hidden" />,
+      hoverIcon: <FaFacebook className="h-5 w-5 mr-2 hidden group-hover:inline text-white/80" />,
       bg: 'bg-[#1877F2]',
       text: 'text-white',
-      hover: 'hover:bg-[#166FE5]',
     },
     {
       name: 'Instagram',
-      icon: <FaInstagram className="h-5 w-5 mr-2" />,
+      icon: <FaInstagram className="h-5 w-5 mr-2 group-hover:hidden" />,
+      hoverIcon: <FaInstagram className="h-5 w-5 mr-2 hidden group-hover:inline opacity-90" />,
       bg: 'bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600',
       text: 'text-white',
-      hover: 'hover:opacity-90',
     },
     {
       name: 'Apple',
-      icon: <FaApple className="h-5 w-5 mr-2" />,
+      icon: <FaApple className="h-5 w-5 mr-2 group-hover:hidden" />,
+      hoverIcon: <FaApple className="h-5 w-5 mr-2 hidden group-hover:inline text-gray-300" />,
       bg: 'bg-black',
       text: 'text-white',
-      hover: 'hover:bg-gray-900',
     },
   ];
 
@@ -196,16 +196,17 @@ export default function LoginPage() {
 
         {/* SSO Buttons */}
         <div className="mt-6 grid grid-cols-2 gap-4">
-          {ssoProviders.map(({ name, icon, bg, text, border, hover }) => (
+          {ssoProviders.map(({ name, icon, bg, text, border, hoverIcon }) => (
             <button
               key={name}
               onClick={() => handleSSOLogin(name)}
               disabled={loading}
-              className={`flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-xs font-bold uppercase ${bg} ${text} ${border || ''} ${hover} transition`}
+              className={`group flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-xs font-bold uppercase ${bg} ${text} ${border || ''} hover:scale-[1.03] transition-transform duration-150 cursor-pointer`}
               aria-label={`Login with ${name}`}
               data-testid={`sso-${name.toLowerCase()}`}
             >
               {icon}
+              {hoverIcon}
               {name}
             </button>
           ))}
