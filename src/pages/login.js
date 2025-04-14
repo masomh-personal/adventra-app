@@ -201,7 +201,7 @@ export default function LoginPage() {
               key={name}
               onClick={() => handleSSOLogin(name)}
               disabled={loading}
-              className={`flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-black ${bg} ${text} ${border || ''} ${hover} transition`}
+              className={`flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-xs font-bold uppercase ${bg} ${text} ${border || ''} ${hover} transition`}
               aria-label={`Login with ${name}`}
               data-testid={`sso-${name.toLowerCase()}`}
             >

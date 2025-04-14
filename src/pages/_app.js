@@ -1,26 +1,38 @@
+import Head from 'next/head';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { ModalProvider } from '@/contexts/ModalContext';
 import '@/styles/globals.css';
-import { Quicksand, Nunito } from 'next/font/google';
+import { Quicksand, Nunito, Baloo_2 } from 'next/font/google';
 
-// Load fonts with specific weights and attach to CSS variables
 const headingFont = Quicksand({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-heading',
 });
 
 const bodyFont = Nunito({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['200', '300', '400', '500', '600', '700', '800', '900'],
   variable: '--font-body',
+});
+
+const accentFont = Baloo_2({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-accent',
 });
 
 export default function MyApp({ Component, pageProps }) {
   return (
     <ModalProvider>
-      <div className={`${headingFont.variable} ${bodyFont.variable} flex flex-col min-h-screen`}>
+      <div
+        className={`${headingFont.variable} ${bodyFont.variable} ${accentFont.variable} flex flex-col min-h-screen`}
+      >
+        <Head>
+          <title>Adventra</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
         <Header />
         <main className="flex-grow flex">
           <Component {...pageProps} />

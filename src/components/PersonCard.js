@@ -73,7 +73,7 @@ export default function PersonCard({
 
         {/* Name + Age */}
         <h3 className="text-lg font-bold text-gray-900 -mb-1" data-testid="person-card-name">
-          {age ? `${age} | ` : ''}
+          <span className="font-accent"> {age ? `${age} | ` : ''}</span>
           {name || 'Unnamed Explorer'}
         </h3>
 
