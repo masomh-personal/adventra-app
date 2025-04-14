@@ -27,7 +27,7 @@ export default function Footer() {
     <footer className="bg-primary text-white py-4 px-4 z-10">
       <div className="flex flex-col items-center">
         {/* Footer Links */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-7 font-body font-bold">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-7 font-body font-semibold">
           <Link href="/about" className="hover:text-secondary transition-colors duration-200">
             About
           </Link>
@@ -44,7 +44,7 @@ export default function Footer() {
 
         {/* Attribution & Build Info */}
         <div className="text-center mt-2 text-sm space-y-2">
-          <p className="font-extrabold">
+          <p className="font-semibold">
             &copy; {new Date().getFullYear()} Adventra. All rights reserved.
           </p>
           <p className="flex items-center justify-center gap-1 flex-wrap">

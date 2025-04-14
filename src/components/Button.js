@@ -45,6 +45,7 @@ export default function Button({
 
   const baseStyle = `
     inline-flex items-center justify-center gap-2
+    hover:scale-[1.03] transition-transform duration-150
     rounded-md font-heading font-extrabold uppercase tracking-wide
     transition-all duration-200 ease-in-out
     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary
@@ -59,7 +60,7 @@ export default function Button({
     ${baseStyle}
     ${sizeStyles[size] || sizeStyles.lg}
     ${variants[variant] || variants.primary}
-    ${isButtonDisabled ? disabledStyle : ''}
+    ${isButtonDisabled ? disabledStyle : 'cursor-pointer'}
     ${!isValid && !isLoading && !disabled ? invalidStyle : ''}
     ${className}
   `;
