@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { ImSpinner9 } from 'react-icons/im';
+import { FaInstagram, FaFacebook } from 'react-icons/fa'; // Instagram and Facebook icons
 import {
   adventurePreferences as preferenceConfig,
   skillColors,
@@ -14,9 +15,11 @@ export default function PersonCard({
   skillLevel,
   bio,
   adventurePreferences,
-  datingPreference, // New prop for dating preference
+  datingPreference,
+  instagramUrl,
+  facebookUrl,
   imgSrc,
-  useNextImage = true, // Toggle for optimized vs. live preview
+  useNextImage = true,
 }) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
@@ -28,10 +31,7 @@ export default function PersonCard({
   }, [source]);
 
   return (
-    <div
-      className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full
-      max-w-[22rem] transition-all duration-300 group overflow-hidden hover:scale-[1.01] hover:shadow-xl"
-    >
+    <div className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl">
       {/* Banner Strip */}
       <div className="h-2 w-full bg-primary rounded-t-xl" />
 
@@ -103,7 +103,7 @@ export default function PersonCard({
 
         {/* Bio */}
         <div className="w-full">
-          <h4 className="text-xs font-semibold text-gray-600 mb-1 uppercase">Bio</h4>
+          <h5 className="text-xs font-semibold text-gray-600 mb-2 uppercase">Bio/Description</h5>
           <p
             className="text-gray-700 text-sm leading-snug max-w-xs mx-auto"
             data-testid="person-card-bio"
@@ -114,9 +114,9 @@ export default function PersonCard({
 
         {/* Adventure Preferences */}
         <div className="w-full">
-          <h4 className="text-xs font-semibold text-gray-600 mb-1 uppercase">
+          <h5 className="text-xs font-semibold text-gray-600 mb-2 uppercase">
             Adventure Preferences
-          </h4>
+          </h5>
           <div
             className="flex flex-wrap justify-center gap-2"
             data-testid="person-card-preferences"
@@ -152,10 +152,9 @@ export default function PersonCard({
 
         {/* Dating Preferences */}
         <div className="w-full">
-          <h4 className="text-xs font-semibold text-gray-600 mb-1 uppercase">Dating Preference</h4>
+          <h5 className="text-xs font-semibold text-gray-600 mb-2 uppercase">Dating Preference</h5>
           <div className="flex justify-center gap-2" data-testid="person-card-dating-preference">
             {datingPreference ? (
-              // Find the selected preference from the config
               datingConfig
                 .filter((pref) => pref.value === datingPreference)
                 .map((pref) => {
@@ -180,6 +179,54 @@ export default function PersonCard({
               <span className="text-xs text-gray-400 italic">Not specified</span>
             )}
           </div>
+        </div>
+
+        {/* Divider Line (Main Body and Social Icons) */}
+        <hr className="my-0 border-t-2 border-primary w-full" />
+
+        {/* Instagram and Facebook Icons */}
+        <div className="w-full flex justify-center gap-4 mt-2">
+          {/* Instagram Icon */}
+          <a
+            href={instagramUrl || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={clsx(
+              'transition',
+              !instagramUrl && 'opacity-50 cursor-not-allowed', // Disable if URL is not provided
+              'cursor-pointer text-pink-600 hover:text-pink-800'
+            )}
+            title="Instagram Profile"
+            aria-label="Instagram Profile"
+          >
+            <FaInstagram
+              className={clsx(
+                'w-6 h-6',
+                !instagramUrl && 'opacity-50 cursor-not-allowed' // Disable if URL is not provided
+              )}
+            />
+          </a>
+
+          {/* Facebook Icon */}
+          <a
+            href={facebookUrl || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={clsx(
+              'transition',
+              !facebookUrl && 'opacity-50 cursor-not-allowed', // Disable if URL is not provided
+              'cursor-pointer text-blue-600 hover:text-blue-800'
+            )}
+            title="Facebook Profile"
+            aria-label="Facebook Profile"
+          >
+            <FaFacebook
+              className={clsx(
+                'w-6 h-6',
+                !facebookUrl && 'opacity-50 cursor-not-allowed' // Disable if URL is not provided
+              )}
+            />
+          </a>
         </div>
       </div>
     </div>

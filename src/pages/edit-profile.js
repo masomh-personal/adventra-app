@@ -51,6 +51,8 @@ function EditProfile() {
         skillLevel: data.skill_summary || '',
         profileImageUrl: data.profile_image_url || '',
         datingPreferences: data.dating_preferences || '',
+        instagramUrl: data.instagram_url || '',
+        facebookUrl: data.facebook_url || '',
       };
 
       setProfile(hydratedProfile);
@@ -143,6 +145,8 @@ function EditProfile() {
           skill_summary: data.skillLevel,
           profile_image_url: profile.profileImageUrl,
           dating_preferences: data.datingPreferences,
+          instagram_url: data.instagramUrl,
+          facebook_url: data.facebookUrl,
         },
         { onConflict: 'user_id' }
       );
@@ -159,6 +163,8 @@ function EditProfile() {
         adventurePreferences: data.adventurePreferences,
         skillLevel: data.skillLevel,
         datingPreferences: data.datingPreferences,
+        instagramUrl: data.instagramUrl,
+        facebookUrl: data.facebookUrl,
       }));
 
       showSuccessModal('Profile updated successfully!', 'Saved');
@@ -195,17 +201,20 @@ function EditProfile() {
             const watchedBio = watch('bio');
             const watchedAdventures = watch('adventurePreferences') || [];
             const watchedSkill = watch('skillLevel');
-            const watchedDatingPreference = watch('datingPreferences'); // Track dating preference
+            const watchedDatingPreference = watch('datingPreferences');
+            const watchedInstagramUrl = watch('instagramUrl');
+            const watchedFacebookUrl = watch('facebookUrl');
 
             const isDirty =
               watchedBio !== profile.bio ||
               JSON.stringify(watchedAdventures) !== JSON.stringify(profile.adventurePreferences) ||
               watchedSkill !== profile.skillLevel ||
-              watchedDatingPreference !== profile.datingPreferences; // Include dating preferences
+              watchedDatingPreference !== profile.datingPreferences ||
+              watchedInstagramUrl !== profile.instagramUrl ||
+              watchedFacebookUrl !== profile.facebookUrl;
 
             return (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Form Fields Section */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                 <div>
                   {/* Profile Image Upload */}
                   <div className="mb-4">
@@ -272,21 +281,23 @@ function EditProfile() {
                     />
                   </div>
 
-                  <FormField
-                    label="Bio"
-                    id="bio"
-                    type="textarea"
-                    register={register}
-                    errors={errors}
-                    placeholder="Tell us about yourself"
-                    maxHeight="max-h-48"
-                    characterCountOptions={{
-                      value: watchedBio,
-                      maxLength: 500,
-                    }}
-                  />
+                  <div className="mt-2">
+                    <FormField
+                      label="Bio"
+                      id="bio"
+                      type="textarea"
+                      register={register}
+                      errors={errors}
+                      placeholder="Tell us about yourself"
+                      maxHeight="max-h-48"
+                      characterCountOptions={{
+                        value: watchedBio,
+                        maxLength: 500,
+                      }}
+                    />
+                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                     <FormField
                       label="Seeking"
                       id="adventurePreferences"
@@ -312,6 +323,27 @@ function EditProfile() {
                       options={datingPreferences}
                       register={register}
                       errors={errors}
+                    />
+                  </div>
+
+                  {/* Instagram and Facebook URLs */}
+                  <div className="grid grid-cols-1 gap-2 mt-4">
+                    <FormField
+                      label="Instagram URL"
+                      id="instagramUrl"
+                      type="url"
+                      register={register}
+                      errors={errors}
+                      placeholder="https://instagram.com/yourprofile"
+                    />
+
+                    <FormField
+                      label="Facebook URL"
+                      id="facebookUrl"
+                      type="url"
+                      register={register}
+                      errors={errors}
+                      placeholder="https://facebook.com/yourprofile"
                     />
                   </div>
 
@@ -344,6 +376,8 @@ function EditProfile() {
                       skillLevel={watchedSkill}
                       adventurePreferences={watchedAdventures}
                       datingPreference={watchedDatingPreference}
+                      instagramUrl={watchedInstagramUrl} // Pass Instagram URL to PersonCard
+                      facebookUrl={watchedFacebookUrl} // Pass Facebook URL to PersonCard
                       imgSrc={previewImageUrl}
                       useNextImage={false}
                     />
