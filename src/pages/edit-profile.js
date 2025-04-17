@@ -6,7 +6,7 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import useRunOnce from '@/hooks/useRunOnce';
-import { adventurePreferences, skillLevels } from '@/lib/constants/userMeta';
+import { adventurePreferences, datingPreferences, skillLevels } from '@/lib/constants/userMeta';
 import { editProfileSchema as validationSchema } from '@/validation/editProfileSchema';
 
 import FormWrapper from '@/components/FormWrapper';
@@ -50,6 +50,7 @@ function EditProfile() {
         adventurePreferences: data.adventure_preferences || [],
         skillLevel: data.skill_summary || '',
         profileImageUrl: data.profile_image_url || '',
+        datingPreferences: data.dating_preferences || '',
       };
 
       setProfile(hydratedProfile);
@@ -141,6 +142,7 @@ function EditProfile() {
           adventure_preferences: data.adventurePreferences,
           skill_summary: data.skillLevel,
           profile_image_url: profile.profileImageUrl,
+          dating_preferences: data.datingPreferences,
         },
         { onConflict: 'user_id' }
       );
@@ -156,6 +158,7 @@ function EditProfile() {
         bio: data.bio,
         adventurePreferences: data.adventurePreferences,
         skillLevel: data.skillLevel,
+        datingPreferences: data.datingPreferences,
       }));
 
       showSuccessModal('Profile updated successfully!', 'Saved');
@@ -176,7 +179,7 @@ function EditProfile() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 font-body w-full">
-      <div className="w-full max-w-[53rem] bg-white shadow-md rounded-lg p-6 mx-auto">
+      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 mx-auto">
         <FormWrapper
           ref={formRef}
           validationSchema={validationSchema}
@@ -192,11 +195,13 @@ function EditProfile() {
             const watchedBio = watch('bio');
             const watchedAdventures = watch('adventurePreferences') || [];
             const watchedSkill = watch('skillLevel');
+            const watchedDatingPreference = watch('datingPreferences'); // Track dating preference
 
             const isDirty =
               watchedBio !== profile.bio ||
               JSON.stringify(watchedAdventures) !== JSON.stringify(profile.adventurePreferences) ||
-              watchedSkill !== profile.skillLevel;
+              watchedSkill !== profile.skillLevel ||
+              watchedDatingPreference !== profile.datingPreferences; // Include dating preferences
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -280,9 +285,9 @@ function EditProfile() {
                     }}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                     <FormField
-                      label="Adventure Preferences"
+                      label="Seeking"
                       id="adventurePreferences"
                       type="checkbox"
                       options={adventurePreferences.map(({ value, label }) => ({ value, label }))}
@@ -291,10 +296,19 @@ function EditProfile() {
                     />
 
                     <FormField
-                      label="Skill Level"
+                      label="Skill"
                       id="skillLevel"
                       type="radio"
                       options={skillLevels}
+                      register={register}
+                      errors={errors}
+                    />
+
+                    <FormField
+                      label="Preference"
+                      id="datingPreferences"
+                      type="radio"
+                      options={datingPreferences}
                       register={register}
                       errors={errors}
                     />
@@ -317,7 +331,7 @@ function EditProfile() {
                   </div>
                 </div>
 
-                <div>
+                <div className="w-full md:w-[320px] mx-auto space-y-4">
                   <h4 className="text-lg font-bold mb-2">Live Preview</h4>
                   <PersonCard
                     key={previewImageUrl}
@@ -326,6 +340,7 @@ function EditProfile() {
                     bio={watchedBio}
                     skillLevel={watchedSkill}
                     adventurePreferences={watchedAdventures}
+                    datingPreference={watchedDatingPreference}
                     imgSrc={previewImageUrl}
                     useNextImage={false}
                   />

@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import { ImSpinner9 } from 'react-icons/im';
-import { adventurePreferences as preferenceConfig, skillColors } from '@/lib/constants/userMeta';
+import {
+  adventurePreferences as preferenceConfig,
+  skillColors,
+  datingPreferences as datingConfig,
+} from '@/lib/constants/userMeta';
 
 export default function PersonCard({
   name,
@@ -10,6 +14,7 @@ export default function PersonCard({
   skillLevel,
   bio,
   adventurePreferences,
+  datingPreference, // New prop for dating preference
   imgSrc,
   useNextImage = true, // Toggle for optimized vs. live preview
 }) {
@@ -107,7 +112,7 @@ export default function PersonCard({
           </p>
         </div>
 
-        {/* Preferences */}
+        {/* Adventure Preferences */}
         <div className="w-full">
           <h4 className="text-xs font-semibold text-gray-600 mb-1 uppercase">
             Adventure Preferences
@@ -141,6 +146,38 @@ export default function PersonCard({
               })
             ) : (
               <span className="text-xs text-gray-400 italic">None selected</span>
+            )}
+          </div>
+        </div>
+
+        {/* Dating Preferences */}
+        <div className="w-full">
+          <h4 className="text-xs font-semibold text-gray-600 mb-1 uppercase">Dating Preference</h4>
+          <div className="flex justify-center gap-2" data-testid="person-card-dating-preference">
+            {datingPreference ? (
+              // Find the selected preference from the config
+              datingConfig
+                .filter((pref) => pref.value === datingPreference)
+                .map((pref) => {
+                  const Icon = pref.icon;
+                  return (
+                    <span
+                      key={pref.value}
+                      className={clsx(
+                        'flex items-center gap-1 px-3 py-1 rounded-md text-xs font-bold uppercase border',
+                        pref.bg,
+                        pref.border,
+                        pref.text,
+                        'transition-transform duration-200 hover:scale-105'
+                      )}
+                    >
+                      <Icon className={`w-4 h-4 ${pref.text}`} />
+                      {pref.label}
+                    </span>
+                  );
+                })
+            ) : (
+              <span className="text-xs text-gray-400 italic">Not specified</span>
             )}
           </div>
         </div>
