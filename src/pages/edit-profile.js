@@ -179,7 +179,7 @@ function EditProfile() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 font-body w-full">
-      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 mx-auto">
+      <div className="w-full max-w-4xl bg-white shadow-md rounded-md p-6 mx-auto">
         <FormWrapper
           ref={formRef}
           validationSchema={validationSchema}
@@ -205,6 +205,7 @@ function EditProfile() {
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Form Fields Section */}
                 <div>
                   {/* Profile Image Upload */}
                   <div className="mb-4">
@@ -331,19 +332,22 @@ function EditProfile() {
                   </div>
                 </div>
 
+                {/* Live Preview Section */}
                 <div className="w-full md:w-[320px] mx-auto space-y-4">
-                  <h4 className="text-lg font-bold mb-2">Live Preview</h4>
-                  <PersonCard
-                    key={previewImageUrl}
-                    name={profile.name}
-                    age={profile.age}
-                    bio={watchedBio}
-                    skillLevel={watchedSkill}
-                    adventurePreferences={watchedAdventures}
-                    datingPreference={watchedDatingPreference}
-                    imgSrc={previewImageUrl}
-                    useNextImage={false}
-                  />
+                  <h4 className="text-lg font-bold mb-2 text-center">Live Preview</h4>
+                  <div className="flex justify-center">
+                    <PersonCard
+                      key={previewImageUrl}
+                      name={profile.name}
+                      age={profile.age}
+                      bio={watchedBio}
+                      skillLevel={watchedSkill}
+                      adventurePreferences={watchedAdventures}
+                      datingPreference={watchedDatingPreference}
+                      imgSrc={previewImageUrl}
+                      useNextImage={false}
+                    />
+                  </div>
                 </div>
               </div>
             );
