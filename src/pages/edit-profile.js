@@ -14,12 +14,12 @@ import FormField from '@/components/FormField';
 import PersonCard from '@/components/PersonCard';
 import Button from '@/components/Button';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { FiSave, FiUpload, FiArrowLeft, FiXCircle, FiFolder } from 'react-icons/fi';
+import { FiSave, FiUpload, FiArrowLeft, FiXCircle, FiFolder, FiTrash2 } from 'react-icons/fi';
 import { useModal } from '@/contexts/ModalContext';
 
 function EditProfile() {
   const router = useRouter();
-  const { showErrorModal, showSuccessModal } = useModal();
+  const { showConfirmationModal, showErrorModal, showSuccessModal } = useModal();
   const [userId, setUserId] = useState(null);
   const [profile, setProfile] = useState(null);
   const [previewImageUrl, setPreviewImageUrl] = useState('');
@@ -172,6 +172,41 @@ function EditProfile() {
     } catch (err) {
       console.error('Save failed:', err);
       showErrorModal('Failed to save profile.', 'Save Error');
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    const confirmed = await showConfirmationModal(
+      'Are you sure you want to delete your profile? This action cannot be undone.',
+      'Delete Profile'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      // Send the user ID to the server-side API route to delete the user
+      const res = await fetch('/api/delete-profile', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId }), // Pass the userId to the API route
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      // Step 1: Sign out the user after successful deletion
+      await supabase.auth.signOut(); // Sign the user out
+
+      // Step 2: Show success modal and handle redirection after modal is closed
+      showSuccessModal('Your profile has been deleted successfully.', 'Profile Deleted', () => {
+        router.push('/'); // Redirect to the homepage after sign-out
+      });
+    } catch (err) {
+      console.error('Error during deletion:', err);
+      showErrorModal('An error occurred while deleting your profile.', 'Delete Error');
     }
   };
 
@@ -389,7 +424,8 @@ function EditProfile() {
         </FormWrapper>
       </div>
 
-      <div className="mt-4 mx-auto">
+      <div className="mt-4 mx-auto flex gap-4">
+        {/* Back to Dashboard button */}
         <Button
           label={
             <>
@@ -398,6 +434,17 @@ function EditProfile() {
           }
           variant="secondary"
           onClick={() => router.push('/dashboard')}
+        />
+
+        {/* Delete Profile button */}
+        <Button
+          label={
+            <>
+              <FiTrash2 className="text-sm" /> Delete Profile
+            </>
+          }
+          variant="danger"
+          onClick={handleDeleteProfile}
         />
       </div>
     </div>

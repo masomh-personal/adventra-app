@@ -122,6 +122,48 @@ export const ModalProvider = ({ children }) => {
     [openModal, closeModal]
   );
 
+  // New showConfirmationModal function
+  const showConfirmationModal = useCallback(
+    (message, title) => {
+      return new Promise((resolve) => {
+        const confirmModal = (
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <div className="flex justify-between items-center border-b pb-3 mb-4">
+              <h2 className="text-xl font-bold text-red-600 flex items-center">
+                <FiAlertCircle className="text-red-600 w-6 h-6 mr-2" />
+                {title}
+              </h2>
+            </div>
+            <p className="text-gray-700 mb-4">{message}</p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => {
+                  resolve(false); // No
+                  closeModal();
+                }}
+                className="px-4 py-2 text-white bg-gray-400 rounded"
+              >
+                No
+              </button>
+              <button
+                onClick={() => {
+                  resolve(true); // Yes
+                  closeModal();
+                }}
+                className="px-4 py-2 text-white bg-red-600 rounded"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        );
+
+        openModal(confirmModal);
+      });
+    },
+    [closeModal, openModal]
+  );
+
   const showErrorModal = showModal('error');
   const showSuccessModal = showModal('success');
   const showInfoModal = showModal('info');
@@ -165,6 +207,7 @@ export const ModalProvider = ({ children }) => {
         showErrorModal,
         showSuccessModal,
         showInfoModal,
+        showConfirmationModal, // Expose the new function
       }}
     >
       {children}
