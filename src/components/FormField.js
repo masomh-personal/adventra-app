@@ -54,32 +54,42 @@ export default function FormField({
           <textarea
             rows={4}
             {...getInputProps()}
-            className={`${inputClass} resize-none ${maxHeight || 'max-h-48'}`}
+            className={`
+              ${inputClass}
+              resize-none
+              ${maxHeight || 'max-h-48'}
+              focus:ring-offset-1
+              focus:shadow-md
+              transition-all
+              duration-200
+              placeholder:text-gray-400
+              placeholder:font-light
+            `}
           />
         );
 
       case 'checkbox':
         if (options.length > 0) {
           return (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               {options.map((option) => (
                 <label
                   key={option.value}
                   htmlFor={`${id}-${option.value}`}
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-sm border-1 cursor-pointer select-none text-sm font-semibold transition-all hover:bg-secondary/10 peer-checked:bg-secondary/10 peer-checked:border-primary peer-checked:text-primary"
+                  className="flex items-center gap-2 cursor-pointer select-none py-1"
                 >
-                  <input
-                    type="checkbox"
-                    id={`${id}-${option.value}`}
-                    value={option.value}
-                    {...register(id)}
-                    className="hidden peer"
-                    disabled={disabled}
-                  />
-                  <span className="w-4 h-4 flex items-center justify-center border-2 rounded-sm border-gray-400 peer-checked:border-primary peer-checked:bg-primary peer-checked:shadow-inner">
-                    <span className="w-2 h-2 bg-white rounded-sm peer-checked:block hidden" />
-                  </span>
-                  {option.label}
+                  <div className="relative h-5 w-5 rounded">
+                    <input
+                      type="checkbox"
+                      id={`${id}-${option.value}`}
+                      value={option.value}
+                      {...register(id)}
+                      className="peer h-full w-full rounded focus:ring-2 focus:ring-primary text-primary opacity-0 cursor-pointer transition-shadow duration-200"
+                      disabled={disabled}
+                    />
+                    <span className="absolute inset-0 rounded border-2 border-gray-400 shadow-sm peer-checked:border-primary/85 peer-checked:bg-primary/85 transition-all duration-200"></span>
+                  </div>
+                  <span className="text-sm font-medium">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -88,14 +98,17 @@ export default function FormField({
 
         return (
           <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id={id}
-              {...register(id)}
-              disabled={disabled}
-              className="w-4 h-4 border-gray-300 rounded focus:ring-2 focus:ring-primary"
-            />
-            <label htmlFor={id} className="text-sm font-semibold">
+            <div className="relative h-5 w-5 rounded">
+              <input
+                type="checkbox"
+                id={id}
+                {...register(id)}
+                disabled={disabled}
+                className="peer h-full w-full rounded focus:ring-2 focus:ring-primary text-primary opacity-0 cursor-pointer transition-shadow duration-200"
+              />
+              <span className="absolute inset-0 rounded border-2 border-gray-400 shadow-sm peer-checked:border-primary/85 peer-checked:bg-primary/85 transition-all duration-200"></span>
+            </div>
+            <label htmlFor={id} className="text-sm font-medium">
               {label}
             </label>
           </div>
@@ -121,7 +134,7 @@ export default function FormField({
                 <span className="relative w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-400 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary/85 peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
                   <span className="w-2.5 h-2.5 bg-primary rounded-full absolute peer-checked:block peer-checked:scale-110 transition-transform duration-150 hidden" />
                 </span>
-                <span className="text-sm font-semibold uppercase">{option.label}</span>
+                <span className="text-sm font-semibold">{option.label}</span>
               </label>
             ))}
           </div>

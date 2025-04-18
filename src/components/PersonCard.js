@@ -103,7 +103,7 @@ export default function PersonCard({
 
         {/* Bio */}
         <div className="w-full">
-          <h5 className="text-xs font-semibold text-gray-600 mb-2 uppercase">Bio/Description</h5>
+          <h5 className="text-xs font-semibold text-gray-600 mb-2 uppercase">Bio</h5>
           <p
             className="text-gray-700 text-sm leading-snug max-w-xs mx-auto"
             data-testid="person-card-bio"
