@@ -76,19 +76,24 @@ export default function PersonCard({
           )}
         </div>
 
-        {/* Name + Age */}
-        <h3 className="text-lg font-bold text-gray-900 -mb-1" data-testid="person-card-name">
-          <span className="font-accent"> {age ? `${age} | ` : ''}</span>
+        <h3 className="text-lg font-bold text-gray-900 -mb-2" data-testid="person-card-name">
           {name || 'Unnamed Explorer'}
         </h3>
 
-        {/* Skill Level */}
         <div className="w-full flex justify-center items-center gap-2 text-xs text-gray-600">
-          <span className="font-semibold uppercase">Skill Level:</span>
-          {skill ? (
+          {age && (
             <span
               className={clsx(
-                'inline-block px-3 py-0.5 rounded text-xs font-bold uppercase border',
+                'inline-block px-2 py-0 rounded font-bold uppercase border bg-tertiary/10 font-accent text-sm text-tertiary'
+              )}
+            >
+              AGE: {age}
+            </span>
+          )}
+          {skill && (
+            <span
+              className={clsx(
+                'inline-block px-3 py-0.5 rounded font-bold uppercase border',
                 skill.border,
                 skill.text,
                 skill.bg
@@ -96,9 +101,8 @@ export default function PersonCard({
             >
               {skill.label}
             </span>
-          ) : (
-            <span className="italic text-gray-400">Not specified</span>
           )}
+          {!age && !skill && <span className="italic">Not specified</span>}
         </div>
 
         {/* Bio */}
@@ -182,7 +186,7 @@ export default function PersonCard({
         </div>
 
         {/* Divider Line (Main Body and Social Icons) */}
-        <hr className="my-0 border-t-2 border-primary w-full" />
+        <hr className="my-0 border-t-1 border-primary w-full" />
 
         {/* Instagram and Facebook Icons */}
         <div className="w-full flex justify-center gap-4 mt-2">
