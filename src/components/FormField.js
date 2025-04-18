@@ -145,12 +145,35 @@ export default function FormField({
           <input
             type="date"
             {...getInputProps()}
-            className={`${inputClass} text-sm bg-white text-gray-800`}
+            className={`
+        ${inputClass}
+        text-sm
+        bg-white
+        text-gray-800
+        focus:ring-offset-1
+        focus:shadow-md
+        transition-all
+        duration-200
+      `}
           />
         );
 
       default:
-        return <input type={type} {...getInputProps()} />;
+        return (
+          <input
+            type={type}
+            {...getInputProps()}
+            className={`
+              ${inputClass}
+              focus:ring-offset-1
+              focus:shadow-md
+              transition-all
+              duration-200
+              placeholder:text-gray-400
+              placeholder:font-light
+            `}
+          />
+        );
     }
   };
 
