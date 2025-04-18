@@ -118,7 +118,9 @@ export default function FormField({
                   className="peer sr-only"
                   disabled={disabled}
                 />
-                <span className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-400 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary/20 peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary" />
+                <span className="relative w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-400 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary/85 peer-hover:scale-105 peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+                  <span className="w-2.5 h-2.5 bg-primary rounded-full absolute peer-checked:block peer-checked:scale-110 transition-transform duration-150 hidden" />
+                </span>
                 <span className="text-sm font-semibold uppercase">{option.label}</span>
               </label>
             ))}
