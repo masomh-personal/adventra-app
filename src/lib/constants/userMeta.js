@@ -1,4 +1,48 @@
-import { FaHiking, FaCampground, FaMountain, FaCamera } from 'react-icons/fa';
+import {
+  FaHiking,
+  FaCampground,
+  FaMountain,
+  FaCamera,
+  FaHeart,
+  FaTransgender,
+  FaRainbow,
+  FaHandshake,
+} from 'react-icons/fa';
+
+export const datingPreferences = [
+  {
+    value: 'straight',
+    label: 'Straight',
+    icon: FaHeart,
+    border: 'border-pink-500',
+    text: 'text-pink-600',
+    bg: 'bg-pink-100',
+  },
+  {
+    value: 'gay',
+    label: 'Gay',
+    icon: FaRainbow,
+    border: 'border-purple-500',
+    text: 'text-purple-600',
+    bg: 'bg-purple-100',
+  },
+  {
+    value: 'bi',
+    label: 'Bisexual',
+    icon: FaTransgender,
+    border: 'border-indigo-500',
+    text: 'text-indigo-600',
+    bg: 'bg-indigo-100',
+  },
+  {
+    value: 'platonic',
+    label: 'Platonic',
+    icon: FaHandshake,
+    border: 'border-gray-500',
+    text: 'text-gray-600',
+    bg: 'bg-gray-100',
+  },
+];
 
 export const adventurePreferences = [
   {

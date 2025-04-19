@@ -1,18 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * Initialize and export the Supabase client.
- * This client is reused across the app to interact with Supabase services.
- */
-
-// Environment variables (keep them secure!)
+// Environment variables for public keys (client-side)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables for the client.');
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Client-side (public) supabase client using anon key
+const supabaseAnon = createClient(supabaseUrl, supabaseAnonKey);
 
-export default supabase;
+export default supabaseAnon;

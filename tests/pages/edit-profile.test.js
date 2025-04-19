@@ -1,5 +1,3 @@
-// tests/pages/edit-profile.test.js
-
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditProfile from '@/pages/edit-profile';
@@ -9,6 +7,11 @@ import * as getProfileModule from '@/lib/getFullUserProfile';
 import { useModal } from '@/contexts/ModalContext';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
+
+// Mock global fetch to simulate profile deletion
+global.fetch = jest.fn().mockResolvedValue({
+  json: jest.fn().mockResolvedValue({}),
+});
 
 // Mock router before component imports
 jest.mock('next/router', () => ({ useRouter: jest.fn() }));
@@ -37,19 +40,24 @@ jest.mock('@/contexts/ModalContext');
 const mockPush = jest.fn();
 const mockShowSuccessModal = jest.fn();
 const mockShowErrorModal = jest.fn();
+const mockShowConfirmationModal = jest.fn().mockResolvedValue(true);
 
 const hydratedProfile = {
   user: { name: 'Alex Example' },
   age: 30,
   bio: 'Nature lover',
-  adventure_preferences: ['camping'],
-  skill_summary: 'beginner',
+  adventure_preferences: ['hiking'],
+  skill_summary: 'novice',
   profile_image_url: '/profile.jpg',
+  instagram_url: 'https://instagram.com/aleexample',
+  facebook_url: 'https://facebook.com/aleexample',
+  dating_preferences: 'straight',
 };
 
 describe('EditProfile Page', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
+    fetch.mockClear();
 
     getUserModule.getCurrentUserId.mockResolvedValue('user-123');
     getProfileModule.getFullUserProfile.mockResolvedValue(hydratedProfile);
@@ -57,6 +65,7 @@ describe('EditProfile Page', () => {
     useModal.mockReturnValue({
       showSuccessModal: mockShowSuccessModal,
       showErrorModal: mockShowErrorModal,
+      showConfirmationModal: mockShowConfirmationModal,
     });
 
     useRouter.mockReturnValue({ push: mockPush });
@@ -74,13 +83,51 @@ describe('EditProfile Page', () => {
 
   it('enables save on form change and submits', async () => {
     const user = userEvent.setup();
-    const bioInput = await screen.findByLabelText('Bio');
 
+    const bioInput = await screen.findByLabelText('Bio');
     await user.clear(bioInput);
     await user.type(bioInput, 'Wilderness explorer.');
 
     const saveButton = screen.getByRole('button', { name: /save changes/i });
-    expect(saveButton).toBeEnabled();
+
+    await waitFor(() => {
+      expect(saveButton).toBeEnabled();
+    });
+
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpsert).toHaveBeenCalled();
+      expect(mockShowSuccessModal).toHaveBeenCalledWith(
+        expect.stringContaining('Profile updated'),
+        'Saved'
+      );
+    });
+  });
+
+  it('enables save on multiple form changes and submits', async () => {
+    const user = userEvent.setup();
+
+    const bioInput = await screen.findByLabelText('Bio');
+    const adventurePreferencesInput = screen.getByLabelText('Hiking');
+
+    await user.clear(bioInput);
+    await user.type(bioInput, 'Mountain enthusiast with a love for wildlife.');
+
+    await user.click(adventurePreferencesInput); // Uncheck 'Hiking'
+    await user.click(adventurePreferencesInput); // Recheck 'Hiking'
+
+    const intermediateSkillLevelInput = screen.getByLabelText('Intermediate');
+    await user.click(intermediateSkillLevelInput);
+
+    const biDatingPreferenceInput = screen.getByLabelText('Bisexual');
+    await user.click(biDatingPreferenceInput);
+
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
+
+    await waitFor(() => {
+      expect(saveButton).toBeEnabled();
+    });
 
     await user.click(saveButton);
 
@@ -115,7 +162,7 @@ describe('EditProfile Page', () => {
     const user = userEvent.setup();
     const file = new File(['image'], 'profile.jpg', { type: 'image/jpeg' });
 
-    const fileInput = screen.getByLabelText(/upload.*jpg or png/i);
+    const fileInput = screen.getByLabelText(/upload \(max 2 MB, JPG\/PNG\)/i);
     await user.upload(fileInput, file);
 
     const uploadBtn = screen.getByRole('button', { name: /upload photo/i });
@@ -125,7 +172,7 @@ describe('EditProfile Page', () => {
       expect(mockUpload).toHaveBeenCalled();
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         'Profile image uploaded successfully!',
-        'Upload Successful'
+        'Upload OK'
       );
     });
   });
@@ -134,5 +181,37 @@ describe('EditProfile Page', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: /back to dashboard/i }));
     expect(mockPush).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('correctly handles Instagram URL input', async () => {
+    const user = userEvent.setup();
+    const instagramInput = await screen.findByLabelText('Instagram URL');
+    expect(instagramInput).toHaveValue('https://instagram.com/aleexample');
+
+    await user.clear(instagramInput);
+    await user.type(instagramInput, 'https://instagram.com/updatedProfile');
+
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpsert).toHaveBeenCalled();
+    });
+  });
+
+  it('correctly handles Facebook URL input', async () => {
+    const user = userEvent.setup();
+    const facebookInput = await screen.findByLabelText('Facebook URL');
+    expect(facebookInput).toHaveValue('https://facebook.com/aleexample');
+
+    await user.clear(facebookInput);
+    await user.type(facebookInput, 'https://facebook.com/updatedProfile');
+
+    const saveButton = screen.getByRole('button', { name: /save changes/i });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockUpsert).toHaveBeenCalled();
+    });
   });
 });

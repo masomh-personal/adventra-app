@@ -7,7 +7,7 @@ import FormField from '@/components/FormField';
 import supabase from '@/lib/supabaseClient';
 import { useModal } from '@/contexts/ModalContext';
 import { FcGoogle } from 'react-icons/fc';
-import { FaFacebook, FaInstagram, FaApple, FaGoogle } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaApple } from 'react-icons/fa';
 import Button from '@/components/Button';
 import DividerWithText from '@/components/DividerWithText';
 import MagicLinkForm from '@/components/MagicLinkForm';
@@ -93,7 +93,7 @@ export default function LoginPage() {
     {
       name: 'Google',
       icon: <FcGoogle className="h-5 w-5 mr-2 group-hover:hidden" />,
-      hoverIcon: <FaGoogle className="h-5 w-5 mr-2 hidden group-hover:inline text-red-500" />,
+      hoverIcon: <FcGoogle className="h-5 w-5 mr-2 hidden group-hover:inline text-red-500" />,
       bg: 'bg-white',
       text: 'text-gray-700',
       border: 'border border-gray-300',

@@ -20,6 +20,9 @@ export async function getFullUserProfile(uid) {
       skill_summary,
       profile_image_url,
       birthdate,
+      instagram_url,
+      facebook_url,
+      dating_preferences,
       user:user_id (
         name,
         email

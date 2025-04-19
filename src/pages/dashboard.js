@@ -4,7 +4,7 @@ import supabase from '@/lib/supabaseClient';
 import withAuth from '@/lib/withAuth';
 import Button from '@/components/Button';
 import InfoCard from '@/components/InfoCard';
-import { FaUserEdit, FaSignOutAlt, FaEye, FaMap, FaComment } from 'react-icons/fa';
+import { FaUserEdit, FaSignOutAlt, FaMap, FaComment } from 'react-icons/fa';
 
 function Dashboard({ user }) {
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ function Dashboard({ user }) {
 
   return (
     <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
-      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8 my-8">
+      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8 my-8">
         <main>
           <h2 className="text-xl font-extrabold mb-4 text-center">
             Welcome, <span className="text-secondary">{userFirstName}</span>!
@@ -43,20 +43,7 @@ function Dashboard({ user }) {
             Start planning your next adventure with someone new
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            {/* Your Matches Section */}
-            <InfoCard
-              title="Your Matches"
-              description="View your matches and start planning your next adventure!"
-              buttonLabel="Matches"
-              buttonIcon={<FaEye className="mr-0" />}
-              onClick={() => {
-                /* Add view matches logic */
-                console.log('View Matches clicked');
-              }}
-              testId="matches-infocard" // Added testId
-            />
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             {/* Find Adventures Section */}
             <InfoCard
               title="Find Adventurers"

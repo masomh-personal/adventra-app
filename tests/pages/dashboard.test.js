@@ -59,7 +59,6 @@ describe('Dashboard', () => {
 
   it('renders the InfoCards', () => {
     render(<Dashboard user={mockUser} />);
-    expect(screen.getByTestId('matches-infocard')).toBeInTheDocument();
     expect(screen.getByTestId('adventurers-infocard')).toBeInTheDocument();
     expect(screen.getByTestId('messages-infocard')).toBeInTheDocument();
   });
@@ -106,20 +105,6 @@ describe('Dashboard', () => {
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/edit-profile');
     });
-  });
-
-  it('calls onClick when the Matches button is clicked', async () => {
-    const user = setup();
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    render(<Dashboard user={mockUser} />);
-    await user.click(screen.getByTestId('infocard-button-matches'));
-
-    await waitFor(() => {
-      expect(consoleLogSpy).toHaveBeenCalledWith('View Matches clicked');
-    });
-
-    consoleLogSpy.mockRestore();
   });
 
   it('calls onClick when the Adventurers button is clicked', async () => {
