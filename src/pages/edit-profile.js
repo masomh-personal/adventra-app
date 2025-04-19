@@ -252,7 +252,9 @@ function EditProfile() {
                   {/* photo uploader */}
                   <div className="mb-4">
                     <h4 className="font-bold text-base mb-2">Profile Photo</h4>
-                    <label className="block font-medium mb-1">Upload (max 2 MB, JPG/PNG)</label>
+                    <label className="block font-medium mb-1" htmlFor="file-upload">
+                      Upload (max 2 MB, JPG/PNG)
+                    </label>
 
                     <div className="flex items-center gap-3">
                       <Button
@@ -300,6 +302,7 @@ function EditProfile() {
                     </div>
 
                     <input
+                      id="file-upload"
                       ref={fileInputRef}
                       type="file"
                       accept="image/png,image/jpeg"
