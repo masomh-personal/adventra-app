@@ -50,9 +50,8 @@ function Dashboard({ user }) {
               description="Start browsing other adventurers and plan your next journey!"
               buttonLabel="Adventurers"
               buttonIcon={<FaMap className="mr-0" />}
-              onClick={() => {
-                /* Add browse adventures logic */
-                console.log('Browse Adventures clicked');
+              onClick={async () => {
+                await router.push('/search');
               }}
               testId="adventurers-infocard" // Added testId
             />
