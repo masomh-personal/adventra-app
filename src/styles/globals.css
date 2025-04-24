@@ -93,6 +93,33 @@
   .animate-fade-in-scale {
     animation: fade-in-scale 0.25s ease-in-out forwards;
   }
+
+  /* Smoother swipe animations with rotation */
+  @keyframes swipeLeft {
+    from {
+      transform: translateX(0) rotate(0deg);
+    }
+    to {
+      transform: translateX(-100vw) rotate(-30deg); /* Move off-screen and tilt */
+    }
+  }
+
+  @keyframes swipeRight {
+    from {
+      transform: translateX(0) rotate(0deg);
+    }
+    to {
+      transform: translateX(100vw) rotate(30deg); /* Move off-screen and tilt */
+    }
+  }
+
+  .animate-swipe-left {
+    animation: swipeLeft 0.7s ease-out forwards; /* Smoother, slower swipe */
+  }
+
+  .animate-swipe-right {
+    animation: swipeRight 0.7s ease-out forwards; /* Smoother, slower swipe */
+  }
 }
 
 /* -------------------------------
