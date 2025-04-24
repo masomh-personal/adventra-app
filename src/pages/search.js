@@ -13,6 +13,7 @@ export default function SearchPage() {
   const [currentUserIndex, setCurrentUserIndex] = useState(0); // Index of the current user to display
   const [currentUserId, setCurrentUserId] = useState(null); // Store the current user ID
   const [loading, setLoading] = useState(true);
+  const [swipeDirection, setSwipeDirection] = useState(null); // State for swipe direction
 
   const router = useRouter();
 
@@ -37,13 +38,20 @@ export default function SearchPage() {
 
   // Handle swipe left (no match)
   const handleSwipeLeft = () => {
-    setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length); // Move to next user
+    setSwipeDirection('left'); // Set swipe direction to left
+    setTimeout(() => {
+      setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length); // Move to next user after animation
+      setSwipeDirection(null); // Reset swipe direction
+    }, 300); // Wait for the animation to finish before moving to the next user
   };
 
   // Handle swipe right (match)
   const handleSwipeRight = () => {
-    // Match logic could be implemented here (e.g., updating a "matches" table in the database)
-    setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length); // Move to next user
+    setSwipeDirection('right'); // Set swipe direction to right
+    setTimeout(() => {
+      setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length); // Move to next user after animation
+      setSwipeDirection(null); // Reset swipe direction
+    }, 300); // Wait for the animation to finish before moving to the next user
   };
 
   // Exclude the current user from the list of users displayed
@@ -76,6 +84,7 @@ export default function SearchPage() {
             instagramUrl={currentUser.instagram_url}
             facebookUrl={currentUser.facebook_url}
             imgSrc={currentUser.profile_image_url}
+            swipeDirection={swipeDirection} // Pass swipe direction to PersonCard
           />
         )}
 

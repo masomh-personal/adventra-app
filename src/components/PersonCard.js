@@ -20,6 +20,7 @@ export default function PersonCard({
   facebookUrl,
   imgSrc,
   useNextImage = true,
+  swipeDirection, // Pass swipe direction to handle animation
 }) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
@@ -31,8 +32,19 @@ export default function PersonCard({
     setIsImgLoading(true); // Show spinner when changing image
   }, [source]);
 
+  // Classnames for swipe animations
+  const swipeClass = clsx({
+    'animate-swipe-left': swipeDirection === 'left',
+    'animate-swipe-right': swipeDirection === 'right',
+  });
+
   return (
-    <div className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl">
+    <div
+      className={clsx(
+        'relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl',
+        swipeClass // Apply swipe animation class
+      )}
+    >
       {/* Banner Strip */}
       <div className="h-2 w-full bg-primary rounded-t-xl" />
 
