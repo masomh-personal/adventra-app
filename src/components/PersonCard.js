@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import { ImSpinner9 } from 'react-icons/im';
+import { ImSpinner9 } from 'react-icons/im'; // Spinner Icon
 import { FaInstagram, FaFacebook } from 'react-icons/fa'; // Instagram and Facebook icons
 import {
   adventurePreferences as preferenceConfig,
@@ -23,11 +23,12 @@ export default function PersonCard({
 }) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
-  const [isImgLoading, setIsImgLoading] = useState(true);
+  const [isImgLoading, setIsImgLoading] = useState(true); // To track the image loading state
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
 
+  // Reset the loading state when the image source changes
   useEffect(() => {
-    setIsImgLoading(true);
+    setIsImgLoading(true); // Show spinner when changing image
   }, [source]);
 
   return (
@@ -39,16 +40,25 @@ export default function PersonCard({
         {/* Profile Image */}
         <div className="relative w-[220px] aspect-[11/14]">
           {useNextImage ? (
-            <Image
-              src={source}
-              alt={name || 'Adventra user profile'}
-              width={220}
-              height={290}
-              onError={() => setSource(fallbackImgSrc)}
-              className="rounded-md object-cover border border-gray-200 shadow-sm"
-              loading="lazy"
-              data-testid="person-card-image"
-            />
+            <>
+              {isImgLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-md z-10">
+                  <ImSpinner9 className="w-6 h-6 text-primary animate-spin" aria-hidden="true" />
+                </div>
+              )}
+              <Image
+                key={source} // This forces a re-render of the image
+                src={source}
+                alt={name || 'Adventra user profile'}
+                width={220}
+                height={290}
+                onError={() => setSource(fallbackImgSrc)} // Handle error to show fallback image
+                className="rounded-md object-cover border border-gray-200 shadow-sm"
+                loading="lazy"
+                data-testid="person-card-image"
+                onLoad={() => setIsImgLoading(false)} // Set loading to false once image is loaded
+              />
+            </>
           ) : (
             <>
               {isImgLoading && (
@@ -57,12 +67,12 @@ export default function PersonCard({
                 </div>
               )}
               <img
-                key={source}
+                key={source} // This forces a re-render of the image
                 src={source}
                 alt={name || 'Adventra user profile'}
-                onLoad={() => setIsImgLoading(false)}
+                onLoad={() => setIsImgLoading(false)} // Set loading to false once image is loaded
                 onError={() => {
-                  setSource(fallbackImgSrc);
+                  setSource(fallbackImgSrc); // Fallback in case image fails
                   setIsImgLoading(false);
                 }}
                 className={clsx(
