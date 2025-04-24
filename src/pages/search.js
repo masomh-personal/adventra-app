@@ -76,7 +76,7 @@ export default function SearchPage() {
   const currentUser = filteredUsers[currentUserIndex] || {};
 
   return (
-    <div className="w-full flex items-center justify-center bg-background text-foreground p-6 font-body">
+    <div className="w-full flex items-center justify-center bg-background text-foreground p-4 font-body">
       {/* Wrapper for centering everything */}
       <div className="flex flex-col items-center justify-center space-y-4">
         {/* Person Card */}
