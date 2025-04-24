@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import { ImSpinner9 } from 'react-icons/im';
+import { ImSpinner9 } from 'react-icons/im'; // Spinner Icon
 import { FaInstagram, FaFacebook } from 'react-icons/fa'; // Instagram and Facebook icons
 import {
   adventurePreferences as preferenceConfig,
@@ -20,35 +20,57 @@ export default function PersonCard({
   facebookUrl,
   imgSrc,
   useNextImage = true,
+  swipeDirection, // Pass swipe direction to handle animation
 }) {
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
-  const [isImgLoading, setIsImgLoading] = useState(true);
+  const [isImgLoading, setIsImgLoading] = useState(true); // To track the image loading state
   const skill = skillColors[skillLevel?.toLowerCase()] || null;
 
+  // Reset the loading state when the image source changes
   useEffect(() => {
-    setIsImgLoading(true);
+    setIsImgLoading(true); // Show spinner when changing image
   }, [source]);
 
+  // Classnames for swipe animations
+  const swipeClass = clsx({
+    'animate-swipe-left': swipeDirection === 'left',
+    'animate-swipe-right': swipeDirection === 'right',
+  });
+
   return (
-    <div className="relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl">
+    <div
+      className={clsx(
+        'relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl',
+        swipeClass // Apply swipe animation class
+      )}
+    >
       {/* Banner Strip */}
       <div className="h-2 w-full bg-primary rounded-t-xl" />
 
       <div className="p-4 flex flex-col items-center text-center space-y-4">
         {/* Profile Image */}
-        <div className="relative w-[220px] aspect-[11/14]">
+        <div className="relative w-[220px] max-h-[290px] overflow-hidden">
           {useNextImage ? (
-            <Image
-              src={source}
-              alt={name || 'Adventra user profile'}
-              width={220}
-              height={290}
-              onError={() => setSource(fallbackImgSrc)}
-              className="rounded-md object-cover border border-gray-200 shadow-sm"
-              loading="lazy"
-              data-testid="person-card-image"
-            />
+            <>
+              {isImgLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-md z-10">
+                  <ImSpinner9 className="w-6 h-6 text-primary animate-spin" aria-hidden="true" />
+                </div>
+              )}
+              <Image
+                key={source} // This forces a re-render of the image
+                src={source}
+                alt={name || 'Adventra user profile'}
+                width={220}
+                height={0} // Let height be auto-calculated based on the aspect ratio
+                onError={() => setSource(fallbackImgSrc)} // Handle error to show fallback image
+                className="rounded-md object-cover border border-gray-200 shadow-sm"
+                loading="lazy"
+                data-testid="person-card-image"
+                onLoad={() => setIsImgLoading(false)} // Set loading to false once image is loaded
+              />
+            </>
           ) : (
             <>
               {isImgLoading && (
@@ -57,12 +79,12 @@ export default function PersonCard({
                 </div>
               )}
               <img
-                key={source}
+                key={source} // This forces a re-render of the image
                 src={source}
                 alt={name || 'Adventra user profile'}
-                onLoad={() => setIsImgLoading(false)}
+                onLoad={() => setIsImgLoading(false)} // Set loading to false once image is loaded
                 onError={() => {
-                  setSource(fallbackImgSrc);
+                  setSource(fallbackImgSrc); // Fallback in case image fails
                   setIsImgLoading(false);
                 }}
                 className={clsx(
@@ -81,15 +103,21 @@ export default function PersonCard({
         </h3>
 
         <div className="w-full flex justify-center items-center gap-2 text-xs text-gray-600">
-          {age && (
+          {/* Display Age */}
+          {age ? (
             <span
               className={clsx(
-                'inline-block px-2 py-0 rounded font-bold uppercase border bg-tertiary/10 font-accent text-sm text-tertiary'
+                'inline-block px-1 py-0 rounded font-bold text-sm uppercase border bg-tertiary/20 font-accent text-tertiary'
               )}
             >
               AGE: {age}
             </span>
+          ) : (
+            // If age is not specified, display fallback message
+            <span className="italic text-gray-400">Unknown</span>
           )}
+
+          {/* Display Skill Level */}
           {skill && (
             <span
               className={clsx(
@@ -102,7 +130,9 @@ export default function PersonCard({
               {skill.label}
             </span>
           )}
-          {!age && !skill && <span className="italic">Not specified</span>}
+
+          {/* Fallback if neither age nor skill are provided */}
+          {!age && !skill && <span className="italic text-gray-400">Not specified</span>}
         </div>
 
         {/* Bio */}

@@ -35,6 +35,7 @@ export default function Button({
     ghost: 'bg-gray-100 text-primary hover:bg-gray-200 border border-transparent',
     subtle: 'bg-gray-200 text-gray-700 hover:bg-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700',
+    green: 'bg-green-600 text-white hover:bg-green-700',
     tertiary: 'bg-tertiary text-white hover:bg-primary',
     link: 'bg-transparent text-primary underline hover:text-secondary p-0',
     muted: 'bg-[#e2e2e2] text-gray-700 hover:bg-[#d0d0d0]',

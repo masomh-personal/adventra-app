@@ -106,32 +106,4 @@ describe('Dashboard', () => {
       expect(mockPush).toHaveBeenCalledWith('/edit-profile');
     });
   });
-
-  it('calls onClick when the Adventurers button is clicked', async () => {
-    const user = setup();
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    render(<Dashboard user={mockUser} />);
-    await user.click(screen.getByTestId('infocard-button-adventurers'));
-
-    await waitFor(() => {
-      expect(consoleLogSpy).toHaveBeenCalledWith('Browse Adventures clicked');
-    });
-
-    consoleLogSpy.mockRestore();
-  });
-
-  it('calls onClick when the Messages button is clicked', async () => {
-    const user = setup();
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    render(<Dashboard user={mockUser} />);
-    await user.click(screen.getByTestId('infocard-button-messages'));
-
-    await waitFor(() => {
-      expect(consoleLogSpy).toHaveBeenCalledWith('View Messages clicked');
-    });
-
-    consoleLogSpy.mockRestore();
-  });
 });

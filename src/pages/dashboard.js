@@ -48,11 +48,11 @@ function Dashboard({ user }) {
             <InfoCard
               title="Find Adventurers"
               description="Start browsing other adventurers and plan your next journey!"
-              buttonLabel="Adventurers"
+              buttonLabel="Search"
               buttonIcon={<FaMap className="mr-0" />}
-              onClick={() => {
-                /* Add browse adventures logic */
-                console.log('Browse Adventures clicked');
+              buttonVariant="green"
+              onClick={async () => {
+                await router.push('/search');
               }}
               testId="adventurers-infocard" // Added testId
             />
@@ -61,8 +61,9 @@ function Dashboard({ user }) {
             <InfoCard
               title="Messages"
               description="View and reply to all your chat messages from other adventurers!"
-              buttonLabel="Messages"
+              buttonLabel="Inbox"
               buttonIcon={<FaComment className="mr-0" />}
+              buttonVariant="tertiary"
               onClick={() => {
                 /* Add view messages logic */
                 console.log('View Messages clicked');
