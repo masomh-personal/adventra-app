@@ -50,7 +50,7 @@ export default function PersonCard({
 
       <div className="p-4 flex flex-col items-center text-center space-y-4">
         {/* Profile Image */}
-        <div className="relative w-[220px] aspect-[11/14]">
+        <div className="relative w-[220px] max-h-[290px] overflow-hidden">
           {useNextImage ? (
             <>
               {isImgLoading && (
@@ -63,7 +63,7 @@ export default function PersonCard({
                 src={source}
                 alt={name || 'Adventra user profile'}
                 width={220}
-                height={290}
+                height={0} // Let height be auto-calculated based on the aspect ratio
                 onError={() => setSource(fallbackImgSrc)} // Handle error to show fallback image
                 className="rounded-md object-cover border border-gray-200 shadow-sm"
                 loading="lazy"
