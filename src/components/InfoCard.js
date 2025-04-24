@@ -10,6 +10,7 @@ const InfoCard = ({
   imgAlt,
   buttonIcon,
   testId,
+  buttonVariant = 'primary', // Set default variant as 'primary'
 }) => {
   return (
     <div
@@ -37,6 +38,7 @@ const InfoCard = ({
           label={buttonLabel}
           onClick={onClick}
           leftIcon={buttonIcon}
+          variant={buttonVariant} // Pass the variant prop to the Button
           data-testid={`infocard-button-${buttonLabel.toLowerCase().replace(/\s+/g, '-')}`}
         />
       )}
