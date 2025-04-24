@@ -103,15 +103,21 @@ export default function PersonCard({
         </h3>
 
         <div className="w-full flex justify-center items-center gap-2 text-xs text-gray-600">
-          {age && (
+          {/* Display Age */}
+          {age ? (
             <span
               className={clsx(
-                'inline-block px-2 py-0 rounded font-bold uppercase border bg-tertiary/10 font-accent text-sm text-tertiary'
+                'inline-block px-1 py-0 rounded font-bold text-sm uppercase border bg-tertiary/20 font-accent text-tertiary'
               )}
             >
               AGE: {age}
             </span>
+          ) : (
+            // If age is not specified, display fallback message
+            <span className="italic text-gray-400">Unknown</span>
           )}
+
+          {/* Display Skill Level */}
           {skill && (
             <span
               className={clsx(
@@ -124,7 +130,9 @@ export default function PersonCard({
               {skill.label}
             </span>
           )}
-          {!age && !skill && <span className="italic">Not specified</span>}
+
+          {/* Fallback if neither age nor skill are provided */}
+          {!age && !skill && <span className="italic text-gray-400">Not specified</span>}
         </div>
 
         {/* Bio */}

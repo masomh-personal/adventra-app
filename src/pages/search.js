@@ -7,6 +7,7 @@ import { MdClose } from 'react-icons/md'; // Import Close (X) icon
 import { FaThumbsUp } from 'react-icons/fa'; // Import Thumbs Up icon
 import { useRouter } from 'next/router';
 import LoadingSpinner from '@/components/LoadingSpinner'; // Import the LoadingSpinner component
+import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate'; // Import the function to calculate age
 
 export default function SearchPage() {
   const [users, setUsers] = useState([]); // List of all user profiles
@@ -26,7 +27,14 @@ export default function SearchPage() {
           getAllUserProfiles(), // Fetch all user profiles
           getCurrentUserId(), // Get the current logged-in user ID
         ]);
-        setUsers(allUsers);
+
+        // Calculate age for each user and add it to the user object
+        const usersWithAge = allUsers.map((user) => {
+          const age = user.birthdate ? calcAgeFromBirthdate(user.birthdate) : null;
+          return { ...user, age }; // Add age to user data
+        });
+
+        setUsers(usersWithAge);
         setCurrentUserId(userId); // Set the current user's ID
       } catch (error) {
         console.error('Error fetching profiles or current user:', error);
@@ -76,7 +84,7 @@ export default function SearchPage() {
           <PersonCard
             key={currentUser.profile_image_url} // Use the image URL as the key to force re-render
             name={currentUser.user?.name}
-            age={currentUser.age}
+            age={currentUser.age} // Pass age
             skillLevel={currentUser.skill_summary}
             bio={currentUser.bio}
             adventurePreferences={currentUser.adventure_preferences}
