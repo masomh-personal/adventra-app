@@ -6,6 +6,7 @@ import Button from '@/components/Button'; // Custom Button component
 import { MdClose } from 'react-icons/md'; // Import Close (X) icon
 import { FaThumbsUp } from 'react-icons/fa'; // Import Thumbs Up icon
 import { useRouter } from 'next/router';
+import LoadingSpinner from '@/components/LoadingSpinner'; // Import the LoadingSpinner component
 
 export default function SearchPage() {
   const [users, setUsers] = useState([]); // List of all user profiles
@@ -48,7 +49,12 @@ export default function SearchPage() {
   // Exclude the current user from the list of users displayed
   const filteredUsers = users.filter((user) => user.user_id !== currentUserId);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-background text-foreground">
+        <LoadingSpinner label="Fetching profiles..." />
+      </div>
+    );
 
   // Get the current user data to pass to PersonCard
   const currentUser = filteredUsers[currentUserIndex] || {};
@@ -60,6 +66,7 @@ export default function SearchPage() {
         {/* Person Card */}
         {currentUser && (
           <PersonCard
+            key={currentUser.profile_image_url} // Use the image URL as the key to force re-render
             name={currentUser.user?.name}
             age={currentUser.age}
             skillLevel={currentUser.skill_summary}
