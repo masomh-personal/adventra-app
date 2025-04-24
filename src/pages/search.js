@@ -4,7 +4,7 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId'; // Import the functio
 import PersonCard from '@/components/PersonCard'; // Your provided PersonCard component
 import Button from '@/components/Button'; // Custom Button component
 import { MdClose } from 'react-icons/md'; // Import Close (X) icon
-import { FaThumbsUp } from 'react-icons/fa'; // Import Thumbs Up icon
+import { FaComment, FaThumbsUp } from 'react-icons/fa'; // Import Thumbs Up icon
 import { useRouter } from 'next/router';
 import LoadingSpinner from '@/components/LoadingSpinner'; // Import the LoadingSpinner component
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate'; // Import the function to calculate age
@@ -12,7 +12,7 @@ import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate'; // Import the
 export default function SearchPage() {
   const [users, setUsers] = useState([]); // List of all user profiles
   const [currentUserIndex, setCurrentUserIndex] = useState(0); // Index of the current user to display
-  const [currentUserId, setCurrentUserId] = useState(null); // Store the current user ID
+  const [currentUserId, setCurrentUserId] = useState(undefined); // Store the current user ID
   const [loading, setLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState(null); // State for swipe direction
 
@@ -79,6 +79,22 @@ export default function SearchPage() {
     <div className="w-full flex items-center justify-center bg-background text-foreground p-4 font-body">
       {/* Wrapper for centering everything */}
       <div className="flex flex-col items-center justify-center space-y-4">
+        {/* Yay/Nay Buttons */}
+        <div className="flex justify-center gap-6">
+          <Button
+            onClick={handleSwipeLeft}
+            variant="danger"
+            label="No Match"
+            leftIcon={<MdClose />}
+          />
+          <Button
+            onClick={handleSwipeRight}
+            variant="green"
+            label="Interested"
+            leftIcon={<FaThumbsUp />}
+          />
+        </div>
+
         {/* Person Card */}
         {currentUser && (
           <PersonCard
@@ -96,19 +112,16 @@ export default function SearchPage() {
           />
         )}
 
-        {/* Buttons */}
-        <div className="flex justify-center gap-6">
+        {/* Message Button */}
+        <div className="w-full">
           <Button
-            onClick={handleSwipeLeft}
-            variant="danger"
-            label="No Match"
-            leftIcon={<MdClose />} // Pass MdClose icon for "No Match"
-          />
-          <Button
-            onClick={handleSwipeRight}
-            variant="green"
-            label="Interested"
-            leftIcon={<FaThumbsUp />} // Pass FaThumbsUp icon for "Interested"
+            label="Message"
+            onClick={async () => {
+              await router.push(`./messages?userId=${currentUser.user_id}`);
+            }}
+            leftIcon={<FaComment className="mr-0" />}
+            variant="tertiary"
+            className="w-full"
           />
         </div>
       </div>
