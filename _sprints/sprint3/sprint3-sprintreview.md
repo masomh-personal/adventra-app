@@ -19,52 +19,51 @@
 
 ## Completed Work
 
-| Story                                  | Points | Status  |
-| -------------------------------------- | ------ | ------- |
-| Create Messaging Page                  | 8      | ✅ Done |
-| Create Matching Page                   | 10     | ✅ Done |
-| Create Manage Profile Page             | 5      | ✅ Done |
-| Connect Profiles to social media       | 4      | ✅ Done |
-| Implement Messaging Functionality      | 5      | ✅ Done |
-| Implement Matching Functionality       | 10     | ✅ Done |
-| Implement User Reporting and Blocking  | 5      | ✅ Done |
-| Implement User status and availability | 3      | ✅ Done |
+| Story                                  | Points | Status      |
+| -------------------------------------- | ------ | ----------- |
+| Create Messaging Page                  | 8      | ✅ Done     |
+| Create Matching Page                   | 10     | ✅ Done     |
+| Create Manage Profile Page             | 5      | ✅ Done     |
+| Connect Profiles to social media       | 4      | ✅ Done     |
+| Implement Matching Functionality       | 10     | ✅ Done     |
+| Implement Messaging Functionality      | 5      | ❌ Not Done |
+| Implement User Reporting and Blocking  | 5      | ❌ Not Done |
+| Implement User status and availability | 3      | ❌ Not Done |
 
 ---
 
 ## Metrics
 
 - **Forecasted Points:** 50
-- **Completed Points:**
-- **Velocity:** story points
+- **Completed Points:** 37
+- **Velocity:** 37 story points
 
 ---
 
 ## Demo Highlights
 
--
-
----
+- All pages created and styled
+- Matching function implemented
 
 ## What Went Well
 
 - Regular meetings were held consistently
-- All deadlines were met successfully
+- Team stayed in regularf communication
 
 ---
 
 ## What Could Be Improved
 
--
-
----
+- Better pacing and distribution of backlog items across earlier sprints would have helped balance workload
 
 ## Incomplete/Deferred Work
 
-- **N/A** (All planned stories were completed this sprint)
+- Implement Messaging Functionality
+- Implement User Reporting and Blocking
+- Implement User status and availability
 
 ---
 
 ## Next Steps
 
-- **Sprint 3 Planning:** April 15, 7:00 PM
+- **Final submission:** May 1, 11:59 PM
