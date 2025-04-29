@@ -93,12 +93,12 @@ function MessagesPage() {
     <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
       <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8 my-8">
         <main className="flex flex-col">
-          <h3 className="text-xl font-extrabold mb-4 text-center">Your Messages</h3>
-          <hr className="border-t border-gray-300 my-4" />
+          <h2 className="text-xl font-extrabold mb-4 text-center">🏕️ Your Messages</h2>
+          <hr className="border-t border-primary my-2" />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {/* Left Side: Inbox */}
-            <div className="col-span-1 bg-gray-100 p-4 rounded-md min-h-[40vh] max-h-[40vh] overflow-y-auto">
+            <div className="col-span-1 bg-gray-100 p-4 rounded-md min-h-[50vh] max-h-[50vh] overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">Inbox</h3>
               {conversations.length === 0 ? (
                 <p>No conversations yet!</p>
@@ -113,7 +113,7 @@ function MessagesPage() {
                         key={conv.conversation_id}
                         onClick={() => handleSelectConversation(conv.conversation_id)}
                         className={`flex items-center p-2 rounded-md cursor-pointer hover:bg-gray-200
-                        ${isSelected ? 'border-2 border-primary bg-primary-50' : ''}`}
+                        ${isSelected ? 'border-1 border-r-4 border-primary bg-primary/15' : ''}`}
                       >
                         <FaComment className="text-primary mr-2" />
                         <strong>{otherName}</strong>
@@ -125,7 +125,7 @@ function MessagesPage() {
             </div>
 
             {/* Right Side: Messages View */}
-            <div className="col-span-2 bg-gray-50 p-4 rounded-md min-h-[40vh] max-h-[40vh] overflow-y-auto">
+            <div className="col-span-2 bg-gray-50 p-4 rounded-md min-h-[50vh] max-h-[50vh] overflow-y-auto">
               {selectedConversation ? (
                 <div className="flex flex-col space-y-4">
                   <h3 className="text-lg font-semibold mb-4">Conversation</h3>
