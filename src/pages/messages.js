@@ -5,6 +5,8 @@ import withAuth from '@/lib/withAuth';
 import { FaComment } from 'react-icons/fa';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
+import { FiArrowLeft } from 'react-icons/fi';
+import Button from '@/components/Button';
 
 function MessagesPage() {
   const [conversations, setConversations] = useState([]);
@@ -12,6 +14,7 @@ function MessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -89,13 +92,13 @@ function MessagesPage() {
   return (
     <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
       <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8 my-8">
-        <main>
+        <main className="flex flex-col">
           <h3 className="text-xl font-extrabold mb-4 text-center">Your Messages</h3>
           <hr className="border-t border-gray-300 my-4" />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             {/* Left Side: Inbox */}
-            <div className="col-span-1 bg-gray-100 p-4 rounded-md">
+            <div className="col-span-1 bg-gray-100 p-4 rounded-md min-h-[40vh] max-h-[40vh] overflow-y-auto">
               <h3 className="text-lg font-semibold mb-4">Inbox</h3>
               {conversations.length === 0 ? (
                 <p>No conversations yet!</p>
@@ -110,7 +113,7 @@ function MessagesPage() {
                         key={conv.conversation_id}
                         onClick={() => handleSelectConversation(conv.conversation_id)}
                         className={`flex items-center p-2 rounded-md cursor-pointer hover:bg-gray-200
-                        ${isSelected ? 'border-1 border-primary bg-primary-light/30' : ''}`}
+                        ${isSelected ? 'border-2 border-primary bg-primary-50' : ''}`}
                       >
                         <FaComment className="text-primary mr-2" />
                         <strong>{otherName}</strong>
@@ -122,40 +125,51 @@ function MessagesPage() {
             </div>
 
             {/* Right Side: Messages View */}
-            <div className="col-span-2 bg-gray-50 p-4 rounded-md">
+            <div className="col-span-2 bg-gray-50 p-4 rounded-md min-h-[40vh] max-h-[40vh] overflow-y-auto">
               {selectedConversation ? (
-                <div>
+                <div className="flex flex-col space-y-4">
                   <h3 className="text-lg font-semibold mb-4">Conversation</h3>
-                  <div className="flex flex-col space-y-4">
-                    {messages.length === 0 ? (
-                      <p>No messages in this conversation.</p>
-                    ) : (
-                      messages.map((msg) => {
-                        const isOutgoing = msg.sender_id === userId;
-                        return (
-                          <div
-                            key={msg.message_id}
-                            className={`p-2 rounded-md border-l-4 max-w-2/3
-                            ${
-                              isOutgoing
-                                ? 'bg-blue-100 border-blue-400 self-start pl-6'
-                                : 'bg-green-100 border-green-400 self-end pr-6'
-                            }`}
-                          >
-                            <p>{msg.message_content}</p>
-                            <span className="text-[0.65rem] text-gray-500">
-                              {formatDate(msg.timestamp)}
-                            </span>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
+                  {messages.length === 0 ? (
+                    <p>No messages in this conversation.</p>
+                  ) : (
+                    messages.map((msg) => {
+                      const isOutgoing = msg.sender_id === userId;
+                      return (
+                        <div
+                          key={msg.message_id}
+                          className={`p-2 rounded-md border-l-4 max-w-2/3
+                          ${
+                            isOutgoing
+                              ? 'bg-blue-100 border-blue-400 self-start pl-6'
+                              : 'bg-green-100 border-green-400 self-end pr-6'
+                          }`}
+                        >
+                          <p>{msg.message_content}</p>
+                          <span className="text-[0.65rem] text-gray-500">
+                            {formatDate(msg.timestamp)}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               ) : (
                 <p>Select a conversation to view messages.</p>
               )}
             </div>
+          </div>
+
+          {/* -------- bottom buttons -------- */}
+          <div className="mt-8 flex justify-center">
+            <Button
+              label={
+                <>
+                  <FiArrowLeft className="text-sm" /> Back to Dashboard
+                </>
+              }
+              variant="secondary"
+              onClick={() => router.push('/dashboard')}
+            />
           </div>
         </main>
       </div>
