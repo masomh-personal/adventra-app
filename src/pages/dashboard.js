@@ -64,9 +64,8 @@ function Dashboard({ user }) {
               buttonLabel="Inbox"
               buttonIcon={<FaComment className="mr-0" />}
               buttonVariant="tertiary"
-              onClick={() => {
-                /* Add view messages logic */
-                console.log('View Messages clicked');
+              onClick={async () => {
+                await router.push('/messages');
               }}
               testId="messages-infocard" // Added testId
             />
