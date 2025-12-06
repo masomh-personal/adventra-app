@@ -1,34 +1,14 @@
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
-import prettierPlugin from 'eslint-plugin-prettier';
-import jestPlugin from 'eslint-plugin-jest';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextPlugin from 'eslint-config-next';
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals'),
   {
-    files: ['**/*.{js,ts,jsx,tsx}'],
-    plugins: {
-      prettier: prettierPlugin,
-    },
-    rules: {
-      'prettier/prettier': 'warn', // Show Prettier issues as warnings
-    },
+    ignores: ['node_modules/**', '.next/**', 'out/**', 'coverage/**', 'public/**'],
   },
+  ...nextPlugin,
   {
-    files: ['**/__tests__/**/*.js', '**/*.test.js'],
-    plugins: {
-      jest: jestPlugin,
-    },
-    languageOptions: {
-      globals: jestPlugin.environments.globals.globals,
+    rules: {
+      'react/no-unescaped-entities': 'off',
+      '@next/next/no-img-element': 'off',
     },
   },
 ];

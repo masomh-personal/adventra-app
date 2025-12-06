@@ -17,13 +17,21 @@ jest.mock('@/lib/getCurrentUserId', () => ({ getCurrentUserId: jest.fn() }));
 jest.mock('@/lib/calcAgeFromBirthdate', () => ({ calcAgeFromBirthdate: jest.fn() }));
 
 // 3) Mock components for easy querying
-jest.mock('@/components/LoadingSpinner', () => () => <div>Fetching profiles...</div>);
-jest.mock('@/components/PersonCard', () => ({ name }) => (
-  <div data-testid="person-card">{name}</div>
-));
-jest.mock('@/components/Button', () => ({ label, onClick }) => (
-  <button onClick={onClick}>{label}</button>
-));
+jest.mock('@/components/LoadingSpinner', () => {
+  const MockLoadingSpinner = () => <div>Fetching profiles...</div>;
+  MockLoadingSpinner.displayName = 'MockLoadingSpinner';
+  return MockLoadingSpinner;
+});
+jest.mock('@/components/PersonCard', () => {
+  const MockPersonCard = ({ name }) => <div data-testid="person-card">{name}</div>;
+  MockPersonCard.displayName = 'MockPersonCard';
+  return MockPersonCard;
+});
+jest.mock('@/components/Button', () => {
+  const MockButton = ({ label, onClick }) => <button onClick={onClick}>{label}</button>;
+  MockButton.displayName = 'MockButton';
+  return MockButton;
+});
 
 // 4) Mock next/router
 jest.mock('next/router', () => ({ useRouter: jest.fn() }));

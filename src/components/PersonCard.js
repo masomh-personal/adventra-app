@@ -29,7 +29,9 @@ export default function PersonCard({
 
   // Reset the loading state when the image source changes
   useEffect(() => {
-    setIsImgLoading(true); // Show spinner when changing image
+    // Queue state update to avoid cascading renders
+    const timer = setTimeout(() => setIsImgLoading(true), 0);
+    return () => clearTimeout(timer);
   }, [source]);
 
   // Classnames for swipe animations

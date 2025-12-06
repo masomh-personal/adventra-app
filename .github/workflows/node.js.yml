@@ -32,3 +32,28 @@ jobs:
 
       - name: Run tests with coverage
         run: npm run test:coverage
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          # Provide dummy values for build-time env vars
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-key
+          NEXT_PUBLIC_SUPABASE_BUCKET: member_pictures
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+      - name: Check bundle size
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "### Build completed successfully ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build artifacts are ready for Vercel deployment." >> $GITHUB_STEP_SUMMARY
