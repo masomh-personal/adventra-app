@@ -1,65 +1,65 @@
-import { useState, useMemo } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useState } from 'react';
 import Link from 'next/link';
 
-export default function AboutPage() {
-  const faqs = useMemo(
-    () => [
-      {
-        id: uuidv4(),
-        question: 'Is Adventra free to use?',
-        answer:
-          'Yes! Adventra is free to join and use. Optional premium features may be introduced for enhanced experiences.',
-      },
-      {
-        id: uuidv4(),
-        question: 'How do I find adventure partners?',
-        answer:
-          'After creating a profile, explore matches based on your adventure preferences and connect through our swipe-to-match system.',
-      },
-      {
-        id: uuidv4(),
-        question: 'What kind of adventures are supported?',
-        answer:
-          'Adventra supports hiking, backpacking, kayaking, climbing, skiing, and more. Customize your profile for your interests.',
-      },
-      {
-        id: uuidv4(),
-        question: 'Is my data safe?',
-        answer: (
-          <>
-            Yes. We take your privacy seriously. Data is encrypted and secured. See our{' '}
-            <Link href="/privacy-policy/" className="text-primary hover:underline">
-              Privacy Policy
-            </Link>{' '}
-            for details.
-          </>
-        ),
-      },
-      {
-        id: uuidv4(),
-        question: 'How can I contact support?',
-        answer: (
-          <>
-            Reach us anytime at {/* mailto: link correctly uses <a> */}
-            <a href="mailto:support@adventra.com" className="text-primary hover:underline">
-              support@adventra.com
-            </a>
-            . We&rsquo;re here to help!
-          </>
-        ),
-      },
-    ],
-    []
-  );
+const FAQS = [
+  {
+    id: 'free-to-use',
+    question: 'Is Adventra free to use?',
+    answer:
+      'Yes! Adventra is free to join and use. Optional premium features may be introduced for enhanced experiences.',
+  },
+  {
+    id: 'find-partners',
+    question: 'How do I find adventure partners?',
+    answer:
+      'After creating a profile, explore matches based on your adventure preferences and connect through our swipe-to-match system.',
+  },
+  {
+    id: 'adventures-supported',
+    question: 'What kind of adventures are supported?',
+    answer:
+      'Adventra supports hiking, backpacking, kayaking, climbing, skiing, and more. Customize your profile for your interests.',
+  },
+  {
+    id: 'data-safety',
+    question: 'Is my data safe?',
+    answer: (
+      <>
+        Yes. We take your privacy seriously. Data is encrypted and secured. See our{' '}
+        <Link href="/privacy-policy/" className="text-primary hover:underline">
+          Privacy Policy
+        </Link>{' '}
+        for details.
+      </>
+    ),
+  },
+  {
+    id: 'contact-support',
+    question: 'How can I contact support?',
+    answer: (
+      <>
+        Reach us anytime at{' '}
+        <a href="mailto:support@adventra.com" className="text-primary hover:underline">
+          support@adventra.com
+        </a>
+        . We&rsquo;re here to help!
+      </>
+    ),
+  },
+];
 
+export default function AboutPage() {
   const [openFAQs, setOpenFAQs] = useState(new Set());
 
   const toggleFAQ = (id) => {
     setOpenFAQs((prev) => {
-      const updated = new Set(prev);
-      updated.has(id) ? updated.delete(id) : updated.add(id);
-      return updated;
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
     });
   };
 
@@ -111,22 +111,27 @@ export default function AboutPage() {
         </h2>
 
         <div className="space-y-4">
-          {faqs.map(({ id, question, answer }) => {
+          {FAQS.map(({ id, question, answer }) => {
             const isOpen = openFAQs.has(id);
             return (
               <div key={id} className="border border-gray-300 rounded-md">
                 <button
                   onClick={() => toggleFAQ(id)}
-                  className="w-full text-left px-4 py-3 font-heading text-lg font-semibold flex justify-between items-center focus:outline-none"
+                  className="w-full text-left px-4 py-3 font-heading text-lg font-semibold flex justify-between items-center focus:outline-none hover:bg-gray-50 transition-colors"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${id}`}
                 >
                   {question}
-                  <span>{isOpen ? '-' : '+'}</span>
+                  <span aria-hidden="true">{isOpen ? '-' : '+'}</span>
                 </button>
 
                 <div
+                  id={`faq-answer-${id}`}
                   className={`px-4 overflow-hidden transition-all duration-300 ${
                     isOpen ? 'max-h-96 pb-4' : 'max-h-0'
                   }`}
+                  role="region"
+                  aria-labelledby={`faq-question-${id}`}
                 >
                   {isOpen && <div className="text-lg leading-relaxed">{answer}</div>}
                 </div>
