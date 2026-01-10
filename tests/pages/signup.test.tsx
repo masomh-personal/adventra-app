@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import SignupPage from '@/pages/signup';
 import supabase from '@/lib/supabaseClient';
@@ -7,8 +8,11 @@ import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/router';
 
 jest.mock('@/lib/supabaseClient', () => ({
-  auth: {
-    signUp: jest.fn(),
+  __esModule: true,
+  default: {
+    auth: {
+      signUp: jest.fn(),
+    },
   },
 }));
 
@@ -24,23 +28,30 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
+const mockedUseModal = useModal as jest.MockedFunction<typeof useModal>;
+const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedDbCreateUser = dbCreateUser as jest.MockedFunction<typeof dbCreateUser>;
+
 describe('SignupPage', () => {
-  const mockSignUp = supabase.auth.signUp;
-  const mockCreateUser = dbCreateUser;
   const mockShowErrorModal = jest.fn();
   const mockShowSuccessModal = jest.fn();
   const mockPush = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useModal.mockReturnValue({
+    mockedUseModal.mockReturnValue({
+      openModal: jest.fn(),
+      closeModal: jest.fn(),
       showErrorModal: mockShowErrorModal,
       showSuccessModal: mockShowSuccessModal,
-    });
-    useRouter.mockReturnValue({ push: mockPush });
+      showInfoModal: jest.fn(),
+      showConfirmationModal: jest.fn().mockResolvedValue(false),
+    } as ReturnType<typeof useModal>);
+    mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
   });
 
-  const fillSignupForm = async (user) => {
+  const fillSignupForm = async (user: ReturnType<typeof userEvent.setup>): Promise<void> => {
     await user.type(screen.getByLabelText('Full Name'), 'Alex Example');
     await user.type(screen.getByLabelText('Date of Birth'), '1990-01-01');
     await user.type(screen.getByLabelText('Email Address'), 'alex@example.com');
@@ -95,8 +106,11 @@ describe('SignupPage', () => {
     const user = userEvent.setup();
 
     const fakeUser = { id: 'fake-user-id' };
-    mockSignUp.mockResolvedValue({ data: { user: fakeUser }, error: null });
-    mockCreateUser.mockResolvedValue({});
+    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
+      data: { user: fakeUser },
+      error: null,
+    });
+    mockedDbCreateUser.mockResolvedValue({} as never);
 
     render(<SignupPage />);
     await fillSignupForm(user);
@@ -107,7 +121,7 @@ describe('SignupPage', () => {
 
     await waitFor(() => {
       // Assert correct supabase call
-      expect(mockSignUp).toHaveBeenCalledWith({
+      expect(mockedSupabase.auth.signUp).toHaveBeenCalledWith({
         email: 'alex@example.com',
         password: 'Password123!',
         options: {
@@ -117,7 +131,7 @@ describe('SignupPage', () => {
       });
 
       // Extract args passed to dbCreateUser and assert key fields
-      const createArgs = mockCreateUser.mock.calls[0][0];
+      const createArgs = mockedDbCreateUser.mock.calls[0]?.[0];
 
       expect(createArgs).toEqual(
         expect.objectContaining({
@@ -128,8 +142,8 @@ describe('SignupPage', () => {
       );
 
       // Ensure the birthdate is a Date and matches ISO string
-      expect(createArgs.birthdate).toBeInstanceOf(Date);
-      expect(createArgs.birthdate.toISOString().slice(0, 10)).toBe('1990-01-01');
+      expect(createArgs?.birthdate).toBeInstanceOf(Date);
+      expect((createArgs?.birthdate as unknown as Date).toISOString().slice(0, 10)).toBe('1990-01-01');
 
       // Confirm success modal triggered
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
@@ -143,7 +157,7 @@ describe('SignupPage', () => {
 
   it('shows error modal when Supabase fails', async () => {
     const user = userEvent.setup();
-    mockSignUp.mockResolvedValue({
+    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
       error: { message: 'User already registered' },
       data: {},
     });
@@ -163,12 +177,12 @@ describe('SignupPage', () => {
   it('shows error modal if dbCreateUser fails after signup', async () => {
     const user = userEvent.setup();
 
-    mockSignUp.mockResolvedValue({
+    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
       data: { user: { id: 'abc123' } },
       error: null,
     });
 
-    mockCreateUser.mockRejectedValue(new Error('DB insert failed'));
+    mockedDbCreateUser.mockRejectedValue(new Error('DB insert failed'));
 
     // Suppress expected error log in this test only
     const originalConsoleError = console.error;

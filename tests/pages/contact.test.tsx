@@ -1,15 +1,22 @@
-import React from 'react';
 import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import ContactPage from '@/pages/contact';
 import { useRouter } from 'next/router';
-import '@testing-library/jest-dom';
 
 jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
+const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+
 // Silence test logs
 jest.spyOn(console, 'log').mockImplementation(() => {});
+
+interface ContactFormData {
+  name?: string;
+  email?: string;
+  message?: string;
+}
 
 describe('ContactPage', () => {
   const mockPush = jest.fn();
@@ -18,13 +25,13 @@ describe('ContactPage', () => {
     name = 'John Doe',
     email = 'john@example.com',
     message = 'Hello Adventra!',
-  } = {}) => {
+  }: ContactFormData = {}): void => {
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: name } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: email } });
     fireEvent.change(screen.getByLabelText(/message/i), { target: { value: message } });
   };
 
-  const submitForm = async (formData) => {
+  const submitForm = async (formData?: ContactFormData): Promise<void> => {
     fillContactForm(formData);
     await act(async () => {
       fireEvent.submit(screen.getByRole('form'));
@@ -33,7 +40,7 @@ describe('ContactPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useRouter.mockReturnValue({ push: mockPush });
+    mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
 
     // Global mock for fetch (instant response)
     global.fetch = jest.fn(() =>
@@ -41,7 +48,7 @@ describe('ContactPage', () => {
         ok: true,
         json: () => Promise.resolve({ message: 'Mock success' }),
       })
-    );
+    ) as jest.Mock;
   });
 
   afterEach(() => {
@@ -50,7 +57,9 @@ describe('ContactPage', () => {
 
   describe('Initial Rendering', () => {
     it('renders heading, text, and form fields', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
 
       expect(screen.getByRole('heading', { name: /contact us/i })).toBeInTheDocument();
       expect(screen.getByText(/got questions, feedback/i)).toBeInTheDocument();
@@ -60,23 +69,33 @@ describe('ContactPage', () => {
     });
 
     it('applies Tailwind spacing classes', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       expect(screen.getByRole('form')).toHaveClass('space-y-4', 'mt-4');
     });
   });
 
   describe('Form Interactions', () => {
     it('updates field values on user input', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       fillContactForm({ name: 'Jane', email: 'jane@site.com', message: 'Test' });
 
-      expect(screen.getByLabelText(/name/i).value).toBe('Jane');
-      expect(screen.getByLabelText(/email/i).value).toBe('jane@site.com');
-      expect(screen.getByLabelText(/message/i).value).toBe('Test');
+      const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+      const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
+      const messageInput = screen.getByLabelText(/message/i) as HTMLTextAreaElement;
+
+      expect(nameInput.value).toBe('Jane');
+      expect(emailInput.value).toBe('jane@site.com');
+      expect(messageInput.value).toBe('Test');
     });
 
     it('updates and colors the character counter', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
 
       const input = screen.getByLabelText(/message/i);
       const counter = screen.getByTestId('char-counter');
@@ -93,8 +112,10 @@ describe('ContactPage', () => {
     });
 
     it('truncates message input at 2000 characters', async () => {
-      await act(async () => render(<ContactPage />));
-      const input = screen.getByLabelText(/message/i);
+      await act(async () => {
+        render(<ContactPage />);
+      });
+      const input = screen.getByLabelText(/message/i) as HTMLTextAreaElement;
 
       await act(async () => {
         fireEvent.change(input, { target: { value: 'A'.repeat(2100) } });
@@ -106,7 +127,9 @@ describe('ContactPage', () => {
 
   describe('Validation', () => {
     it('shows required field errors', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
 
       const form = screen.getByRole('form');
       form.setAttribute('novalidate', 'true');
@@ -121,16 +144,22 @@ describe('ContactPage', () => {
     });
 
     it('triggers native email validation', async () => {
-      await act(async () => render(<ContactPage />));
-      const emailInput = screen.getByLabelText(/email/i);
+      await act(async () => {
+        render(<ContactPage />);
+      });
+      const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
       fireEvent.change(emailInput, { target: { value: 'bad-email' } });
 
-      await act(async () => fireEvent.submit(screen.getByRole('form')));
+      await act(async () => {
+        fireEvent.submit(screen.getByRole('form'));
+      });
       expect(emailInput.validity.valid).toBe(false);
     });
 
     it('shows custom invalid email error', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
 
       const form = screen.getByRole('form');
       form.setAttribute('novalidate', 'true');
@@ -145,7 +174,9 @@ describe('ContactPage', () => {
     });
 
     it('shows message length error if too short', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
 
       const form = screen.getByRole('form');
       form.setAttribute('novalidate', 'true');
@@ -162,13 +193,17 @@ describe('ContactPage', () => {
 
   describe('Form Submission', () => {
     it('displays success UI after submit', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm();
       expect(screen.getByTestId('success-message')).toBeInTheDocument();
     });
 
     it('removes form after submit', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm();
       expect(screen.queryByRole('form')).not.toBeInTheDocument();
     });
@@ -176,7 +211,9 @@ describe('ContactPage', () => {
 
   describe('Post-Submission UI', () => {
     beforeEach(async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm();
     });
 
@@ -214,20 +251,26 @@ describe('ContactPage', () => {
 
   describe('Accessibility', () => {
     it('renders accessible email mailto link', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       const link = screen.getByRole('link', { name: /support@adventra.com/i });
       expect(link).toHaveAttribute('href', 'mailto:support@adventra.com');
     });
 
     it('ensures all fields are labeled', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
     });
 
     it('renders the alert with appropriate role', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm();
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
@@ -235,7 +278,9 @@ describe('ContactPage', () => {
 
   describe('Edge Cases', () => {
     it('handles max-length valid inputs', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm({
         name: 'A'.repeat(50),
         email: 'a'.repeat(20) + '@' + 'b'.repeat(20) + '.com',
@@ -245,7 +290,9 @@ describe('ContactPage', () => {
     });
 
     it('accepts special characters in input', async () => {
-      await act(async () => render(<ContactPage />));
+      await act(async () => {
+        render(<ContactPage />);
+      });
       await submitForm({
         name: "Jöhn O'Dóe-Smith (QA)",
         email: 'john.doe+test@example.com',
@@ -261,12 +308,12 @@ describe('ContactPage', () => {
 
       const fetchMock = jest.fn(
         () =>
-          new Promise((resolve) => {
+          new Promise<Response>((resolve) => {
             setTimeout(() => {
               resolve({
                 ok: true,
                 json: () => Promise.resolve({ message: 'Simulated delayed success' }),
-              });
+              } as Response);
             }, 1500);
           })
       );

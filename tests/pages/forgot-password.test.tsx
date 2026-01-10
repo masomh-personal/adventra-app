@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ForgotPasswordPage from '@/pages/forgot-password';
 
 describe('ForgotPasswordPage', () => {
-  let user;
+  let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     user = userEvent.setup();

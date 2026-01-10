@@ -1,20 +1,24 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MessagesPage from '@/pages/messages';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { useRouter } from 'next/router';
+import supabase from '@/lib/supabaseClient';
 
 // 1) Mock the withAuth HOC so it just returns the component
-jest.mock('@/lib/withAuth', () => (Component) => Component);
+jest.mock('@/lib/withAuth', () => (Component: React.ComponentType<unknown>) => Component);
 
 // 2) Stub out the entire Supabase client so it never reads env vars
 jest.mock('@/lib/supabaseClient', () => ({
-  from: jest.fn().mockReturnThis(),
-  select: jest.fn().mockReturnThis(),
-  or: jest.fn().mockReturnThis(),
-  order: jest.fn().mockReturnThis(),
-  eq: jest.fn().mockReturnThis(),
+  __esModule: true,
+  default: {
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    or: jest.fn().mockReturnThis(),
+    order: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+  },
 }));
 
 // 3) Mock getCurrentUserId
@@ -27,18 +31,22 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
+const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockedGetCurrentUserId = getCurrentUserId as jest.MockedFunction<typeof getCurrentUserId>;
+const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+
 describe('MessagesPage', () => {
-  let mockPush;
+  let mockPush: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     // router.push stub
     mockPush = jest.fn();
-    useRouter.mockReturnValue({ push: mockPush });
+    mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
 
     // current user stub
-    getCurrentUserId.mockResolvedValue('admin');
+    mockedGetCurrentUserId.mockResolvedValue('admin');
 
     // conversations mock data
     const convs = [
@@ -64,23 +72,30 @@ describe('MessagesPage', () => {
     ];
 
     // supabase.from('conversations') chain
-    const sb = require('@/lib/supabaseClient');
-    sb.from.mockImplementation((table) => {
+    (mockedSupabase.from as jest.Mock).mockImplementation((table: string) => {
       if (table === 'conversations') {
         return {
           select: () => ({
-            or: () => ({ order: () => Promise.resolve({ data: convs, error: null }) }),
+            or: () => ({
+              order: () => Promise.resolve({ data: convs, error: null }),
+            }),
           }),
         };
       }
       if (table === 'messages') {
         return {
           select: () => ({
-            eq: () => ({ order: () => Promise.resolve({ data: msgs, error: null }) }),
+            eq: () => ({
+              order: () => Promise.resolve({ data: msgs, error: null }),
+            }),
           }),
         };
       }
-      return { select: () => ({ order: () => Promise.resolve({ data: [], error: null }) }) };
+      return {
+        select: () => ({
+          order: () => Promise.resolve({ data: [], error: null }),
+        }),
+      };
     });
   });
 

@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event'; // Import userEvent
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import PrivacyPolicyPage from '@/pages/privacy-policy';
 
 // Consistent date for snapshots and assertions
@@ -15,15 +14,15 @@ describe('PrivacyPolicyPage', () => {
 
     jest.spyOn(Date.prototype, 'toLocaleDateString').mockImplementation(
       function (
-        locales, // Keep arguments for potential future use/robustness
-        options
-      ) {
+        this: Date,
+        locales?: Intl.LocalesArgument,
+        options?: Intl.DateTimeFormatOptions
+      ): string {
         // Basic check to ensure it's called similarly to the component
         if (locales === 'en-US' && options?.year === 'numeric') {
           return MOCK_DATE;
         }
         // Fallback to original for other calls if necessary (though unlikely here)
-        // @ts-ignore - Allow calling original with 'this' contexts
         return originalToLocaleDateString.call(this, locales, options);
       }
     );
@@ -69,7 +68,7 @@ describe('PrivacyPolicyPage', () => {
       /3\. Data Sharing & Third Parties/i,
       /4\. Data Security/i,
       /5\. Your Choices & Rights/i,
-      /6\. Children’s Privacy/i, // Use ’ instead of ' if that's in the source
+      /6\. Children's Privacy/i, // Use ' instead of ' if that's in the source
       /7\. Changes to This Policy/i,
       /8\. Contact Us/i,
     ];
@@ -100,7 +99,7 @@ describe('PrivacyPolicyPage', () => {
       /Personalize your experience/i,
       /Improve platform features/i,
       /Send updates, promotions/i,
-      /Ensure the platform’s security/i, // Use ’ instead of '
+      /Ensure the platform's security/i, // Use ' instead of '
     ];
 
     usageItems.forEach((itemRegex) => {

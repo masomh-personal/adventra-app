@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
@@ -13,7 +13,7 @@ describe('FormWrapper + FormField Integration', () => {
     mockSubmit.mockClear();
   });
 
-  const fill = async (label, value) => {
+  const fill = async (label: string, value: string): Promise<void> => {
     const input = screen.getByLabelText(label);
     await user.clear(input);
     await user.type(input, value);

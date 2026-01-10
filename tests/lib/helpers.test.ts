@@ -24,11 +24,14 @@ jest.mock('@/lib/supabaseClient', () => {
 });
 
 // Re-extract mocks from the mocked module
-const { mockGetSession, mockSingle } = jest.requireMock('@/lib/supabaseClient').__mocks__;
+ 
+const { mockGetSession, mockSingle } = (jest.requireMock('@/lib/supabaseClient') as any).__mocks__;
 
 // Silence expected console errors
 beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
-afterAll(() => console.error.mockRestore());
+afterAll(() => {
+  (console.error as jest.Mock).mockRestore();
+});
 
 describe('calcAgeFromBirthdate', () => {
   it('returns correct age when birthday has passed this year', () => {
@@ -55,7 +58,7 @@ describe('calcAgeFromBirthdate', () => {
 
 describe('getCurrentUserId', () => {
   it('returns user ID when session is valid', async () => {
-    mockGetSession.mockResolvedValue({
+    (mockGetSession as jest.Mock).mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
@@ -65,7 +68,7 @@ describe('getCurrentUserId', () => {
   });
 
   it('returns null when no session exists', async () => {
-    mockGetSession.mockResolvedValue({
+    (mockGetSession as jest.Mock).mockResolvedValue({
       data: { session: null },
       error: null,
     });
@@ -75,7 +78,7 @@ describe('getCurrentUserId', () => {
   });
 
   it('throws error if Supabase fails', async () => {
-    mockGetSession.mockResolvedValue({
+    (mockGetSession as jest.Mock).mockResolvedValue({
       data: {},
       error: new Error('Session error'),
     });
@@ -85,7 +88,9 @@ describe('getCurrentUserId', () => {
 });
 
 describe('getFullUserProfile', () => {
-  beforeEach(() => mockSingle.mockReset());
+  beforeEach(() => {
+    (mockSingle as jest.Mock).mockReset();
+  });
 
   it('returns hydrated profile with age', async () => {
     const profile = {
@@ -95,9 +100,10 @@ describe('getFullUserProfile', () => {
       profile_image_url: '/img.jpg',
       birthdate: '1995-08-10',
       user: { name: 'Test User', email: 'test@example.com' },
+      user_id: 'user-123',
     };
 
-    mockSingle.mockResolvedValue({ data: profile, error: null });
+    (mockSingle as jest.Mock).mockResolvedValue({ data: profile, error: null });
 
     const result = await getFullUserProfile('user-123');
     expect(result).toMatchObject({
@@ -107,7 +113,7 @@ describe('getFullUserProfile', () => {
   });
 
   it('returns null if Supabase throws error', async () => {
-    mockSingle.mockResolvedValue({ data: null, error: new Error('fail') });
+    (mockSingle as jest.Mock).mockResolvedValue({ data: null, error: new Error('fail') });
 
     const result = await getFullUserProfile('user-123');
     expect(result).toBeNull();

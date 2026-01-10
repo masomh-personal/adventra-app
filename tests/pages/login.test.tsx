@@ -1,7 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
+import supabase from '@/lib/supabaseClient';
 
 // Mocks
 const mockShowErrorModal = jest.fn();
@@ -20,18 +21,25 @@ jest.mock('@/contexts/ModalContext', () => ({
 }));
 
 jest.mock('@/lib/supabaseClient', () => ({
-  auth: {
-    signInWithPassword: jest.fn(),
-    signInWithOtp: jest.fn(),
+  __esModule: true,
+  default: {
+    auth: {
+      signInWithPassword: jest.fn(),
+      signInWithOtp: jest.fn(),
+    },
   },
 }));
 
-const supabase = require('@/lib/supabaseClient');
+const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
 
 // Helpers
 const renderPage = () => render(<LoginPage />);
 const setupUser = () => userEvent.setup();
-const fillLoginForm = async (user, email, password) => {
+const fillLoginForm = async (
+  user: ReturnType<typeof userEvent.setup>,
+  email: string,
+  password: string
+): Promise<void> => {
   await user.type(screen.getByLabelText(/email address/i), email);
   await user.type(screen.getByLabelText(/password/i), password);
 };
@@ -72,7 +80,7 @@ describe('LoginPage', () => {
   });
 
   it('submits magic link request and shows success modal', async () => {
-    supabase.auth.signInWithOtp.mockResolvedValueOnce({ error: null });
+    (mockedSupabase.auth.signInWithOtp as jest.Mock).mockResolvedValueOnce({ error: null });
 
     renderPage();
     const user = setupUser();
@@ -82,7 +90,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('submit-magic'));
 
     await waitFor(() => {
-      expect(supabase.auth.signInWithOtp).toHaveBeenCalledWith(
+      expect(mockedSupabase.auth.signInWithOtp).toHaveBeenCalledWith(
         expect.objectContaining({ email: 'magic@example.com' })
       );
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
@@ -93,7 +101,10 @@ describe('LoginPage', () => {
   });
 
   it('handles successful email/password login', async () => {
-    supabase.auth.signInWithPassword.mockResolvedValueOnce({ data: { user: {} }, error: null });
+    (mockedSupabase.auth.signInWithPassword as jest.Mock).mockResolvedValueOnce({
+      data: { user: {} },
+      error: null,
+    });
 
     renderPage();
     const user = setupUser();
@@ -101,7 +112,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('button'));
 
     await waitFor(() => {
-      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+      expect(mockedSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'user@example.com',
         password: 'Password99!',
       });
@@ -110,7 +121,7 @@ describe('LoginPage', () => {
   });
 
   it('shows error modal when login fails', async () => {
-    supabase.auth.signInWithPassword.mockResolvedValueOnce({
+    (mockedSupabase.auth.signInWithPassword as jest.Mock).mockResolvedValueOnce({
       data: null,
       error: { message: 'Invalid login credentials' },
     });
@@ -130,7 +141,7 @@ describe('LoginPage', () => {
   });
 
   it('handles magic link request error and shows error modal', async () => {
-    supabase.auth.signInWithOtp.mockResolvedValueOnce({
+    (mockedSupabase.auth.signInWithOtp as jest.Mock).mockResolvedValueOnce({
       error: { message: 'Some magic link error' },
     });
 
@@ -142,7 +153,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('submit-magic'));
 
     await waitFor(() => {
-      expect(supabase.auth.signInWithOtp).toHaveBeenCalled();
+      expect(mockedSupabase.auth.signInWithOtp).toHaveBeenCalled();
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         'Unable to send magic link. Please try again.',
         'Magic Link Error'

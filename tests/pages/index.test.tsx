@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import HomePage from '@/pages/index';
@@ -9,16 +8,20 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
+const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+
 // Mock the next/link component
 jest.mock('next/link', () => {
-  const Link = ({ children, href }) => <a href={href}>{children}</a>;
+  const Link = ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  );
   Link.displayName = 'MockLink';
   return Link;
 });
 
 // Mock withAuth to just return the component without Supabase check
-jest.mock('@/lib/withAuth', () => (Component) => {
-  const Wrapped = (props) => <Component {...props} />;
+jest.mock('@/lib/withAuth', () => (Component: React.ComponentType<unknown>) => {
+  const Wrapped = (props: Record<string, unknown>) => <Component {...props} />;
   Wrapped.displayName = 'MockWithAuth';
   return Wrapped;
 });
@@ -28,22 +31,22 @@ describe('HomePage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useRouter.mockImplementation(() => ({
+    mockedUseRouter.mockReturnValue({
       push: mockPush,
-    }));
+    } as unknown as ReturnType<typeof useRouter>);
   });
 
   describe('Content', () => {
     it('should render the welcome heading with emoji', () => {
       act(() => {
-        render(<HomePage />);
+        render(<HomePage user={null} />);
       });
       expect(screen.getByText('🏕️ Welcome to Adventra')).toBeInTheDocument();
     });
 
     it('should render the descriptive tagline', () => {
       act(() => {
-        render(<HomePage />);
+        render(<HomePage user={null} />);
       });
       expect(
         screen.getByText('A social network for outdoor adventurers. Connect, share, and explore!')
@@ -54,7 +57,7 @@ describe('HomePage', () => {
   describe('Navigation', () => {
     it('should navigate to login page when login button is clicked', () => {
       act(() => {
-        render(<HomePage />);
+        render(<HomePage user={null} />);
       });
       const loginButton = screen.getByText('Login');
       fireEvent.click(loginButton);
@@ -63,7 +66,7 @@ describe('HomePage', () => {
 
     it('should render the signup button as a link with correct href', async () => {
       await act(async () => {
-        render(<HomePage />);
+        render(<HomePage user={null} />);
       });
 
       const signupButton = screen.getByTestId('signup-button');
@@ -73,23 +76,25 @@ describe('HomePage', () => {
 
   describe('Background', () => {
     it('should show video by default', () => {
-      const { container } = render(<HomePage />);
+      const { container } = render(<HomePage user={null} />);
       const video = container.querySelector('video');
       expect(video).not.toBeNull();
-      expect(video.tagName.toLowerCase()).toBe('video');
+      expect(video?.tagName.toLowerCase()).toBe('video');
     });
 
     it('should display gradient fallback when video errors', () => {
-      const { container } = render(<HomePage />);
+      const { container } = render(<HomePage user={null} />);
       const video = container.querySelector('video');
-      fireEvent.error(video);
+      if (video) {
+        fireEvent.error(video);
+      }
 
       const fallback = screen.getByTestId('gradient-fallback');
       expect(fallback).toBeInTheDocument();
     });
 
     it('should render dark overlay for better text readability', () => {
-      render(<HomePage />);
+      render(<HomePage user={null} />);
       const overlay = screen.getByTestId('dark-overlay');
       expect(overlay).toBeInTheDocument();
       expect(overlay).toHaveClass('opacity-40');
