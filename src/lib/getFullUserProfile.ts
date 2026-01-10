@@ -41,11 +41,27 @@ export async function getFullUserProfile(uid: string | null | undefined): Promis
 
   if (!data) return null;
 
+  const profileData = data as {
+    bio?: string | null;
+    adventure_preferences?: string[] | null;
+    skill_summary?: Record<string, string> | null;
+    profile_image_url?: string | null;
+    birthdate?: string | null;
+    instagram_url?: string | null;
+    facebook_url?: string | null;
+    dating_preferences?: string | null;
+    user_id: string;
+    user?: {
+      name: string;
+      email: string;
+    } | null;
+  };
+
   // Compute age from birthdate in userprofile table
-  const age = data?.birthdate ? calcAgeFromBirthdate(data.birthdate) : null;
+  const age = profileData?.birthdate ? calcAgeFromBirthdate(profileData.birthdate) : null;
 
   return {
-    ...data,
+    ...profileData,
     age, // Add it at the root level for easy consumption
   } as FullUserProfile;
 }

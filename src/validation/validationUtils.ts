@@ -30,10 +30,10 @@ export const passwordCriteria = [
 ] as const;
 
 // Dynamically build Yup schema from criteria array
-export const passwordValidation = passwordCriteria.reduce(
-  (schema, rule) => rule.yup(schema),
+export const passwordValidation: yup.StringSchema<string> = passwordCriteria.reduce(
+  (schema: yup.StringSchema<string>, rule) => rule.yup(schema) as yup.StringSchema<string>,
   yup.string().required('Password is required')
-);
+) as yup.StringSchema<string>;
 
 export const emailValidation = yup
   .string()

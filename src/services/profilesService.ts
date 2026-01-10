@@ -7,7 +7,7 @@ import type { CreateProfileData, UserProfile } from '@/types/user';
  * @returns Updated profile
  */
 export async function upsertProfile(profileData: CreateProfileData): Promise<UserProfile> {
-  const { data, error } = await supabase.from('profiles').upsert(profileData).select().single();
+  const { data, error } = await supabase.from('profiles').upsert(profileData as unknown).select().single();
 
   if (error) throw new Error(error.message);
   return data as UserProfile;
@@ -26,5 +26,5 @@ export async function getProfile(userId: string): Promise<UserProfile | null> {
     .single();
 
   if (error) throw new Error(error.message);
-  return data as UserProfile | null;
+  return (data as UserProfile) || null;
 }

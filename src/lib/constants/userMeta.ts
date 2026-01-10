@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   FaHiking,
   FaCampground,
@@ -9,9 +8,7 @@ import {
   FaRainbow,
   FaHandshake,
 } from 'react-icons/fa';
-import type { IconType } from 'react-icons';
 import type { DatingPreferenceOption, AdventurePreferenceOption, SkillLevelOption, SkillColors } from '@/types/index';
-import type { IconType } from 'react-icons';
 
 export const datingPreferences: DatingPreferenceOption[] = [
   {

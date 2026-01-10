@@ -13,7 +13,7 @@ export interface MessageData {
  * @returns New message record
  */
 export async function sendMessage(messageData: MessageData): Promise<MessageData> {
-  const { data, error } = await supabase.from('messages').insert([messageData]).select().single();
+  const { data, error } = await supabase.from('messages').insert([messageData] as unknown[]).select().single();
 
   if (error) throw new Error(error.message);
   return data as MessageData;

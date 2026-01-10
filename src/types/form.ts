@@ -19,11 +19,11 @@ export interface EditProfileFormData {
   name?: string;
   bio?: string;
   birthdate?: Date | string;
-  adventure_preferences?: string[];
-  skill_summary?: Record<string, string>;
-  dating_preferences?: string;
-  instagram_url?: string;
-  facebook_url?: string;
+  adventurePreferences?: string[];
+  skillLevel?: string;
+  datingPreferences?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
 }
 
 export interface ContactFormData {

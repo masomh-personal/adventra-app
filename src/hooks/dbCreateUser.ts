@@ -1,5 +1,5 @@
 import supabase from '@/lib/supabaseClient';
-import type { User, CreateUserData } from '@/types/user';
+import type { User } from '@/types/user';
 
 export interface DbCreateUserParams {
   user_id: string;
@@ -21,7 +21,7 @@ export interface DbCreateUserParams {
 export async function dbCreateUser({ user_id, name, email, birthdate }: DbCreateUserParams): Promise<User> {
   const { data: userData, error: userError } = await supabase
     .from('user')
-    .insert([{ user_id, name, email }])
+    .insert([{ user_id, name, email }] as unknown[])
     .select()
     .single();
 
@@ -32,7 +32,7 @@ export async function dbCreateUser({ user_id, name, email, birthdate }: DbCreate
 
   const { error: profileError } = await supabase
     .from('userprofile')
-    .upsert([{ user_id, birthdate }], { onConflict: 'user_id' });
+    .upsert([{ user_id, birthdate }] as unknown[], { onConflict: 'user_id' });
 
   if (profileError) {
     console.error('[DB Insert Error] Failed to create userprofile:', profileError.message);

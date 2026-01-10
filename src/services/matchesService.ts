@@ -13,7 +13,7 @@ export interface MatchData {
  * @returns New match record
  */
 export async function createMatch(matchData: MatchData): Promise<MatchData> {
-  const { data, error } = await supabase.from('matches').insert([matchData]).select().single();
+  const { data, error } = await supabase.from('matches').insert([matchData] as unknown[]).select().single();
 
   if (error) throw new Error(error.message);
   return data as MatchData;
