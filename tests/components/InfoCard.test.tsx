@@ -2,10 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InfoCard from '@/components/InfoCard';
 import { FaEye } from 'react-icons/fa';
+import type { InfoCardProps } from '@/components/InfoCard';
 
 describe('InfoCard', () => {
   const setup = () => userEvent.setup();
-  const renderComponent = (props) => render(<InfoCard {...props} />);
+  const renderComponent = (props: Partial<InfoCardProps>) => render(<InfoCard {...props} />);
 
   it('renders title, description, and button label', () => {
     renderComponent({
@@ -67,9 +68,8 @@ describe('InfoCard', () => {
       buttonIcon: <FaEye className="mr-2" />,
     });
 
-    expect(screen.getByTestId('infocard-button-test-button')).toContainElement(
-      screen.getByTestId('infocard-button-test-button').querySelector('svg')
-    );
+    const button = screen.getByTestId('infocard-button-test-button');
+    expect(button.querySelector('svg')).toBeTruthy();
   });
 
   it('does not render a button when buttonLabel is not provided', () => {

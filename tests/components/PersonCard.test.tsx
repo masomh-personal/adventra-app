@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import PersonCard from '@/components/PersonCard';
 
 describe('PersonCard Component', () => {
@@ -7,7 +8,7 @@ describe('PersonCard Component', () => {
     age: 28,
     skillLevel: 'Intermediate',
     bio: 'Loves hiking and finding hidden waterfalls.',
-    adventurePreferences: ['hiking', 'photography'],
+    adventurePreferences: ['hiking', 'photography'] as string[],
     imgSrc: '/custom-image.jpg',
   };
 
@@ -43,7 +44,7 @@ describe('PersonCard Component', () => {
       adventurePreferences.forEach((pref) => {
         const input = pref; // Individual preference
         const expected = input.toLowerCase(); // Lowercase the expected value
-        const actual = result.textContent.toLowerCase(); // Lowercase the actual text
+        const actual = result.textContent?.toLowerCase() || ''; // Lowercase the actual text
         const description = `Contains preference: ${input}`;
 
         expect(actual).toContain(expected);
@@ -73,7 +74,7 @@ describe('PersonCard Component', () => {
     });
 
     it('2.3 Shows fallback bio if bio is null or empty', () => {
-      const expected = 'This adventurer hasn’t written a bio yet.';
+      const expected = 'This adventurer hasn't written a bio yet.';
       render(<PersonCard {...baseProps} bio={null} />);
       const result = screen.getByTestId('person-card-bio');
       expect(result).toHaveTextContent(expected);

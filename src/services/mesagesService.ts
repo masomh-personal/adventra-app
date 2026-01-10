@@ -13,9 +13,11 @@ export interface MessageData {
  * @returns New message record
  */
 export async function sendMessage(messageData: MessageData): Promise<MessageData> {
-  const { data, error } = await supabase.from('messages').insert([messageData] as unknown[]).select().single();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from('messages') as any).insert([messageData]).select().single();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(error instanceof Error ? error.message : String(error));
+  if (!data) throw new Error('Message data was not returned from database');
   return data as MessageData;
 }
 

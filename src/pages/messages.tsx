@@ -61,7 +61,20 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
           .order('last_message_timestamp', { ascending: false });
 
         if (error) throw error;
-        setConversations((data as Conversation[]) || []);
+        
+        // Transform Supabase response (joined relations are arrays) to match our type
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const conversations: Conversation[] = (data || []).map((item: any) => ({
+          conversation_id: item.conversation_id,
+          user_1_id: item.user_1_id,
+          user_2_id: item.user_2_id,
+          last_message_timestamp: item.last_message_timestamp,
+          // Supabase returns joined relations as arrays, take first element
+          user_1: Array.isArray(item.user_1) && item.user_1.length > 0 ? item.user_1[0] : null,
+          user_2: Array.isArray(item.user_2) && item.user_2.length > 0 ? item.user_2[0] : null,
+        }));
+        
+        setConversations(conversations);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {

@@ -7,9 +7,11 @@ import type { CreateProfileData, UserProfile } from '@/types/user';
  * @returns Updated profile
  */
 export async function upsertProfile(profileData: CreateProfileData): Promise<UserProfile> {
-  const { data, error } = await supabase.from('profiles').upsert(profileData as unknown).select().single();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from('profiles') as any).upsert(profileData).select().single();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(error instanceof Error ? error.message : String(error));
+  if (!data) throw new Error('Profile data was not returned from database');
   return data as UserProfile;
 }
 
@@ -19,12 +21,12 @@ export async function upsertProfile(profileData: CreateProfileData): Promise<Use
  * @returns Profile or null
  */
 export async function getProfile(userId: string): Promise<UserProfile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from('profiles') as any)
     .select('*')
     .eq('user_id', userId)
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(error instanceof Error ? error.message : String(error));
   return (data as UserProfile) || null;
 }

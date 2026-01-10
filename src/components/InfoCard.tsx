@@ -2,11 +2,11 @@ import Button from './Button';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
-interface InfoCardProps {
+export interface InfoCardProps {
   title: string;
   description: string;
   buttonLabel?: string;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
   imgSrc?: string;
   imgAlt?: string;
   buttonIcon?: ReactNode;

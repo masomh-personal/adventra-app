@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import InfoBox from '@/components/InfoBox';
 
 describe('InfoBox', () => {
@@ -36,6 +37,7 @@ describe('InfoBox', () => {
   });
 
   it('falls back to info variant if invalid variant is passed', () => {
+    // @ts-expect-error - Testing fallback behavior with invalid variant
     render(<InfoBox message="Fallback test" variant="unknown-type" />);
     const infoBox = screen.getByTestId('info-box');
     expect(infoBox).toHaveTextContent(/fallback test/i);

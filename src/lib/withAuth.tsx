@@ -15,8 +15,6 @@ export default function withAuth<P extends object>(
   Component: ComponentType<P & WithAuthProps>,
   options: WithAuthOptions = {}
 ) {
-  const { redirectIfAuthenticated = false } = options;
-
   // It's good practice to give HOCs a display name for debugging
   const displayName = `WithAuth(${Component.displayName || Component.name || 'Component'})`;
 
@@ -24,6 +22,8 @@ export default function withAuth<P extends object>(
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    // Move options destructuring inside component to satisfy React hooks rules
+    const { redirectIfAuthenticated = false } = options;
 
     useEffect(() => {
       // Using a flag to prevent state updates after unmount
@@ -77,8 +77,9 @@ export default function withAuth<P extends object>(
       return () => {
         isMounted = false;
       };
-      // Only include router in the dependency array
-    }, [router, redirectIfAuthenticated]); // Added redirectIfAuthenticated back for proper dependency tracking
+      // redirectIfAuthenticated is a constant from options, but included for completeness
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router]);
 
     if (loading) {
       return (

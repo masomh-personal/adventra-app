@@ -41,7 +41,8 @@ export async function getFullUserProfile(uid: string | null | undefined): Promis
 
   if (!data) return null;
 
-  const profileData = data as {
+  // Transform Supabase response (joined relations are arrays) to match our type
+  const dataTyped = data as {
     bio?: string | null;
     adventure_preferences?: string[] | null;
     skill_summary?: Record<string, string> | null;
@@ -51,10 +52,21 @@ export async function getFullUserProfile(uid: string | null | undefined): Promis
     facebook_url?: string | null;
     dating_preferences?: string | null;
     user_id: string;
-    user?: {
-      name: string;
-      email: string;
-    } | null;
+    user?: { name: string; email: string }[] | { name: string; email: string } | null;
+  };
+
+  const profileData = {
+    bio: dataTyped.bio,
+    adventure_preferences: dataTyped.adventure_preferences,
+    skill_summary: dataTyped.skill_summary,
+    profile_image_url: dataTyped.profile_image_url,
+    birthdate: dataTyped.birthdate,
+    instagram_url: dataTyped.instagram_url,
+    facebook_url: dataTyped.facebook_url,
+    dating_preferences: dataTyped.dating_preferences,
+    user_id: dataTyped.user_id,
+    // Supabase returns joined relations as arrays, take first element
+    user: Array.isArray(dataTyped.user) && dataTyped.user.length > 0 ? dataTyped.user[0] : (!Array.isArray(dataTyped.user) ? dataTyped.user : null),
   };
 
   // Compute age from birthdate in userprofile table

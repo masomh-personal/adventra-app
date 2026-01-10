@@ -10,6 +10,12 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 }
 
 // Server-side supabase client using service role key
-const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceRoleKey);
+// Note: Type assertions needed until proper Supabase schema types are generated
+const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 export default supabaseAdmin;

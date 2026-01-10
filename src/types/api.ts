@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import type { UserProfile, FullUserProfile } from './user';
+import type { UserProfile } from './user';
 
 export interface ApiError {
   error: string;

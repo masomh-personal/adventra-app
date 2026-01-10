@@ -43,16 +43,18 @@ export default async function handler(
     }
 
     // Insert additional user profile data into 'profiles' table
-    const { error: profileError } = await supabase.from('profiles').insert([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: profileError } = await (supabase.from('profiles') as any).insert([
       {
         id: userData.user.id, // Supabase assigns a UUID user id
         full_name: fullName,
         created_at: new Date().toISOString(),
       },
-    ] as unknown[]);
+    ]);
 
     if (profileError) {
-      return res.status(500).json({ error: profileError.message });
+      const errorMessage = profileError instanceof Error ? profileError.message : String(profileError);
+      return res.status(500).json({ error: errorMessage });
     }
 
     return res.status(201).json({ message: 'User signed up successfully', data: userData });

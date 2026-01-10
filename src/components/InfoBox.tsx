@@ -39,7 +39,7 @@ const variants: Record<InfoBoxVariant, InfoBoxVariantConfig> = {
 };
 
 interface InfoBoxProps {
-  message: string;
+  message: string | React.ReactNode;
   variant?: InfoBoxVariant;
   className?: string;
   role?: string;

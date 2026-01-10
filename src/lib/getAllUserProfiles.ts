@@ -18,6 +18,22 @@ export async function getAllUserProfiles(): Promise<FullUserProfile[]> {
     return [];
   }
 
+  if (!data) return [];
+
+  // Transform Supabase response (joined relations are arrays) to match our type
+  const profiles: FullUserProfile[] = data.map((item: any) => ({
+    user_id: item.user_id,
+    bio: item.bio,
+    adventure_preferences: item.adventure_preferences,
+    skill_summary: item.skill_summary,
+    profile_image_url: item.profile_image_url,
+    birthdate: item.birthdate,
+    instagram_url: item.instagram_url,
+    facebook_url: item.facebook_url,
+    dating_preferences: item.dating_preferences,
+    user: Array.isArray(item.user) && item.user.length > 0 ? item.user[0] : null,
+  }));
+
   // Randomize the profiles
-  return (data as FullUserProfile[]).sort(() => Math.random() - 0.5);
+  return profiles.sort(() => Math.random() - 0.5);
 }

@@ -13,9 +13,11 @@ export interface MatchData {
  * @returns New match record
  */
 export async function createMatch(matchData: MatchData): Promise<MatchData> {
-  const { data, error } = await supabase.from('matches').insert([matchData] as unknown[]).select().single();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from('matches') as any).insert([matchData]).select().single();
 
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(error instanceof Error ? error.message : String(error));
+  if (!data) throw new Error('Match data was not returned from database');
   return data as MatchData;
 }
 

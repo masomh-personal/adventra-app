@@ -16,7 +16,7 @@ jest.mock('next/router', () => ({
 jest.useFakeTimers();
 
 // 🔧 Test component to interact with modal
-const TestComponent = () => {
+const TestComponent: React.FC = () => {
   const { showErrorModal, showSuccessModal, showInfoModal, closeModal } = useModal();
 
   return (

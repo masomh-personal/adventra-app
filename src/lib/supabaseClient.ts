@@ -10,6 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Client-side (public) supabase client using anon key
+// Note: Type assertions needed until proper Supabase schema types are generated
 const supabaseAnon = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 export default supabaseAnon;

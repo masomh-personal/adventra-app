@@ -141,7 +141,11 @@ export default function SignupPage(): React.JSX.Element {
             id="confirmPassword"
             placeholder="Re-enter your password"
             autoComplete="new-password"
-            onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => e.preventDefault()}
+            onPaste={(e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+              if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+                e.preventDefault();
+              }
+            }}
           />
         </FormWrapper>
 

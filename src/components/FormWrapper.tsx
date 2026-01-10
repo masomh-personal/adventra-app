@@ -145,15 +145,15 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
               const childComponent = child.type as React.ComponentType<unknown>;
               const isFormField = childComponent === FormField;
               if (isFormField) {
-                return React.cloneElement(child as React.ReactElement<{ register?: unknown; errors?: unknown; [key: string]: unknown }>, { 
+                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { 
                   register: formContext.register,
                   errors: formContext.errors,
                   ...(child.props as Record<string, unknown>),
-                } as React.Attributes);
+                });
               }
               const isCustomComponent = typeof childComponent === 'function';
               if (isCustomComponent) {
-                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { ...formContext, ...(child.props as Record<string, unknown>) } as React.Attributes);
+                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { ...formContext, ...(child.props as Record<string, unknown>) });
               }
               return child;
             })}
