@@ -2,10 +2,11 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 
-jest.mock('@/lib/supabaseClient', () => {
-  const mockGetSession = jest.fn();
-  const mockSingle = jest.fn();
+// Create mocks that we can access in tests
+const mockGetSession = jest.fn();
+const mockSingle = jest.fn();
 
+jest.mock('@/lib/supabaseClient', () => {
   const mockEq = jest.fn(() => ({ single: mockSingle }));
   const mockSelect = jest.fn(() => ({ eq: mockEq }));
   const mockFrom = jest.fn(() => ({ select: mockSelect }));
@@ -16,16 +17,8 @@ jest.mock('@/lib/supabaseClient', () => {
       auth: { getSession: mockGetSession },
       from: mockFrom,
     },
-    __mocks__: {
-      mockGetSession,
-      mockSingle,
-    },
   };
 });
-
-// Re-extract mocks from the mocked module
- 
-const { mockGetSession, mockSingle } = (jest.requireMock('@/lib/supabaseClient') as any).__mocks__;
 
 // Silence expected console errors
 beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));

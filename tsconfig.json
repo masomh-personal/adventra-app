@@ -47,8 +47,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "jest.setup.ts",
-    "jest.config.ts",
+    "vitest.setup.ts",
+    "vitest.config.ts",
+    "vitest.d.ts",
     "tests/**/*.{ts,tsx}"
   ],
   "exclude": [
