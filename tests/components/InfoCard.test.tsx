@@ -6,7 +6,7 @@ import type { InfoCardProps } from '@/components/InfoCard';
 
 describe('InfoCard', () => {
   const setup = () => userEvent.setup();
-  const renderComponent = (props: Partial<InfoCardProps>) => render(<InfoCard {...props} />);
+  const renderComponent = (props: Partial<InfoCardProps>) => render(<InfoCard {...(props as InfoCardProps)} />);
 
   it('renders title, description, and button label', () => {
     renderComponent({

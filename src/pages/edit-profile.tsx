@@ -129,7 +129,6 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
     const cleanUrl = getPublicProfileImageUrl(userId);
     const busted = getPublicProfileImageUrl(userId, { bustCache: true });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: dbErr } = await (supabase.from('userprofile') as any)
       .upsert({ user_id: userId, profile_image_url: cleanUrl }, { onConflict: 'user_id' });
 
@@ -158,7 +157,6 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
         await handleImageUpload();
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from('userprofile') as any).upsert(
         {
           user_id: userId,

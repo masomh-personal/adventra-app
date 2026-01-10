@@ -13,7 +13,6 @@ export interface MessageData {
  * @returns New message record
  */
 export async function sendMessage(messageData: MessageData): Promise<MessageData> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from('messages') as any).insert([messageData]).select().single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));

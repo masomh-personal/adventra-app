@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PersonCard from '@/components/PersonCard';
+import type { AdventurePreference } from '@/types/index';
 
 describe('PersonCard Component', () => {
   const baseProps = {
@@ -8,7 +9,7 @@ describe('PersonCard Component', () => {
     age: 28,
     skillLevel: 'Intermediate',
     bio: 'Loves hiking and finding hidden waterfalls.',
-    adventurePreferences: ['hiking', 'photography'] as string[],
+    adventurePreferences: ['hiking', 'photography'] as AdventurePreference[],
     imgSrc: '/custom-image.jpg',
   };
 
@@ -45,7 +46,6 @@ describe('PersonCard Component', () => {
         const input = pref; // Individual preference
         const expected = input.toLowerCase(); // Lowercase the expected value
         const actual = result.textContent?.toLowerCase() || ''; // Lowercase the actual text
-        const description = `Contains preference: ${input}`;
 
         expect(actual).toContain(expected);
       });
@@ -61,7 +61,7 @@ describe('PersonCard Component', () => {
   describe('2. Fallback Rendering', () => {
     it('2.1 Displays "Unnamed Explorer" if name is missing', () => {
       const expected = 'Unnamed Explorer';
-      render(<PersonCard {...baseProps} name={null} />);
+      render(<PersonCard {...baseProps} name={undefined} />);
       const result = screen.getByTestId('person-card-name');
       expect(result).toHaveTextContent(expected);
     });
@@ -74,7 +74,7 @@ describe('PersonCard Component', () => {
     });
 
     it('2.3 Shows fallback bio if bio is null or empty', () => {
-      const expected = 'This adventurer hasn't written a bio yet.';
+      const expected = "This adventurer hasn't written a bio yet.";
       render(<PersonCard {...baseProps} bio={null} />);
       const result = screen.getByTestId('person-card-bio');
       expect(result).toHaveTextContent(expected);

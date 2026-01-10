@@ -13,7 +13,6 @@ export interface MatchData {
  * @returns New match record
  */
 export async function createMatch(matchData: MatchData): Promise<MatchData> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from('matches') as any).insert([matchData]).select().single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));

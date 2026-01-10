@@ -7,7 +7,6 @@ import type { User, CreateUserData } from '@/types/user';
  * @returns Result or error
  */
 export async function createUser(userData: CreateUserData): Promise<User> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from('users') as any).insert([userData]).select().single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));

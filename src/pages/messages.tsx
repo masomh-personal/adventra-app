@@ -63,7 +63,6 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
         if (error) throw error;
         
         // Transform Supabase response (joined relations are arrays) to match our type
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const conversations: Conversation[] = (data || []).map((item: any) => ({
           conversation_id: item.conversation_id,
           user_1_id: item.user_1_id,

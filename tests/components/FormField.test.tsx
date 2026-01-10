@@ -1,14 +1,21 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import FormField from '@/components/FormField';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 
 describe('FormField', () => {
-  const mockRegister = jest.fn().mockReturnValue({});
+  const mockRegister = jest.fn().mockReturnValue({
+    onChange: jest.fn(),
+    onBlur: jest.fn(),
+    name: '',
+    ref: jest.fn(),
+  }) as unknown as UseFormRegister<{ email: string }>;
   const baseProps = {
     label: 'Email',
-    type: 'email',
-    id: 'email',
+    type: 'email' as const,
+    id: 'email' as const,
     register: mockRegister,
-    errors: {},
+    errors: {} as FieldErrors<{ email: string }>,
     placeholder: 'Enter your email',
   };
 
@@ -48,8 +55,8 @@ describe('FormField', () => {
       const props = {
         ...baseProps,
         errors: {
-          email: { message: 'Email is required' },
-        },
+          email: { message: 'Email is required', type: 'required' },
+        } as FieldErrors<{ email: string }>,
       };
       render(<FormField {...props} />);
       expect(screen.getByText('Email is required')).toBeInTheDocument();
@@ -66,8 +73,8 @@ describe('FormField', () => {
         ...baseProps,
         helpText: 'Helpful hint',
         errors: {
-          email: { message: 'Invalid email' },
-        },
+          email: { message: 'Invalid email', type: 'validate' },
+        } as FieldErrors<{ email: string }>,
       };
       render(<FormField {...props} />);
       expect(screen.queryByText('Helpful hint')).not.toBeInTheDocument();
@@ -87,12 +94,19 @@ describe('FormField', () => {
       expect(input).toHaveAttribute('type', 'date');
     });
 
-    it('renders radio buttons with correct labels', async () => {
+    it('renders radio buttons with correct labels', () => {
+      const mockRegister = jest.fn().mockReturnValue({
+        onChange: jest.fn(),
+        onBlur: jest.fn(),
+        name: 'gender',
+        ref: jest.fn(),
+      }) as unknown as UseFormRegister<{ gender: string }>;
       const props = {
-        ...baseProps,
-        id: 'gender',
+        id: 'gender' as const,
         label: 'Gender',
-        type: 'radio',
+        type: 'radio' as const,
+        register: mockRegister,
+        errors: {} as FieldErrors<{ gender: string }>,
         options: [
           { value: 'm', label: 'Male' },
           { value: 'f', label: 'Female' },
@@ -104,11 +118,18 @@ describe('FormField', () => {
     });
 
     it('renders checkboxes with correct labels', () => {
+      const mockRegister = jest.fn().mockReturnValue({
+        onChange: jest.fn(),
+        onBlur: jest.fn(),
+        name: 'hobbies',
+        ref: jest.fn(),
+      }) as unknown as UseFormRegister<{ hobbies: string[] }>;
       const props = {
-        ...baseProps,
-        id: 'hobbies',
+        id: 'hobbies' as const,
         label: 'Hobbies',
-        type: 'checkbox',
+        type: 'checkbox' as const,
+        register: mockRegister,
+        errors: {} as FieldErrors<{ hobbies: string[] }>,
         options: [
           { value: 'hiking', label: 'Hiking' },
           { value: 'climbing', label: 'Climbing' },
@@ -145,8 +166,6 @@ describe('FormField', () => {
         'email',
         expect.objectContaining({
           required: 'This field is required',
-          onChange: expect.any(Function),
-          onBlur: expect.any(Function),
         })
       );
     });

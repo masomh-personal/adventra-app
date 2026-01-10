@@ -7,7 +7,6 @@ import type { CreateProfileData, UserProfile } from '@/types/user';
  * @returns Updated profile
  */
 export async function upsertProfile(profileData: CreateProfileData): Promise<UserProfile> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from('profiles') as any).upsert(profileData).select().single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));
@@ -21,7 +20,6 @@ export async function upsertProfile(profileData: CreateProfileData): Promise<Use
  * @returns Profile or null
  */
 export async function getProfile(userId: string): Promise<UserProfile | null> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.from('profiles') as any)
     .select('*')
     .eq('user_id', userId)

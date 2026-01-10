@@ -1,11 +1,10 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import { passwordCriteria } from '@/validation/validationUtils';
 
 describe('PasswordStrengthMeter', () => {
-  const getStrengthLabel = (password) => {
+  const getStrengthLabel = (password: string): string => {
     const passed = passwordCriteria.filter((rule) => rule.test(password)).length;
     if (passed <= 2) return 'WEAK';
     if (passed === 3 || passed === 4) return 'MEDIUM';
@@ -22,7 +21,7 @@ describe('PasswordStrengthMeter', () => {
     render(<PasswordStrengthMeter password={password} />);
 
     const label = getStrengthLabel(password);
-    expect(screen.getByTestId('strength-value')).toHaveTextContent(label);
+    expect(screen.getByTestId('strength-value')).toHaveTextContent(label.toUpperCase());
 
     const bar = screen.getByTestId('strength-bar');
     expect(bar).toBeInTheDocument();
@@ -57,8 +56,9 @@ describe('PasswordStrengthMeter', () => {
     ];
 
     testCases.forEach(({ password, label }) => {
-      render(<PasswordStrengthMeter password={password} />);
+      const { unmount } = render(<PasswordStrengthMeter password={password} />);
       expect(screen.getByText(label)).toBeInTheDocument();
+      unmount();
     });
   });
 

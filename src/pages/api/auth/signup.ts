@@ -43,7 +43,6 @@ export default async function handler(
     }
 
     // Insert additional user profile data into 'profiles' table
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: profileError } = await (supabase.from('profiles') as any).insert([
       {
         id: userData.user.id, // Supabase assigns a UUID user id

@@ -3,27 +3,37 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom';
 import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 
 /**
  * Simple mock field to simulate form contexts usage
+ * Note: FormWrapper will inject register and errors automatically
  */
-const FormField = ({ register, errors, id, label }) => (
-  <div>
-    <label htmlFor={id}>{label}</label>
-    <input id={id} {...register(id)} />
-    {errors[id] && <span>{errors[id].message}</span>}
-  </div>
-);
+const MockFormField = ({ id, label, register, errors }: {
+  id: string;
+  label: string;
+  register?: UseFormRegister<{ name: string; email: string }>;
+  errors?: FieldErrors<{ name: string; email: string }>;
+}): React.JSX.Element => {
+  const fieldRegister = register || (() => ({ onChange: jest.fn(), onBlur: jest.fn(), name: id, ref: jest.fn() }));
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} {...fieldRegister(id as 'name' | 'email')} />
+      {errors?.[id as 'name' | 'email'] && <span>{errors[id as 'name' | 'email']?.message}</span>}
+    </div>
+  );
+};
 
 // Helper to safely render UI and avoid act() warnings
-const safeRender = async (ui) => {
+const safeRender = async (ui: React.ReactElement): Promise<void> => {
   await act(async () => {
     render(ui);
   });
 };
 
 // Helper to change field values safely
-const fillField = async (label, value) => {
+const fillField = async (label: string, value: string): Promise<void> => {
   await act(async () => {
     fireEvent.change(screen.getByLabelText(label), { target: { value } });
   });
@@ -47,8 +57,8 @@ describe('FormWrapper', () => {
     it('renders form title, fields, and submit button', async () => {
       await safeRender(
         <FormWrapper title="Test Form" validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -62,7 +72,7 @@ describe('FormWrapper', () => {
     it('renders custom submit button label', async () => {
       await safeRender(
         <FormWrapper submitLabel="Send" validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
+          <MockFormField id="name" label="Name" />
         </FormWrapper>
       );
 
@@ -72,8 +82,8 @@ describe('FormWrapper', () => {
     it('does not render submit button if submitLabel is an empty string', async () => {
       await safeRender(
         <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -84,7 +94,7 @@ describe('FormWrapper', () => {
     it('renders without title if not provided', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
+          <MockFormField id="name" label="Name" />
         </FormWrapper>
       );
 
@@ -94,25 +104,13 @@ describe('FormWrapper', () => {
     it('disables the submit button when form is invalid', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
       const button = screen.getByRole('button', { name: /submit/i });
       expect(button).toBeDisabled();
-    });
-
-    it('does not render submit button if submitLabel is an empty string', async () => {
-      await safeRender(
-        <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
-        </FormWrapper>
-      );
-
-      const buttons = screen.queryAllByRole('button');
-      expect(buttons.length).toBe(0); // Should not render a submit button at all
     });
   });
 
@@ -120,8 +118,8 @@ describe('FormWrapper', () => {
     it('shows error messages when fields are empty after blur', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit} onError={mockOnError}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -147,8 +145,8 @@ describe('FormWrapper', () => {
     it('calls onSubmit with valid form data', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -176,8 +174,8 @@ describe('FormWrapper', () => {
 
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -208,8 +206,8 @@ describe('FormWrapper', () => {
           onSubmit={mockOnSubmit}
           defaultValues={{ name: 'Default Name', email: 'default@example.com' }}
         >
-          <FormField id="name" label="Name" />
-          <FormField id="email" label="Email" />
+          <MockFormField id="name" label="Name" />
+          <MockFormField id="email" label="Email" />
         </FormWrapper>
       );
 
@@ -224,9 +222,9 @@ describe('FormWrapper', () => {
         <FormWrapper
           validationSchema={schema}
           onSubmit={mockOnSubmit}
-          formProps={{ 'data-testid': 'test-form', className: 'extra-class' }}
+          formProps={{ 'data-testid': 'test-form', className: 'extra-class' } as React.FormHTMLAttributes<HTMLFormElement>}
         >
-          <FormField id="name" label="Name" />
+          <MockFormField id="name" label="Name" />
         </FormWrapper>
       );
 
@@ -237,7 +235,7 @@ describe('FormWrapper', () => {
     it('applies className directly to form wrapper', async () => {
       await safeRender(
         <FormWrapper className="custom-form" validationSchema={schema} onSubmit={mockOnSubmit}>
-          <FormField id="name" label="Name" />
+          <MockFormField id="name" label="Name" />
         </FormWrapper>
       );
 
