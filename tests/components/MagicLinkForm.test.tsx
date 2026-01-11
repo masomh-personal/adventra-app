@@ -2,7 +2,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MagicLinkForm from '@/components/MagicLinkForm';
-import { vi } from 'vitest';
+
 
 const safeRender = async (ui: React.ReactElement): Promise<void> => {
   await act(async () => {

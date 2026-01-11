@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import PrivacyPolicyPage from '@/pages/privacy-policy';
-import { vi } from 'vitest';
+
 
 // Consistent date for snapshots and assertions
 const MOCK_DATE = 'March 25, 2025';

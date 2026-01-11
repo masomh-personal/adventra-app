@@ -5,7 +5,7 @@ import MessagesPage from '@/pages/messages';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
-import { vi } from 'vitest';
+
 
 // Hoist mocks
 const { mockFrom, mockGetCurrentUserId, mockUseRouter } = vi.hoisted(() => {

@@ -3,7 +3,6 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ContactPage from '@/pages/contact';
 import { useRouter } from 'next/router';
-import { vi } from 'vitest';
 
 vi.mock('next/router', () => ({
   useRouter: vi.fn(),

@@ -1,7 +1,7 @@
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
-import { vi } from 'vitest';
+
 
 // Hoist mock functions so they can be used in the mock factory
 const { mockGetSession, mockSingle } = vi.hoisted(() => {

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import Button from '@/components/Button';
 import { FaCheck, FaArrowRight } from 'react-icons/fa';
-import { vi } from 'vitest';
+
 
 describe('Button Component', () => {
   test('renders with the correct label', () => {

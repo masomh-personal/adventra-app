@@ -6,7 +6,7 @@ import SearchPage from '@/pages/search';
 import { getAllUserProfiles } from '@/lib/getAllUserProfiles';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
-import { vi } from 'vitest';
+
 
 // Hoist mocks
 const { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalcAgeFromBirthdate, mockUseRouter } = vi.hoisted(() => {

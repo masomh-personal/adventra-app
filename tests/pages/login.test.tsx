@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
 import supabase from '@/lib/supabaseClient';
-import { vi } from 'vitest';
+
 
 // Hoist mocks using vi.hoisted
 const { mockShowErrorModal, mockShowSuccessModal, mockReplace, mockSignInWithPassword, mockSignInWithOtp } = vi.hoisted(() => {

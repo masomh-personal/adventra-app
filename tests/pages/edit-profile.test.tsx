@@ -7,7 +7,7 @@ import * as getProfileModule from '@/lib/getFullUserProfile';
 import { useModal } from '@/contexts/ModalContext';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
-import { vi } from 'vitest';
+
 
 // Hoist mocks
 const { mockUpsert, mockUpload, mockUseRouter, mockUseModal } = vi.hoisted(() => {

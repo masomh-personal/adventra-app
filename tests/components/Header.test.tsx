@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import Header from '@/components/Header';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
-import { vi } from 'vitest';
+
 
 // Hoist mocks
 const { mockGetSession, mockOnAuthStateChange, mockSignOut, mockUseRouter } = vi.hoisted(() => {

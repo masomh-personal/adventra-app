@@ -6,7 +6,7 @@ import supabase from '@/lib/supabaseClient';
 import { dbCreateUser } from '@/hooks/dbCreateUser';
 import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/router';
-import { vi } from 'vitest';
+
 
 // Hoist mocks - these will be available in mock factories
 const { mockSignUp, mockDbCreateUser, mockUseModal, mockUseRouter } = vi.hoisted(() => {

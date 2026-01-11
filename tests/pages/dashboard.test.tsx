@@ -7,7 +7,7 @@ import DashboardPageModule from '@/pages/dashboard';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 import type { User } from '@supabase/supabase-js';
-import { vi } from 'vitest';
+
 
 // Hoist mocks
 const { mockSignOut, mockUseRouter } = vi.hoisted(() => {

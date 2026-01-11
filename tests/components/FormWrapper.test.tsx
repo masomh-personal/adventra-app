@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event';
 import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { vi } from 'vitest';
 
 /**
  * Simple mock field to simulate form contexts usage

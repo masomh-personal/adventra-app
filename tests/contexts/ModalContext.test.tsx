@@ -3,7 +3,6 @@ import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { ModalProvider, useModal } from '@/contexts/ModalContext';
-import { vi } from 'vitest';
 
 // Mock next/router for ModalContext use
 vi.mock('next/router', () => ({
