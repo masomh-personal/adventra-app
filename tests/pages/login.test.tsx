@@ -154,6 +154,46 @@ describe('LoginPage', () => {
     });
   });
 
+  test('shows email not confirmed error when email is not confirmed', async () => {
+    mockSignInWithPassword.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Email not confirmed' },
+    });
+
+    renderPage();
+    const user = setupUser();
+    await fillLoginForm(user, 'unconfirmed@example.com', 'Password99!');
+    await waitFor(() => expect(screen.getByTestId('button')).toBeEnabled());
+    await user.click(screen.getByTestId('button'));
+
+    await waitFor(() => {
+      expect(mockShowErrorModal).toHaveBeenCalledWith(
+        'Email not confirmed',
+        'Email Not Confirmed',
+      );
+    });
+  });
+
+  test('handles login error without message property', async () => {
+    mockSignInWithPassword.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'UNKNOWN_ERROR' }, // Error without message
+    });
+
+    renderPage();
+    const user = setupUser();
+    await fillLoginForm(user, 'error@example.com', 'Password99!');
+    await waitFor(() => expect(screen.getByTestId('button')).toBeEnabled());
+    await user.click(screen.getByTestId('button'));
+
+    await waitFor(() => {
+      expect(mockShowErrorModal).toHaveBeenCalledWith(
+        'An unexpected error occurred. Please try again.',
+        'Login Error',
+      );
+    });
+  });
+
   test('handles magic link request error and shows error modal', async () => {
     mockSignInWithOtp.mockResolvedValueOnce({
       error: { message: 'Some magic link error' },

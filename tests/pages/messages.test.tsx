@@ -109,6 +109,110 @@ describe('MessagesPage', () => {
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
   });
 
+  test('handles conversations with null user arrays', async () => {
+    const conversationsWithNullUsers = [
+      {
+        conversation_id: 'conv-1',
+        user_1_id: 'user-1',
+        user_2_id: 'user-2',
+        last_message_timestamp: '2024-01-01T10:00:00Z',
+        user_1: null,
+        user_2: [{ name: 'Bob' }],
+      },
+    ];
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'conversations') {
+        return {
+          select: () => ({
+            or: () => ({
+              order: () => Promise.resolve({ data: conversationsWithNullUsers, error: null }),
+            }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: [], error: null }),
+          }),
+        }),
+      };
+    });
+
+    render(<MessagesPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/unknown user/i)).toBeInTheDocument();
+    });
+  });
+
+  test('handles conversations with empty user arrays', async () => {
+    const conversationsWithEmptyUsers = [
+      {
+        conversation_id: 'conv-1',
+        user_1_id: 'user-1',
+        user_2_id: 'user-2',
+        last_message_timestamp: '2024-01-01T10:00:00Z',
+        user_1: [],
+        user_2: [{ name: 'Bob' }],
+      },
+    ];
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'conversations') {
+        return {
+          select: () => ({
+            or: () => ({
+              order: () => Promise.resolve({ data: conversationsWithEmptyUsers, error: null }),
+            }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: [], error: null }),
+          }),
+        }),
+      };
+    });
+
+    render(<MessagesPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/unknown user/i)).toBeInTheDocument();
+    });
+  });
+
+  test('handles error when fetching conversations fails', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'conversations') {
+        return {
+          select: () => ({
+            or: () => ({
+              order: () => Promise.reject(new Error('Failed to fetch conversations')),
+            }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            order: () => Promise.resolve({ data: [], error: null }),
+          }),
+        }),
+      };
+    });
+
+    render(<MessagesPage />);
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching data:', expect.any(Error));
+    });
+
+    consoleErrorSpy.mockRestore();
+  });
+
   test('loads messages when clicking a conversation', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });

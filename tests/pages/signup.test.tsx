@@ -211,4 +211,41 @@ describe('SignupPage', () => {
     // Restore after test to avoid hiding unexpected errors elsewhere
     console.error = originalConsoleError;
   });
+
+  test('shows generic error modal when signup fails with different error message', async () => {
+    const user = userEvent.setup();
+
+    mockSignUp.mockResolvedValue({
+      data: null,
+      error: { message: 'Network error occurred' },
+    });
+
+    render(<SignupPage />);
+    await fillSignupForm(user);
+    await user.click(screen.getByRole('button', { name: /Sign Up/i }));
+
+    await waitFor(() => {
+      expect(mockShowErrorModal).toHaveBeenCalledWith(
+        'Network error occurred',
+        'Signup Error',
+      );
+    });
+  });
+
+  test('handles signup error without message property', async () => {
+    const user = userEvent.setup();
+
+    mockSignUp.mockResolvedValue({
+      data: null,
+      error: { code: 'UNKNOWN_ERROR' }, // Error without message
+    });
+
+    render(<SignupPage />);
+    await fillSignupForm(user);
+    await user.click(screen.getByRole('button', { name: /Sign Up/i }));
+
+    await waitFor(() => {
+      expect(mockShowErrorModal).toHaveBeenCalled();
+    });
+  });
 });
