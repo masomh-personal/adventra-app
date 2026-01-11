@@ -115,4 +115,107 @@ describe('ModalContext', () => {
 
     expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
   });
+
+  test('shows confirmation modal and resolves promise', async () => {
+    const user = userEvent.setup({ delay: null });
+    const TestComponentWithConfirm: React.FC = () => {
+      const { showConfirmationModal } = useModal();
+      const [confirmed, setConfirmed] = React.useState<boolean | null>(null);
+
+      const handleClick = async () => {
+        const result = await showConfirmationModal('Are you sure?', 'Confirm Action');
+        setConfirmed(result);
+      };
+
+      return (
+        <div>
+          <button onClick={handleClick}>Show Confirm</button>
+          {confirmed !== null && <div data-testid="result">{confirmed ? 'Yes' : 'No'}</div>}
+        </div>
+      );
+    };
+
+    render(
+      <ModalProvider>
+        <TestComponentWithConfirm />
+      </ModalProvider>,
+    );
+
+    const confirmButton = screen.getByText('Show Confirm');
+    await user.click(confirmButton);
+
+    expect(await screen.findByText('Are you sure?')).toBeInTheDocument();
+    expect(screen.getByText('Confirm Action')).toBeInTheDocument();
+
+    // Click "Yes" button
+    const yesButton = screen.getByRole('button', { name: /yes/i });
+    await user.click(yesButton);
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync();
+    });
+
+    expect(await screen.findByTestId('result')).toHaveTextContent('Yes');
+  });
+
+  test('confirmation modal resolves false when No is clicked', async () => {
+    const user = userEvent.setup({ delay: null });
+    const TestComponentWithConfirm: React.FC = () => {
+      const { showConfirmationModal } = useModal();
+      const [confirmed, setConfirmed] = React.useState<boolean | null>(null);
+
+      const handleClick = async () => {
+        const result = await showConfirmationModal('Are you sure?', 'Confirm Action');
+        setConfirmed(result);
+      };
+
+      return (
+        <div>
+          <button onClick={handleClick}>Show Confirm</button>
+          {confirmed !== null && <div data-testid="result">{confirmed ? 'Yes' : 'No'}</div>}
+        </div>
+      );
+    };
+
+    render(
+      <ModalProvider>
+        <TestComponentWithConfirm />
+      </ModalProvider>,
+    );
+
+    const confirmButton = screen.getByText('Show Confirm');
+    await user.click(confirmButton);
+
+    expect(await screen.findByText('Are you sure?')).toBeInTheDocument();
+
+    // Click "No" button
+    const noButton = screen.getByRole('button', { name: /no/i });
+    await user.click(noButton);
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync();
+    });
+
+    expect(await screen.findByTestId('result')).toHaveTextContent('No');
+  });
+
+  test('closes modal on ESC key press', async () => {
+    const user = userEvent.setup({ delay: null });
+    renderWithProvider();
+
+    const errorButton = screen.getByText('Error');
+    await user.click(errorButton);
+
+    expect(await screen.findByText('Error occurred')).toBeInTheDocument();
+
+    // Press ESC key
+    await user.keyboard('{Escape}');
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync();
+    });
+
+    expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
+  });
+
 });
