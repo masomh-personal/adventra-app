@@ -2,6 +2,12 @@
   "name": "adventra-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "volta": {
+    "node": "22.11.0"
+  },
   "scripts": {
     "format": "prettier --write .",
     "dev": "next dev --turbopack",
