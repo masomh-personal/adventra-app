@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
-import supabase from '@/lib/supabaseClient';
 
 // Hoist mocks using vi.hoisted
 const {
@@ -46,13 +45,6 @@ vi.mock('@/lib/supabaseClient', () => ({
     },
   },
 }));
-
-const mockedSupabase = supabase as {
-  auth: {
-    signInWithPassword: typeof mockSignInWithPassword;
-    signInWithOtp: typeof mockSignInWithOtp;
-  };
-};
 
 // Helpers
 const renderPage = () => render(<LoginPage />);

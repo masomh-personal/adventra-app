@@ -5,7 +5,6 @@ import EditProfile from '@/pages/edit-profile';
 import * as getUserModule from '@/lib/getCurrentUserId';
 import * as getProfileModule from '@/lib/getFullUserProfile';
 import { useModal } from '@/contexts/ModalContext';
-import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 
 // Hoist mocks
@@ -49,7 +48,6 @@ vi.mock('@/contexts/ModalContext', () => ({
 
 const mockedUseModal = vi.mocked(useModal);
 const mockedUseRouter = vi.mocked(useRouter);
-const mockedSupabase = supabase as { from: () => { upsert: typeof mockUpsert } };
 
 const mockPush = vi.fn();
 const mockShowSuccessModal = vi.fn();

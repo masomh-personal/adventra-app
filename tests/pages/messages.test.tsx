@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import MessagesPage from '@/pages/messages';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { useRouter } from 'next/router';
-import supabase from '@/lib/supabaseClient';
 
 // Hoist mocks
 const { mockFrom, mockGetCurrentUserId, mockUseRouter } = vi.hoisted(() => {
@@ -39,7 +38,6 @@ vi.mock('next/router', () => ({
 
 const mockedUseRouter = vi.mocked(useRouter);
 const mockedGetCurrentUserId = vi.mocked(getCurrentUserId);
-const mockedSupabase = supabase as { from: typeof mockFrom };
 
 describe('MessagesPage', () => {
   let mockPush: ReturnType<typeof vi.fn>;

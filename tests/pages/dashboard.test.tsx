@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 // Import the actual Dashboard component (not the wrapped one from default export)
 // Since we mock withAuth, we need to import the component directly
 import DashboardPageModule from '@/pages/dashboard';
-import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 import type { User } from '@supabase/supabase-js';
 
@@ -40,7 +39,6 @@ vi.mock('@/lib/supabaseClient', () => ({
 }));
 
 const mockedUseRouter = vi.mocked(useRouter);
-const mockedSupabase = supabase as { auth: { signOut: typeof mockSignOut } };
 
 // Optional: mock modal context if used
 vi.mock('@/contexts/ModalContext', () => ({

@@ -3,7 +3,6 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import Header from '@/components/Header';
 import { useRouter } from 'next/router';
-import supabase from '@/lib/supabaseClient';
 
 // Hoist mocks
 const { mockGetSession, mockOnAuthStateChange, mockSignOut, mockUseRouter } = vi.hoisted(() => {
@@ -32,13 +31,6 @@ vi.mock('@/lib/supabaseClient', () => ({
 }));
 
 const mockedUseRouter = vi.mocked(useRouter);
-const mockedSupabase = supabase as {
-  auth: {
-    getSession: typeof mockGetSession;
-    onAuthStateChange: typeof mockOnAuthStateChange;
-    signOut: typeof mockSignOut;
-  };
-};
 
 describe('Header Component', () => {
   let mockPush: ReturnType<typeof vi.fn>;

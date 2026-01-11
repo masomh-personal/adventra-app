@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import SignupPage from '@/pages/signup';
-import supabase from '@/lib/supabaseClient';
 import { dbCreateUser } from '@/hooks/dbCreateUser';
 import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/router';
@@ -39,7 +38,6 @@ vi.mock('next/router', () => ({
 
 const mockedUseModal = vi.mocked(useModal);
 const mockedUseRouter = vi.mocked(useRouter);
-const mockedSupabase = supabase as { auth: { signUp: typeof mockSignUp } };
 const mockedDbCreateUser = vi.mocked(dbCreateUser);
 
 describe('SignupPage', () => {

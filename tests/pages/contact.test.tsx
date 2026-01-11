@@ -1,4 +1,4 @@
-import { render, screen, act, cleanup, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, act, cleanup, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ContactPage from '@/pages/contact';
@@ -124,7 +124,6 @@ describe('ContactPage', () => {
     });
 
     test('truncates message input at 2000 characters', async () => {
-      const user = userEvent.setup();
       await act(async () => {
         render(<ContactPage />);
       });
