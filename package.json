@@ -22,7 +22,9 @@
     "test:run": "vitest run",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf node_modules .next package-lock.json coverage && npm cache clean --force",
-    "clean:test": "rm -rf coverage"
+    "clean:test": "rm -rf coverage",
+    "clean:install": "rm -rf node_modules package-lock.json && npm install",
+    "clean:deep": "rm -rf node_modules package-lock.json && npm cache clean --force && npm install"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
