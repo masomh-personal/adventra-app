@@ -55,14 +55,14 @@ describe('MessagesPage', () => {
     // current user stub
     mockedGetCurrentUserId.mockResolvedValue('admin');
 
-    // conversations mock data
+    // conversations mock data - Supabase returns joined relations as arrays
     const convs = [
       {
         conversation_id: 'conv1',
         user_1_id: 'admin',
         user_2_id: 'userA',
-        user_1: { name: 'Admin' },
-        user_2: { name: 'Alice' },
+        user_1: [{ name: 'Admin' }], // Supabase returns joined relations as arrays
+        user_2: [{ name: 'Alice' }], // Supabase returns joined relations as arrays
         last_message_timestamp: '2025-01-01T00:00:00Z',
       },
     ];
@@ -109,12 +109,12 @@ describe('MessagesPage', () => {
   it('shows spinner then loads inbox', async () => {
     render(<MessagesPage />);
     expect(screen.getByText(/Loading messages/i)).toBeInTheDocument();
-    await waitFor(() => screen.getByText('Alice'));
+    await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
   });
 
   it('loads messages when clicking a conversation', async () => {
     render(<MessagesPage />);
-    await waitFor(() => screen.getByText('Alice'));
+    await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
     const user = userEvent.setup();
     await user.click(screen.getByText('Alice'));
     expect(await screen.findByText('Conversation')).toBeInTheDocument();

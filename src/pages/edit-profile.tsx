@@ -162,7 +162,16 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
           user_id: userId,
           bio: formData.bio,
           adventure_preferences: formData.adventurePreferences as string[],
-          skill_summary: formData.skillLevel ? JSON.parse(formData.skillLevel) : null,
+          skill_summary: formData.skillLevel
+            ? (() => {
+                try {
+                  return JSON.parse(formData.skillLevel);
+                } catch {
+                  // If it's not JSON, it's likely a plain string value from radio button
+                  return formData.skillLevel;
+                }
+              })()
+            : null,
           profile_image_url: profile?.profileImageUrl,
           dating_preferences: formData.datingPreferences,
           instagram_url: formData.instagramUrl,
@@ -426,7 +435,18 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                     name={profile.name}
                     age={profile.age}
                     bio={b}
-                    skillLevel={skl ? JSON.parse(skl) : null}
+                    skillLevel={
+                      skl
+                        ? (() => {
+                            try {
+                              return JSON.parse(skl);
+                            } catch {
+                              // If it's not JSON, it's likely a plain string value from radio button
+                              return skl;
+                            }
+                          })()
+                        : null
+                    }
                     adventurePreferences={(adv as unknown) as AdventurePreference[]}
                     datingPreference={(dat as unknown) as DatingPreference | null}
                     instagramUrl={ig || undefined}

@@ -38,23 +38,17 @@ vi.mock('@/lib/calcAgeFromBirthdate', () => ({
 }));
 
 // 3) Mock components for easy querying
-vi.mock('@/components/LoadingSpinner', () => {
-  const MockLoadingSpinner = () => <div>Fetching profiles...</div>;
-  MockLoadingSpinner.displayName = 'MockLoadingSpinner';
-  return MockLoadingSpinner;
-});
-vi.mock('@/components/PersonCard', () => {
-  const MockPersonCard = ({ name }: { name?: string }) => <div data-testid="person-card">{name}</div>;
-  MockPersonCard.displayName = 'MockPersonCard';
-  return MockPersonCard;
-});
-vi.mock('@/components/Button', () => {
-  const MockButton = ({ label, onClick }: { label: string; onClick?: () => void }) => (
+vi.mock('@/components/LoadingSpinner', () => ({
+  default: () => <div>Fetching profiles...</div>,
+}));
+vi.mock('@/components/PersonCard', () => ({
+  default: ({ name }: { name?: string }) => <div data-testid="person-card">{name}</div>,
+}));
+vi.mock('@/components/Button', () => ({
+  default: ({ label, onClick }: { label: string; onClick?: () => void }) => (
     <button onClick={onClick}>{label}</button>
-  );
-  MockButton.displayName = 'MockButton';
-  return MockButton;
-});
+  ),
+}));
 
 // 4) Mock next/router
 vi.mock('next/router', () => ({ useRouter: mockUseRouter }));

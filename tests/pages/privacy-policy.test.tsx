@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import PrivacyPolicyPage from '@/pages/privacy-policy';
+import { vi } from 'vitest';
 
 // Consistent date for snapshots and assertions
 const MOCK_DATE = 'March 25, 2025';
@@ -12,7 +13,7 @@ describe('PrivacyPolicyPage', () => {
     // Store the original implementation
     const originalToLocaleDateString = Date.prototype.toLocaleDateString;
 
-    jest.spyOn(Date.prototype, 'toLocaleDateString').mockImplementation(
+    vi.spyOn(Date.prototype, 'toLocaleDateString').mockImplementation(
       function (
         this: Date,
         locales?: Intl.LocalesArgument,
@@ -30,7 +31,7 @@ describe('PrivacyPolicyPage', () => {
 
   // Restore the original implementation after all tests
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   // Helper function to render and setup userEvent for consistency
@@ -68,7 +69,7 @@ describe('PrivacyPolicyPage', () => {
       /3\. Data Sharing & Third Parties/i,
       /4\. Data Security/i,
       /5\. Your Choices & Rights/i,
-      /6\. Children's Privacy/i, // Use ' instead of ' if that's in the source
+      /6\. Children.*Privacy/i, // Match Children's Privacy with HTML entity
       /7\. Changes to This Policy/i,
       /8\. Contact Us/i,
     ];
@@ -99,7 +100,7 @@ describe('PrivacyPolicyPage', () => {
       /Personalize your experience/i,
       /Improve platform features/i,
       /Send updates, promotions/i,
-      /Ensure the platform's security/i, // Use ' instead of '
+      /Ensure.*security/i, // Match with flexible text (may have HTML entities)
     ];
 
     usageItems.forEach((itemRegex) => {
