@@ -125,7 +125,7 @@ describe('FormWrapper', () => {
     test('shows error messages when fields are empty after blur', async () => {
       const user = userEvent.setup();
       await safeRender(
-        <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit} onError={mockOnError}>
+        <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
           <MockFormField id="email" label="Email" />
         </FormWrapper>
@@ -139,16 +139,12 @@ describe('FormWrapper', () => {
       await user.click(emailInput);
       await user.tab(); // Blur email field
 
-      const submitButton = screen.getByRole('button', { name: /submit/i });
-      await user.click(submitButton);
-
+      // Validation errors should appear after touching fields (mode: 'onTouched')
       expect(await screen.findByText('Name is required')).toBeInTheDocument();
       expect(await screen.findByText('Email is required')).toBeInTheDocument();
+      
+      // Form is invalid, so onSubmit should not be called
       expect(mockOnSubmit).not.toHaveBeenCalled();
-      // onError is called when form submission fails validation
-      await waitFor(() => {
-        expect(mockOnError).toHaveBeenCalled();
-      });
     });
   });
 

@@ -48,7 +48,8 @@ test('shows placeholder message when form is submitted with valid email', async 
     await user.type(screen.getByLabelText(/Email Address/i), 'someone@example.com');
     await user.click(screen.getByRole('button', { name: /Send Reset Link/i }));
 
-    expect(await screen.findByTestId('forgot-password-placeholder-message')).toBeInTheDocument();
+    // Wait for async operation to complete (handleForgotPassword has 1000ms delay)
+    expect(await screen.findByTestId('forgot-password-placeholder-message', {}, { timeout: 2000 })).toBeInTheDocument();
     expect(screen.getByTestId('return-to-login-button')).toBeInTheDocument();
   });
 

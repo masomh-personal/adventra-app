@@ -104,7 +104,7 @@ describe('ContactPage', () => {
     });
 
     test('updates and colors the character counter', async () => {
-      const user = userEvent.setup({ delay: null }); // Disable delays for faster typing
+      const user = userEvent.setup({ delay: null });
       await act(async () => {
         render(<ContactPage />);
       });
@@ -112,29 +112,37 @@ describe('ContactPage', () => {
       const input = screen.getByLabelText(/message/i);
       const counter = screen.getByTestId('char-counter');
 
+      // Test green (below 80% - use 100 chars, which is 5%)
       await user.clear(input);
-      await user.type(input, 'A'.repeat(450), { delay: null });
-      expect(counter).toHaveTextContent('450/2000');
+      await user.type(input, 'A'.repeat(100), { delay: null });
+      expect(counter).toHaveTextContent('100/2000');
       expect(counter).toHaveClass('text-green-600');
 
+      // Test amber (> 80% but < 100% - use 1650 chars, which is 82.5%)
       await user.clear(input);
-      await user.type(input, 'A'.repeat(1800), { delay: null });
+      await user.type(input, 'A'.repeat(1650), { delay: null });
       expect(counter).toHaveClass('text-amber-500');
 
+      // Test red (>= 100% - use 2000 chars, which is exactly 100%)
       await user.clear(input);
       await user.type(input, 'A'.repeat(2000), { delay: null });
       expect(counter).toHaveClass('text-red-500');
     });
 
     test('truncates message input at 2000 characters', async () => {
-      const user = userEvent.setup({ delay: null }); // Disable delays for faster typing
+      const user = userEvent.setup({ delay: null });
       await act(async () => {
         render(<ContactPage />);
       });
       const input = screen.getByLabelText(/message/i) as HTMLTextAreaElement;
 
       await user.clear(input);
-      await user.type(input, 'A'.repeat(2100), { delay: null });
+      // Type exactly 2001 chars to test truncation (maxLength is 2000)
+      // Use a larger chunk to reduce typing operations
+      const chunk = 'A'.repeat(200); // 200 chars per chunk
+      // 10 chunks = 2000 chars, then add 1 more = 2001 total
+      const longString = chunk.repeat(10) + 'A';
+      await user.type(input, longString, { delay: null });
 
       expect(input.value.length).toBe(2000);
     });
@@ -147,7 +155,6 @@ describe('ContactPage', () => {
         render(<ContactPage />);
       });
 
-      // Touch each field to trigger validation (react-hook-form mode: 'onTouched')
       const nameInput = screen.getByLabelText(/name/i);
       const emailInput = screen.getByLabelText(/email/i);
       const messageInput = screen.getByLabelText(/message/i);
@@ -159,7 +166,7 @@ describe('ContactPage', () => {
       await user.click(messageInput);
       await user.tab(); // Blur message field
 
-      // After touching fields, validation errors should appear
+      // After touching fields, validation errors should appear (mode: 'onTouched')
       expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
       expect(await screen.findByText(/email is required/i)).toBeInTheDocument();
       expect(await screen.findByText(/please enter your message/i)).toBeInTheDocument();
@@ -299,7 +306,7 @@ describe('ContactPage', () => {
 
   describe('Edge Cases', () => {
     test('handles max-length valid inputs', async () => {
-      const user = userEvent.setup({ delay: null }); // Disable delays for faster typing
+      const user = userEvent.setup({ delay: null });
       await act(async () => {
         render(<ContactPage />);
       });

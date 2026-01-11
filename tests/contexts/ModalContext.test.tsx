@@ -17,7 +17,7 @@ vi.mock('next/router', () => ({
 
 vi.useFakeTimers();
 
-// 🔧 Test component to interact with modal
+// Test component to interact with modal
 const TestComponent: React.FC = () => {
   const { showErrorModal, showSuccessModal, showInfoModal, closeModal } = useModal();
 
@@ -63,8 +63,11 @@ describe('ModalContext', () => {
     expect(await screen.findByText('Error occurred')).toBeInTheDocument();
     expect(screen.getByText('Error Title')).toBeInTheDocument();
 
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    await user.click(closeButton);
+    // Use getAllByRole and select the footer Close button (not the X button or Close Manually button)
+    const closeButtons = screen.getAllByRole('button', { name: /close/i });
+    // The footer "Close" button is the last one (after the X button with aria-label)
+    const footerCloseButton = closeButtons[closeButtons.length - 1];
+    await user.click(footerCloseButton);
 
     await act(async () => {
       await vi.runOnlyPendingTimersAsync();
