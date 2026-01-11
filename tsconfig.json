@@ -34,7 +34,8 @@
       "@/*": ["./src/*"]
     },
     "baseUrl": ".",
-    "noEmit": true
+    "noEmit": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "next-env.d.ts",

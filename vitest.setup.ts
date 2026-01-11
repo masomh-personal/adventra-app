@@ -1,9 +1,9 @@
 // Vitest setup file - equivalent to jest.setup.ts
 import '@testing-library/jest-dom/vitest';
-import { vi } from 'vitest';
 
 // Make jest available as an alias to vi for compatibility
 // This allows gradual migration from jest.* to vi.*
+// vi is globally available with types: ["vitest/globals"] in tsconfig.json
 global.jest = vi;
 
 // Mock Supabase environment variables for tests
