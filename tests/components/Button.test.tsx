@@ -96,7 +96,8 @@ describe('Button Component', () => {
     render(<Button label="Default Role" onClick={() => {}} />);
     expect(screen.getByRole('button')).toBeInTheDocument();
 
-    render(<Button label="Custom Role" onClick={() => {}} role="link" as="a" href="/test" />);
+    // When as="a", onClick is not allowed (ButtonAsAnchorProps)
+    render(<Button label="Custom Role" role="link" as="a" href="/test" />);
     expect(screen.getByText(/Custom Role/i)).toHaveAttribute('role', 'link');
   });
 });
