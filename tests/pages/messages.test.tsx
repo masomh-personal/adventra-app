@@ -5,44 +5,51 @@ import MessagesPage from '@/pages/messages';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
+import { vi } from 'vitest';
+
+// Hoist mocks
+const { mockFrom, mockGetCurrentUserId, mockUseRouter } = vi.hoisted(() => {
+  const mockFrom = vi.fn();
+  const mockGetCurrentUserId = vi.fn();
+  const mockUseRouter = vi.fn();
+  return { mockFrom, mockGetCurrentUserId, mockUseRouter };
+});
 
 // 1) Mock the withAuth HOC so it just returns the component
-jest.mock('@/lib/withAuth', () => (Component: React.ComponentType<unknown>) => Component);
+vi.mock('@/lib/withAuth', () => ({
+  default: (Component: React.ComponentType<unknown>) => Component,
+}));
 
 // 2) Stub out the entire Supabase client so it never reads env vars
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-    or: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
+    from: mockFrom,
   },
 }));
 
 // 3) Mock getCurrentUserId
-jest.mock('@/lib/getCurrentUserId', () => ({
-  getCurrentUserId: jest.fn(),
+vi.mock('@/lib/getCurrentUserId', () => ({
+  getCurrentUserId: mockGetCurrentUserId,
 }));
 
 // 4) Mock next/router
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: mockUseRouter,
 }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedGetCurrentUserId = getCurrentUserId as jest.MockedFunction<typeof getCurrentUserId>;
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedGetCurrentUserId = vi.mocked(getCurrentUserId);
+const mockedSupabase = supabase as { from: typeof mockFrom };
 
 describe('MessagesPage', () => {
-  let mockPush: jest.Mock;
+  let mockPush: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // router.push stub
-    mockPush = jest.fn();
+    mockPush = vi.fn();
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
 
     // current user stub
@@ -72,7 +79,7 @@ describe('MessagesPage', () => {
     ];
 
     // supabase.from('conversations') chain
-    (mockedSupabase.from as jest.Mock).mockImplementation((table: string) => {
+    mockFrom.mockImplementation((table: string) => {
       if (table === 'conversations') {
         return {
           select: () => ({
@@ -108,7 +115,8 @@ describe('MessagesPage', () => {
   it('loads messages when clicking a conversation', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByText('Alice'));
-    await userEvent.click(screen.getByText('Alice'));
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Alice'));
     expect(await screen.findByText('Conversation')).toBeInTheDocument();
     expect(screen.getByText('Hello Alice!')).toBeInTheDocument();
   });
@@ -116,7 +124,8 @@ describe('MessagesPage', () => {
   it('navigates back on button click', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByRole('button', { name: /Back to Dashboard/i }));
-    await userEvent.click(screen.getByRole('button', { name: /Back to Dashboard/i }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: /Back to Dashboard/i }));
     expect(mockPush).toHaveBeenCalledWith('/dashboard');
   });
 });

@@ -7,43 +7,51 @@ import DashboardPageModule from '@/pages/dashboard';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 import type { User } from '@supabase/supabase-js';
+import { vi } from 'vitest';
+
+// Hoist mocks
+const { mockSignOut, mockUseRouter } = vi.hoisted(() => {
+  const mockSignOut = vi.fn();
+  const mockUseRouter = vi.fn();
+  return { mockSignOut, mockUseRouter };
+});
 
 // Mock the withAuth HOC - returns component that accepts user prop
-jest.mock('@/lib/withAuth', () => {
-  return <P extends { user: unknown }>(Component: React.ComponentType<P>) => {
+vi.mock('@/lib/withAuth', () => ({
+  default: <P extends { user: unknown }>(Component: React.ComponentType<P>) => {
     const MockWithAuth = (props: P) => <Component {...props} />;
     MockWithAuth.displayName = `WithAuth(${(Component.displayName || Component.name || 'Component') as string})`;
     return MockWithAuth;
-  };
-});
+  },
+}));
 
 // Mock router
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: mockUseRouter,
 }));
 
 // Mock supabase
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
     auth: {
-      signOut: jest.fn(),
+      signOut: mockSignOut,
     },
   },
 }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedSupabase = supabase as { auth: { signOut: typeof mockSignOut } };
 
 // Optional: mock modal context if used
-jest.mock('@/contexts/ModalContext', () => ({
+vi.mock('@/contexts/ModalContext', () => ({
   useModal: () => ({
-    showErrorModal: jest.fn(),
-    showSuccessModal: jest.fn(),
-    openModal: jest.fn(),
-    closeModal: jest.fn(),
-    showInfoModal: jest.fn(),
-    showConfirmationModal: jest.fn().mockResolvedValue(false),
+    showErrorModal: vi.fn(),
+    showSuccessModal: vi.fn(),
+    openModal: vi.fn(),
+    closeModal: vi.fn(),
+    showInfoModal: vi.fn(),
+    showConfirmationModal: vi.fn().mockResolvedValue(false),
   }),
 }));
 
@@ -57,11 +65,11 @@ describe('Dashboard', () => {
     created_at: new Date().toISOString(),
   } as User;
 
-  let mockPush: jest.Mock;
+  let mockPush: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockPush = jest.fn();
+    vi.clearAllMocks();
+    mockPush = vi.fn();
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
   });
 
@@ -88,21 +96,21 @@ describe('Dashboard', () => {
 
   it('calls signOut and redirects to login when Log Out is clicked', async () => {
     const user = setup();
-    (mockedSupabase.auth.signOut as jest.Mock).mockResolvedValueOnce({ error: null });
+    mockSignOut.mockResolvedValueOnce({ error: null });
 
     render(<DashboardPage user={mockUser} />);
     await user.click(screen.getByTestId('log-out-button'));
 
     await waitFor(() => {
-      expect(mockedSupabase.auth.signOut).toHaveBeenCalled();
+      expect(mockSignOut).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith('/login');
     });
   });
 
   it('logs an error if signOut fails', async () => {
     const user = setup();
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    (mockedSupabase.auth.signOut as jest.Mock).mockResolvedValueOnce({
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockSignOut.mockResolvedValueOnce({
       error: new Error('Sign out failed'),
     });
 

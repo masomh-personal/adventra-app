@@ -6,47 +6,57 @@ import supabase from '@/lib/supabaseClient';
 import { dbCreateUser } from '@/hooks/dbCreateUser';
 import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/router';
+import { vi } from 'vitest';
 
-jest.mock('@/lib/supabaseClient', () => ({
+// Hoist mocks - these will be available in mock factories
+const { mockSignUp, mockDbCreateUser, mockUseModal, mockUseRouter } = vi.hoisted(() => {
+  const mockSignUp = vi.fn();
+  const mockDbCreateUser = vi.fn();
+  const mockUseModal = vi.fn();
+  const mockUseRouter = vi.fn();
+  return { mockSignUp, mockDbCreateUser, mockUseModal, mockUseRouter };
+});
+
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
     auth: {
-      signUp: jest.fn(),
+      signUp: mockSignUp,
     },
   },
 }));
 
-jest.mock('@/hooks/dbCreateUser', () => ({
-  dbCreateUser: jest.fn(),
+vi.mock('@/hooks/dbCreateUser', () => ({
+  dbCreateUser: mockDbCreateUser,
 }));
 
-jest.mock('@/contexts/ModalContext', () => ({
-  useModal: jest.fn(),
+vi.mock('@/contexts/ModalContext', () => ({
+  useModal: mockUseModal,
 }));
 
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: mockUseRouter,
 }));
 
-const mockedUseModal = useModal as jest.MockedFunction<typeof useModal>;
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
-const mockedDbCreateUser = dbCreateUser as jest.MockedFunction<typeof dbCreateUser>;
+const mockedUseModal = vi.mocked(useModal);
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedSupabase = supabase as { auth: { signUp: typeof mockSignUp } };
+const mockedDbCreateUser = vi.mocked(dbCreateUser);
 
 describe('SignupPage', () => {
-  const mockShowErrorModal = jest.fn();
-  const mockShowSuccessModal = jest.fn();
-  const mockPush = jest.fn();
+  const mockShowErrorModal = vi.fn();
+  const mockShowSuccessModal = vi.fn();
+  const mockPush = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockedUseModal.mockReturnValue({
-      openModal: jest.fn(),
-      closeModal: jest.fn(),
+      openModal: vi.fn(),
+      closeModal: vi.fn(),
       showErrorModal: mockShowErrorModal,
       showSuccessModal: mockShowSuccessModal,
-      showInfoModal: jest.fn(),
-      showConfirmationModal: jest.fn().mockResolvedValue(false),
+      showInfoModal: vi.fn(),
+      showConfirmationModal: vi.fn().mockResolvedValue(false),
     } as ReturnType<typeof useModal>);
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
   });
@@ -106,10 +116,7 @@ describe('SignupPage', () => {
     const user = userEvent.setup();
 
     const fakeUser = { id: 'fake-user-id' };
-    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
-      data: { user: fakeUser },
-      error: null,
-    });
+    mockSignUp.mockResolvedValue({ data: { user: fakeUser }, error: null });
     mockedDbCreateUser.mockResolvedValue({} as never);
 
     render(<SignupPage />);
@@ -121,7 +128,7 @@ describe('SignupPage', () => {
 
     await waitFor(() => {
       // Assert correct supabase call
-      expect(mockedSupabase.auth.signUp).toHaveBeenCalledWith({
+      expect(mockSignUp).toHaveBeenCalledWith({
         email: 'alex@example.com',
         password: 'Password123!',
         options: {
@@ -157,7 +164,7 @@ describe('SignupPage', () => {
 
   it('shows error modal when Supabase fails', async () => {
     const user = userEvent.setup();
-    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
+    mockSignUp.mockResolvedValue({
       error: { message: 'User already registered' },
       data: {},
     });
@@ -177,7 +184,7 @@ describe('SignupPage', () => {
   it('shows error modal if dbCreateUser fails after signup', async () => {
     const user = userEvent.setup();
 
-    (mockedSupabase.auth.signUp as jest.Mock).mockResolvedValue({
+    mockSignUp.mockResolvedValue({
       data: { user: { id: 'abc123' } },
       error: null,
     });
@@ -186,7 +193,7 @@ describe('SignupPage', () => {
 
     // Suppress expected error log in this test only
     const originalConsoleError = console.error;
-    console.error = jest.fn();
+    console.error = vi.fn();
 
     render(<SignupPage />);
     await fillSignupForm(user);

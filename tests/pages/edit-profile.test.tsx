@@ -7,23 +7,32 @@ import * as getProfileModule from '@/lib/getFullUserProfile';
 import { useModal } from '@/contexts/ModalContext';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
+import { vi } from 'vitest';
+
+// Hoist mocks
+const { mockUpsert, mockUpload, mockUseRouter, mockUseModal } = vi.hoisted(() => {
+  const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+  const mockUpload = vi.fn().mockResolvedValue({ error: null });
+  const mockUseRouter = vi.fn();
+  const mockUseModal = vi.fn();
+  return { mockUpsert, mockUpload, mockUseRouter, mockUseModal };
+});
 
 // Mock global fetch to simulate profile deletion
-global.fetch = jest.fn().mockResolvedValue({
-  json: jest.fn().mockResolvedValue({}),
-}) as jest.Mock;
+global.fetch = vi.fn().mockResolvedValue({
+  json: vi.fn().mockResolvedValue({}),
+}) as typeof fetch;
 
 // Mock router before component imports
-jest.mock('next/router', () => ({ useRouter: jest.fn() }));
+vi.mock('next/router', () => ({ useRouter: mockUseRouter }));
 
 // Bypass withAuth HOC
-jest.mock('@/lib/withAuth', () => (Component: React.ComponentType<unknown>) => Component);
+vi.mock('@/lib/withAuth', () => ({
+  default: (Component: React.ComponentType<unknown>) => Component,
+}));
 
 // Mock supabase
-const mockUpsert = jest.fn().mockResolvedValue({ error: null });
-const mockUpload = jest.fn().mockResolvedValue({ error: null });
-
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
     from: () => ({ upsert: mockUpsert }),
@@ -33,18 +42,20 @@ jest.mock('@/lib/supabaseClient', () => ({
   },
 }));
 
-jest.mock('@/lib/getCurrentUserId');
-jest.mock('@/lib/getFullUserProfile');
-jest.mock('@/contexts/ModalContext');
+vi.mock('@/lib/getCurrentUserId');
+vi.mock('@/lib/getFullUserProfile');
+vi.mock('@/contexts/ModalContext', () => ({
+  useModal: mockUseModal,
+}));
 
-const mockedUseModal = useModal as jest.MockedFunction<typeof useModal>;
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedUseModal = vi.mocked(useModal);
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedSupabase = supabase as { from: () => { upsert: typeof mockUpsert } };
 
-const mockPush = jest.fn();
-const mockShowSuccessModal = jest.fn();
-const mockShowErrorModal = jest.fn();
-const mockShowConfirmationModal = jest.fn().mockResolvedValue(true);
+const mockPush = vi.fn();
+const mockShowSuccessModal = vi.fn();
+const mockShowErrorModal = vi.fn();
+const mockShowConfirmationModal = vi.fn().mockResolvedValue(true);
 
 const hydratedProfile = {
   user: { name: 'Alex Example' },
@@ -62,19 +73,19 @@ const hydratedProfile = {
 
 describe('EditProfile Page', () => {
   beforeEach(async () => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockClear();
+    vi.clearAllMocks();
+    (global.fetch as ReturnType<typeof vi.fn>).mockClear();
 
-    (getUserModule.getCurrentUserId as jest.Mock).mockResolvedValue('user-123');
-    (getProfileModule.getFullUserProfile as jest.Mock).mockResolvedValue(hydratedProfile);
+    (getUserModule.getCurrentUserId as ReturnType<typeof vi.fn>).mockResolvedValue('user-123');
+    (getProfileModule.getFullUserProfile as ReturnType<typeof vi.fn>).mockResolvedValue(hydratedProfile);
 
     mockedUseModal.mockReturnValue({
       showSuccessModal: mockShowSuccessModal,
       showErrorModal: mockShowErrorModal,
       showConfirmationModal: mockShowConfirmationModal,
-      openModal: jest.fn(),
-      closeModal: jest.fn(),
-      showInfoModal: jest.fn(),
+      openModal: vi.fn(),
+      closeModal: vi.fn(),
+      showInfoModal: vi.fn(),
     } as ReturnType<typeof useModal>);
 
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
@@ -151,9 +162,9 @@ describe('EditProfile Page', () => {
 
   it('shows error if supabase upsert fails', async () => {
     const user = userEvent.setup();
-    (mockedSupabase.from as jest.Mock)().upsert.mockResolvedValueOnce({ error: new Error('DB error') });
+    mockUpsert.mockResolvedValueOnce({ error: new Error('DB error') });
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const bioInput = await screen.findByLabelText('Bio');
     await user.clear(bioInput);

@@ -6,38 +6,49 @@ import SearchPage from '@/pages/search';
 import { getAllUserProfiles } from '@/lib/getAllUserProfiles';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
+import { vi } from 'vitest';
+
+// Hoist mocks
+const { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalcAgeFromBirthdate, mockUseRouter } = vi.hoisted(() => {
+  const mockCreateClient = vi.fn(() => ({
+    from: () => ({ select: vi.fn().mockResolvedValue({ data: [], error: null }) }),
+  }));
+  const mockGetAllUserProfiles = vi.fn();
+  const mockGetCurrentUserId = vi.fn();
+  const mockCalcAgeFromBirthdate = vi.fn();
+  const mockUseRouter = vi.fn();
+  return { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalcAgeFromBirthdate, mockUseRouter };
+});
 
 // 1) Mock supabaseClient so it never throws
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
-  createClient: () => ({
-    from: () => ({ select: jest.fn().mockResolvedValue({ data: [], error: null }) }),
-  }),
+  createClient: mockCreateClient,
 }));
 
 // 2) Mock data‐fetching helpers
-jest.mock('@/lib/getAllUserProfiles', () => ({
-  getAllUserProfiles: jest.fn(),
+vi.mock('@/lib/getAllUserProfiles', () => ({
+  getAllUserProfiles: mockGetAllUserProfiles,
 }));
-jest.mock('@/lib/getCurrentUserId', () => ({
-  getCurrentUserId: jest.fn(),
+vi.mock('@/lib/getCurrentUserId', () => ({
+  getCurrentUserId: mockGetCurrentUserId,
 }));
-jest.mock('@/lib/calcAgeFromBirthdate', () => ({
-  calcAgeFromBirthdate: jest.fn(),
+vi.mock('@/lib/calcAgeFromBirthdate', () => ({
+  calcAgeFromBirthdate: mockCalcAgeFromBirthdate,
 }));
 
 // 3) Mock components for easy querying
-jest.mock('@/components/LoadingSpinner', () => {
+vi.mock('@/components/LoadingSpinner', () => {
   const MockLoadingSpinner = () => <div>Fetching profiles...</div>;
   MockLoadingSpinner.displayName = 'MockLoadingSpinner';
   return MockLoadingSpinner;
 });
-jest.mock('@/components/PersonCard', () => {
+vi.mock('@/components/PersonCard', () => {
   const MockPersonCard = ({ name }: { name?: string }) => <div data-testid="person-card">{name}</div>;
   MockPersonCard.displayName = 'MockPersonCard';
   return MockPersonCard;
 });
-jest.mock('@/components/Button', () => {
+vi.mock('@/components/Button', () => {
   const MockButton = ({ label, onClick }: { label: string; onClick?: () => void }) => (
     <button onClick={onClick}>{label}</button>
   );
@@ -46,18 +57,18 @@ jest.mock('@/components/Button', () => {
 });
 
 // 4) Mock next/router
-jest.mock('next/router', () => ({ useRouter: jest.fn() }));
+vi.mock('next/router', () => ({ useRouter: mockUseRouter }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedGetAllUserProfiles = getAllUserProfiles as jest.MockedFunction<typeof getAllUserProfiles>;
-const mockedGetCurrentUserId = getCurrentUserId as jest.MockedFunction<typeof getCurrentUserId>;
-const mockedCalcAgeFromBirthdate = calcAgeFromBirthdate as jest.MockedFunction<typeof calcAgeFromBirthdate>;
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedGetAllUserProfiles = vi.mocked(getAllUserProfiles);
+const mockedGetCurrentUserId = vi.mocked(getCurrentUserId);
+const mockedCalcAgeFromBirthdate = vi.mocked(calcAgeFromBirthdate);
 
 describe('SearchPage', () => {
-  let mockPush: jest.Mock;
+  let mockPush: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    mockPush = jest.fn();
+    mockPush = vi.fn();
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
 
     mockedGetAllUserProfiles.mockResolvedValue([
@@ -101,7 +112,8 @@ describe('SearchPage', () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
-    userEvent.click(screen.getByText('No Match'));
+    const user = userEvent.setup();
+    await user.click(screen.getByText('No Match'));
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
@@ -109,7 +121,8 @@ describe('SearchPage', () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
-    userEvent.click(screen.getByText('Interested'));
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Interested'));
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
@@ -117,7 +130,8 @@ describe('SearchPage', () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
-    userEvent.click(screen.getByText('Message'));
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Message'));
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('./messages?userId=2'));
   });
 });

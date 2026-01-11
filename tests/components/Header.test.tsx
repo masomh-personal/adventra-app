@@ -4,41 +4,57 @@ import userEvent from '@testing-library/user-event';
 import Header from '@/components/Header';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
+import { vi } from 'vitest';
+
+// Hoist mocks
+const { mockGetSession, mockOnAuthStateChange, mockSignOut, mockUseRouter } = vi.hoisted(() => {
+  const mockGetSession = vi.fn();
+  const mockOnAuthStateChange = vi.fn();
+  const mockSignOut = vi.fn();
+  const mockUseRouter = vi.fn();
+  return { mockGetSession, mockOnAuthStateChange, mockSignOut, mockUseRouter };
+});
 
 // Mock Next.js router
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: mockUseRouter,
 }));
 
 // Mock Supabase client
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
     auth: {
-      getSession: jest.fn(),
-      onAuthStateChange: jest.fn(),
-      signOut: jest.fn(),
+      getSession: mockGetSession,
+      onAuthStateChange: mockOnAuthStateChange,
+      signOut: mockSignOut,
     },
   },
 }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedUseRouter = vi.mocked(useRouter);
+const mockedSupabase = supabase as {
+  auth: {
+    getSession: typeof mockGetSession;
+    onAuthStateChange: typeof mockOnAuthStateChange;
+    signOut: typeof mockSignOut;
+  };
+};
 
 describe('Header Component', () => {
-  let mockPush: jest.Mock;
+  let mockPush: ReturnType<typeof vi.fn>;
   let mockRouterEvents: {
-    on: jest.Mock;
-    off: jest.Mock;
+    on: ReturnType<typeof vi.fn>;
+    off: ReturnType<typeof vi.fn>;
   };
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     user = userEvent.setup();
-    mockPush = jest.fn();
+    mockPush = vi.fn();
     mockRouterEvents = {
-      on: jest.fn(),
-      off: jest.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
     };
 
     mockedUseRouter.mockReturnValue({
@@ -47,16 +63,16 @@ describe('Header Component', () => {
     } as unknown as ReturnType<typeof useRouter>);
 
     // Default mock setup: no user
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({ data: { session: null }, error: null });
-    (mockedSupabase.auth.onAuthStateChange as jest.Mock).mockReturnValue({
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
+    mockOnAuthStateChange.mockReturnValue({
       data: {
-        subscription: { unsubscribe: jest.fn() },
+        subscription: { unsubscribe: vi.fn() },
       },
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders logo and default links when logged out', async () => {
@@ -78,7 +94,7 @@ describe('Header Component', () => {
   });
 
   it('renders dashboard and logout buttons when user is logged in', async () => {
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
@@ -120,12 +136,12 @@ describe('Header Component', () => {
   });
 
   it('calls signOut and navigates to /login on logout', async () => {
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
 
-    (mockedSupabase.auth.signOut as jest.Mock).mockResolvedValue({ error: null });
+    mockSignOut.mockResolvedValue({ error: null });
 
     await act(async () => {
       render(<Header />);
@@ -135,14 +151,14 @@ describe('Header Component', () => {
     await user.click(logoutButton);
 
     await waitFor(() => {
-      expect(mockedSupabase.auth.signOut).toHaveBeenCalled();
+      expect(mockSignOut).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith('/login');
     });
   });
 
   it('cleans up event listeners on unmount', async () => {
-    const unsubscribeMock = jest.fn();
-    (mockedSupabase.auth.onAuthStateChange as jest.Mock).mockReturnValue({
+    const unsubscribeMock = vi.fn();
+    mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: unsubscribeMock } },
     });
 
@@ -156,12 +172,12 @@ describe('Header Component', () => {
   });
 
   it('logs an error if signOut fails', async () => {
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    (mockedSupabase.auth.signOut as jest.Mock).mockResolvedValueOnce({ error: new Error('Sign out failed') });
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockSignOut.mockResolvedValueOnce({ error: new Error('Sign out failed') });
 
     await act(async () => {
       render(<Header />);
@@ -177,8 +193,8 @@ describe('Header Component', () => {
   });
 
   it('logs an error if getSession fails', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    (mockedSupabase.auth.getSession as jest.Mock).mockRejectedValueOnce(new Error('Get session failed'));
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockGetSession.mockRejectedValueOnce(new Error('Get session failed'));
 
     await act(async () => {
       render(<Header />);
@@ -215,7 +231,7 @@ describe('Header Component', () => {
   });
 
   it('renders correct links in mobile menu when logged in', async () => {
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
@@ -258,7 +274,7 @@ describe('Header Component', () => {
   });
 
   it('renders correct links in desktop nav when logged in', async () => {
-    (mockedSupabase.auth.getSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });

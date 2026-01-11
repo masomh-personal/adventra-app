@@ -3,34 +3,40 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
 import supabase from '@/lib/supabaseClient';
+import { vi } from 'vitest';
 
-// Mocks
-const mockShowErrorModal = jest.fn();
-const mockShowSuccessModal = jest.fn();
-const mockReplace = jest.fn();
+// Hoist mocks using vi.hoisted
+const { mockShowErrorModal, mockShowSuccessModal, mockReplace, mockSignInWithPassword, mockSignInWithOtp } = vi.hoisted(() => {
+  const mockShowErrorModal = vi.fn();
+  const mockShowSuccessModal = vi.fn();
+  const mockReplace = vi.fn();
+  const mockSignInWithPassword = vi.fn();
+  const mockSignInWithOtp = vi.fn();
+  return { mockShowErrorModal, mockShowSuccessModal, mockReplace, mockSignInWithPassword, mockSignInWithOtp };
+});
 
-jest.mock('next/router', () => ({
+vi.mock('next/router', () => ({
   useRouter: () => ({ replace: mockReplace }),
 }));
 
-jest.mock('@/contexts/ModalContext', () => ({
+vi.mock('@/contexts/ModalContext', () => ({
   useModal: () => ({
     showErrorModal: mockShowErrorModal,
     showSuccessModal: mockShowSuccessModal,
   }),
 }));
 
-jest.mock('@/lib/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   __esModule: true,
   default: {
     auth: {
-      signInWithPassword: jest.fn(),
-      signInWithOtp: jest.fn(),
+      signInWithPassword: mockSignInWithPassword,
+      signInWithOtp: mockSignInWithOtp,
     },
   },
 }));
 
-const mockedSupabase = supabase as jest.Mocked<typeof supabase>;
+const mockedSupabase = supabase as { auth: { signInWithPassword: typeof mockSignInWithPassword; signInWithOtp: typeof mockSignInWithOtp } };
 
 // Helpers
 const renderPage = () => render(<LoginPage />);
@@ -46,7 +52,7 @@ const fillLoginForm = async (
 
 describe('LoginPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders the login form initially', () => {
@@ -80,7 +86,7 @@ describe('LoginPage', () => {
   });
 
   it('submits magic link request and shows success modal', async () => {
-    (mockedSupabase.auth.signInWithOtp as jest.Mock).mockResolvedValueOnce({ error: null });
+    mockSignInWithOtp.mockResolvedValueOnce({ error: null });
 
     renderPage();
     const user = setupUser();
@@ -90,7 +96,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('submit-magic'));
 
     await waitFor(() => {
-      expect(mockedSupabase.auth.signInWithOtp).toHaveBeenCalledWith(
+      expect(mockSignInWithOtp).toHaveBeenCalledWith(
         expect.objectContaining({ email: 'magic@example.com' })
       );
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
@@ -101,7 +107,7 @@ describe('LoginPage', () => {
   });
 
   it('handles successful email/password login', async () => {
-    (mockedSupabase.auth.signInWithPassword as jest.Mock).mockResolvedValueOnce({
+    mockSignInWithPassword.mockResolvedValueOnce({
       data: { user: {} },
       error: null,
     });
@@ -112,7 +118,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('button'));
 
     await waitFor(() => {
-      expect(mockedSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
+      expect(mockSignInWithPassword).toHaveBeenCalledWith({
         email: 'user@example.com',
         password: 'Password99!',
       });
@@ -121,7 +127,7 @@ describe('LoginPage', () => {
   });
 
   it('shows error modal when login fails', async () => {
-    (mockedSupabase.auth.signInWithPassword as jest.Mock).mockResolvedValueOnce({
+    mockSignInWithPassword.mockResolvedValueOnce({
       data: null,
       error: { message: 'Invalid login credentials' },
     });
@@ -141,7 +147,7 @@ describe('LoginPage', () => {
   });
 
   it('handles magic link request error and shows error modal', async () => {
-    (mockedSupabase.auth.signInWithOtp as jest.Mock).mockResolvedValueOnce({
+    mockSignInWithOtp.mockResolvedValueOnce({
       error: { message: 'Some magic link error' },
     });
 
@@ -153,7 +159,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByTestId('submit-magic'));
 
     await waitFor(() => {
-      expect(mockedSupabase.auth.signInWithOtp).toHaveBeenCalled();
+      expect(mockSignInWithOtp).toHaveBeenCalled();
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         'Unable to send magic link. Please try again.',
         'Magic Link Error'
