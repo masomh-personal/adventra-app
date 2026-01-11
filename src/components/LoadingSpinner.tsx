@@ -1,27 +1,27 @@
 import { ImSpinner9 } from 'react-icons/im';
 
 interface LoadingSpinnerProps {
-  label?: string;
+    label?: string;
 }
 
 export default function LoadingSpinner({
-  label = 'Loading...',
+    label = 'Loading...',
 }: LoadingSpinnerProps): React.JSX.Element {
-  return (
-    <div className="flex items-center justify-center w-full h-full py-24">
-      <div
-        className="bg-slate-50 border border-gray-200 bg-gradient-to-br from-slate-50 to-slate-100
+    return (
+        <div className="flex items-center justify-center w-full h-full py-24">
+            <div
+                className="bg-slate-50 border border-gray-200 bg-gradient-to-br from-slate-50 to-slate-100
         rounded-xl shadow-md px-6 py-8 flex flex-col items-center gap-y-6 max-w-md w-full"
-      >
-        <ImSpinner9
-          className="animate-spin text-primary w-16 h-16 drop-shadow-sm"
-          aria-hidden="true"
-          data-testid="loading-icon"
-        />
-        <p className="text-base md:text-lg font-medium text-gray-700 tracking-wide uppercase">
-          {label}
-        </p>
-      </div>
-    </div>
-  );
+            >
+                <ImSpinner9
+                    className="animate-spin text-primary w-16 h-16 drop-shadow-sm"
+                    aria-hidden="true"
+                    data-testid="loading-icon"
+                />
+                <p className="text-base md:text-lg font-medium text-gray-700 tracking-wide uppercase">
+                    {label}
+                </p>
+            </div>
+        </div>
+    );
 }

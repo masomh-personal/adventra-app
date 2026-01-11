@@ -7,201 +7,207 @@ import supabase from '@/lib/supabaseClient';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
 interface NavLink {
-  href: string;
-  label: string;
-  dataTestId: string;
-  onClick?: () => void;
+    href: string;
+    label: string;
+    dataTestId: string;
+    onClick?: () => void;
 }
 
 export default function Header(): React.JSX.Element {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+    const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
 
-  useEffect(() => {
-    // Fetch initial session
-    const fetchSession = async (): Promise<void> => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        setUser(session?.user || null);
-      } catch (error) {
-        console.error('Error fetching session:', error);
-      }
+    useEffect(() => {
+        // Fetch initial session
+        const fetchSession = async (): Promise<void> => {
+            try {
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
+                setUser(session?.user || null);
+            } catch (error) {
+                console.error('Error fetching session:', error);
+            }
+        };
+
+        fetchSession();
+
+        // Listen for auth state changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user || null);
+        });
+
+        // Close menu when route changes
+        const handleRouteChange = (): void => {
+            setIsMenuOpen(false);
+        };
+
+        router.events.on('routeChangeStart', handleRouteChange);
+
+        // Clean up listeners
+        return () => {
+            router.events.off('routeChangeStart', handleRouteChange);
+            authListener.subscription.unsubscribe();
+        };
+    }, [router]);
+
+    // Logout handler
+    const handleLogout = async (): Promise<void> => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error logging out:', error);
+                return;
+            }
+
+            // Properly await router push
+            await router.push('/login');
+        } catch (error) {
+            console.error('Unexpected logout error:', error);
+        }
     };
 
-    fetchSession();
-
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-
-    // Close menu when route changes
-    const handleRouteChange = (): void => {
-      setIsMenuOpen(false);
+    const toggleMenu = (): void => {
+        setIsMenuOpen(!isMenuOpen);
     };
 
-    router.events.on('routeChangeStart', handleRouteChange);
+    // Navigation Links (Now conditionally created)
+    const baseNavLinks: NavLink[] = [
+        { href: '/about', label: 'About', dataTestId: 'about-link' },
+        { href: '/contact', label: 'Contact', dataTestId: 'contact-link' },
+    ];
 
-    // Clean up listeners
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChange);
-      authListener.subscription.unsubscribe();
-    };
-  }, [router]);
+    const loggedInNavLinks: NavLink[] = [
+        { href: '/dashboard', label: 'Dashboard', dataTestId: 'dashboard-link' },
+        ...baseNavLinks,
+    ];
 
-  // Logout handler
-  const handleLogout = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error logging out:', error);
-        return;
-      }
+    const loggedOutNavLinks: NavLink[] = [
+        { href: '/', label: 'Home', dataTestId: 'home-link' },
+        ...baseNavLinks,
+    ];
 
-      // Properly await router push
-      await router.push('/login');
-    } catch (error) {
-      console.error('Unexpected logout error:', error);
-    }
-  };
+    const navLinks = user ? loggedInNavLinks : loggedOutNavLinks;
 
-  const toggleMenu = (): void => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+    // Auth Link (Now conditionally created)
+    const authLink: NavLink = user
+        ? {
+              href: '#',
+              label: 'Logout',
+              onClick: handleLogout,
+              dataTestId: 'logout-button',
+          }
+        : {
+              href: '/login',
+              label: 'Login',
+              dataTestId: 'login-link',
+          };
 
-  // Navigation Links (Now conditionally created)
-  const baseNavLinks: NavLink[] = [
-    { href: '/about', label: 'About', dataTestId: 'about-link' },
-    { href: '/contact', label: 'Contact', dataTestId: 'contact-link' },
-  ];
+    return (
+        <header className="flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30">
+            {/* Logo + Text Link to Home */}
+            <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
+                <Image
+                    src="/adventra-logo.png"
+                    alt="Adventra Logo"
+                    width={48}
+                    height={48}
+                    priority
+                />
+                <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
+                    adventra
+                </span>
+            </Link>
 
-  const loggedInNavLinks: NavLink[] = [
-    { href: '/dashboard', label: 'Dashboard', dataTestId: 'dashboard-link' },
-    ...baseNavLinks,
-  ];
+            {/* Mobile Menu Button */}
+            <button
+                className="md:hidden text-white p-2"
+                onClick={toggleMenu}
+                aria-label="Toggle navigation menu"
+                data-testid="mobile-menu-button"
+            >
+                {isMenuOpen ? (
+                    <FaTimes className="w-6 h-6" data-testid="mobile-menu-times" />
+                ) : (
+                    <FaBars className="w-6 h-6" data-testid="mobile-menu-bars" />
+                )}
+            </button>
 
-  const loggedOutNavLinks: NavLink[] = [
-    { href: '/', label: 'Home', dataTestId: 'home-link' },
-    ...baseNavLinks,
-  ];
+            {/* Desktop Navigation */}
+            <nav
+                className="hidden md:flex space-x-6 font-heading font-bold text-white"
+                data-testid="desktop-nav"
+            >
+                {navLinks.map(link => (
+                    <Link
+                        key={link.href}
+                        href={link.href}
+                        className="hover:text-primary"
+                        data-testid={link.dataTestId}
+                    >
+                        {link.label}
+                    </Link>
+                ))}
+                {authLink.label === 'Logout' && authLink.onClick ? (
+                    <button
+                        onClick={authLink.onClick}
+                        className="hover:text-primary"
+                        data-testid={authLink.dataTestId}
+                    >
+                        {authLink.label}
+                    </button>
+                ) : (
+                    <Link
+                        href={authLink.href}
+                        className="hover:text-primary"
+                        data-testid={authLink.dataTestId}
+                    >
+                        {authLink.label}
+                    </Link>
+                )}
+            </nav>
 
-  const navLinks = user ? loggedInNavLinks : loggedOutNavLinks;
-
-  // Auth Link (Now conditionally created)
-  const authLink: NavLink = user
-    ? {
-        href: '#',
-        label: 'Logout',
-        onClick: handleLogout,
-        dataTestId: 'logout-button',
-      }
-    : {
-        href: '/login',
-        label: 'Login',
-        dataTestId: 'login-link',
-      };
-
-  return (
-    <header className="flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30">
-      {/* Logo + Text Link to Home */}
-      <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
-        <Image src="/adventra-logo.png" alt="Adventra Logo" width={48} height={48} priority />
-        <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
-          adventra
-        </span>
-      </Link>
-
-      {/* Mobile Menu Button */}
-      <button
-        className="md:hidden text-white p-2"
-        onClick={toggleMenu}
-        aria-label="Toggle navigation menu"
-        data-testid="mobile-menu-button"
-      >
-        {isMenuOpen ? (
-          <FaTimes className="w-6 h-6" data-testid="mobile-menu-times" />
-        ) : (
-          <FaBars className="w-6 h-6" data-testid="mobile-menu-bars" />
-        )}
-      </button>
-
-      {/* Desktop Navigation */}
-      <nav
-        className="hidden md:flex space-x-6 font-heading font-bold text-white"
-        data-testid="desktop-nav"
-      >
-        {navLinks.map(link => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="hover:text-primary"
-            data-testid={link.dataTestId}
-          >
-            {link.label}
-          </Link>
-        ))}
-        {authLink.label === 'Logout' && authLink.onClick ? (
-          <button
-            onClick={authLink.onClick}
-            className="hover:text-primary"
-            data-testid={authLink.dataTestId}
-          >
-            {authLink.label}
-          </button>
-        ) : (
-          <Link
-            href={authLink.href}
-            className="hover:text-primary"
-            data-testid={authLink.dataTestId}
-          >
-            {authLink.label}
-          </Link>
-        )}
-      </nav>
-
-      {/* Mobile Navigation Menu (Dropdown) */}
-      {isMenuOpen && (
-        <div
-          className="absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50"
-          data-testid="mobile-menu"
-        >
-          <nav
-            className="flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white"
-            data-testid="mobile-nav"
-          >
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-primary w-full text-center py-2"
-                data-testid={link.dataTestId}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {authLink.label === 'Logout' && authLink.onClick ? (
-              <button
-                onClick={authLink.onClick}
-                className="hover:text-primary w-full text-center py-2"
-                data-testid={authLink.dataTestId}
-              >
-                {authLink.label}
-              </button>
-            ) : (
-              <Link
-                href={authLink.href}
-                className="hover:text-primary w-full text-center py-2"
-                data-testid={authLink.dataTestId}
-              >
-                {authLink.label}
-              </Link>
+            {/* Mobile Navigation Menu (Dropdown) */}
+            {isMenuOpen && (
+                <div
+                    className="absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50"
+                    data-testid="mobile-menu"
+                >
+                    <nav
+                        className="flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white"
+                        data-testid="mobile-nav"
+                    >
+                        {navLinks.map(link => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="hover:text-primary w-full text-center py-2"
+                                data-testid={link.dataTestId}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        {authLink.label === 'Logout' && authLink.onClick ? (
+                            <button
+                                onClick={authLink.onClick}
+                                className="hover:text-primary w-full text-center py-2"
+                                data-testid={authLink.dataTestId}
+                            >
+                                {authLink.label}
+                            </button>
+                        ) : (
+                            <Link
+                                href={authLink.href}
+                                className="hover:text-primary w-full text-center py-2"
+                                data-testid={authLink.dataTestId}
+                            >
+                                {authLink.label}
+                            </Link>
+                        )}
+                    </nav>
+                </div>
             )}
-          </nav>
-        </div>
-      )}
-    </header>
-  );
+        </header>
+    );
 }

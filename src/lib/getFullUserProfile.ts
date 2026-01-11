@@ -10,14 +10,14 @@ import type { FullUserProfile } from '@/types/user';
  * @returns Full user profile or null on error
  */
 export async function getFullUserProfile(
-  uid: string | null | undefined,
+    uid: string | null | undefined,
 ): Promise<FullUserProfile | null> {
-  if (!uid) return null;
+    if (!uid) return null;
 
-  const { data, error } = await supabase
-    .from('userprofile')
-    .select(
-      `
+    const { data, error } = await supabase
+        .from('userprofile')
+        .select(
+            `
       bio,
       adventure_preferences,
       skill_summary,
@@ -32,55 +32,55 @@ export async function getFullUserProfile(
         email
       )
     `,
-    )
-    .eq('user_id', uid)
-    .single();
+        )
+        .eq('user_id', uid)
+        .single();
 
-  if (error) {
-    console.error('Error fetching full user profile:', error);
-    return null;
-  }
+    if (error) {
+        console.error('Error fetching full user profile:', error);
+        return null;
+    }
 
-  if (!data) return null;
+    if (!data) return null;
 
-  // Transform Supabase response (joined relations are arrays) to match our type
-  const dataTyped = data as {
-    bio?: string | null;
-    adventure_preferences?: string[] | null;
-    skill_summary?: Record<string, string> | null;
-    profile_image_url?: string | null;
-    birthdate?: string | null;
-    instagram_url?: string | null;
-    facebook_url?: string | null;
-    dating_preferences?: string | null;
-    user_id: string;
-    user?: { name: string; email: string }[] | { name: string; email: string } | null;
-  };
+    // Transform Supabase response (joined relations are arrays) to match our type
+    const dataTyped = data as {
+        bio?: string | null;
+        adventure_preferences?: string[] | null;
+        skill_summary?: Record<string, string> | null;
+        profile_image_url?: string | null;
+        birthdate?: string | null;
+        instagram_url?: string | null;
+        facebook_url?: string | null;
+        dating_preferences?: string | null;
+        user_id: string;
+        user?: { name: string; email: string }[] | { name: string; email: string } | null;
+    };
 
-  const profileData = {
-    bio: dataTyped.bio,
-    adventure_preferences: dataTyped.adventure_preferences,
-    skill_summary: dataTyped.skill_summary,
-    profile_image_url: dataTyped.profile_image_url,
-    birthdate: dataTyped.birthdate,
-    instagram_url: dataTyped.instagram_url,
-    facebook_url: dataTyped.facebook_url,
-    dating_preferences: dataTyped.dating_preferences,
-    user_id: dataTyped.user_id,
-    // Supabase returns joined relations as arrays, take first element
-    user:
-      Array.isArray(dataTyped.user) && dataTyped.user.length > 0
-        ? dataTyped.user[0]
-        : !Array.isArray(dataTyped.user)
-          ? dataTyped.user
-          : null,
-  };
+    const profileData = {
+        bio: dataTyped.bio,
+        adventure_preferences: dataTyped.adventure_preferences,
+        skill_summary: dataTyped.skill_summary,
+        profile_image_url: dataTyped.profile_image_url,
+        birthdate: dataTyped.birthdate,
+        instagram_url: dataTyped.instagram_url,
+        facebook_url: dataTyped.facebook_url,
+        dating_preferences: dataTyped.dating_preferences,
+        user_id: dataTyped.user_id,
+        // Supabase returns joined relations as arrays, take first element
+        user:
+            Array.isArray(dataTyped.user) && dataTyped.user.length > 0
+                ? dataTyped.user[0]
+                : !Array.isArray(dataTyped.user)
+                  ? dataTyped.user
+                  : null,
+    };
 
-  // Compute age from birthdate in userprofile table
-  const age = profileData?.birthdate ? calcAgeFromBirthdate(profileData.birthdate) : null;
+    // Compute age from birthdate in userprofile table
+    const age = profileData?.birthdate ? calcAgeFromBirthdate(profileData.birthdate) : null;
 
-  return {
-    ...profileData,
-    age, // Add it at the root level for easy consumption
-  } as FullUserProfile;
+    return {
+        ...profileData,
+        age, // Add it at the root level for easy consumption
+    } as FullUserProfile;
 }

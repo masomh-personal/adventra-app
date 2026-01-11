@@ -11,12 +11,12 @@ import supabase from './supabaseClient';
  * @throws {Error} If fetching the session fails.
  */
 export async function getCurrentUserId(): Promise<string | null> {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+    const {
+        data: { session },
+        error,
+    } = await supabase.auth.getSession();
 
-  if (error) throw error;
+    if (error) throw error;
 
-  return session?.user?.id ?? null;
+    return session?.user?.id ?? null;
 }

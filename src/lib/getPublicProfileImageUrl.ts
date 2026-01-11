@@ -7,16 +7,16 @@
  * @returns Full public URL to the image.
  */
 export default function getPublicProfileImageUrl(
-  userId: string | null | undefined,
-  options: { bustCache?: boolean } = {},
+    userId: string | null | undefined,
+    options: { bustCache?: boolean } = {},
 ): string {
-  if (!userId || typeof userId !== 'string') return '';
+    if (!userId || typeof userId !== 'string') return '';
 
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
-  const cacheBuster = options.bustCache ? `?t=${Date.now()}` : '';
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
+    const cacheBuster = options.bustCache ? `?t=${Date.now()}` : '';
 
-  if (!baseUrl || !bucket) return '';
+    if (!baseUrl || !bucket) return '';
 
-  return `${baseUrl}/storage/v1/object/public/${bucket}/user-${userId}.jpg${cacheBuster}`;
+    return `${baseUrl}/storage/v1/object/public/${bucket}/user-${userId}.jpg${cacheBuster}`;
 }
