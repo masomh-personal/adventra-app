@@ -24,6 +24,11 @@ export default defineConfig({
         '**/vitest.setup.ts',
         'src/pages/_app.tsx',
         'src/pages/_document.tsx',
+        'src/pages/api/**', // API routes need integration tests, not unit tests
+        'src/pages/auth/callback.tsx', // OAuth callback, integration test territory
+        'src/types/**/*.ts', // Type definitions only, no runtime code
+        'src/lib/supabaseClient.ts', // Just creates client instance
+        'src/lib/supabaseServer.ts', // Just creates server client instance
         'coverage/',
         '.next/',
       ],
