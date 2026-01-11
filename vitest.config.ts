@@ -22,7 +22,7 @@ export default defineConfig({
       'dist',
     ],
     coverage: {
-      provider: 'v8', // Uses Istanbul under the hood
+      provider: 'v8', // Native V8 coverage (faster, recommended by Vitest)
       reporter: ['text', 'json', 'html', 'lcov'],
       exclude: [
         'node_modules/',
