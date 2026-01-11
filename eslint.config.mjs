@@ -8,8 +8,8 @@ const eslintConfig = [
   },
   ...nextPlugin,
   {
+    files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
-      ...prettierConfig.rules,
       'react/no-unescaped-entities': 'off',
       '@next/next/no-img-element': 'off',
     },
@@ -21,9 +21,9 @@ const eslintConfig = [
     },
     rules: {
       ...vitest.configs.recommended.rules,
-      ...prettierConfig.rules,
     },
   },
+  prettierConfig,
 ];
 
 export default eslintConfig;

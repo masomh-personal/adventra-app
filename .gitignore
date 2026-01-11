@@ -65,14 +65,9 @@ dist/
 coverage/
 public/static/
 public/uploads/
-/.vs/adventra-app/FileContentIndex
-/.vs/adventra-app/CopilotIndices/17.12.53.23981
-/.vs/adventra-app/v17
-/.vs/adventra-app/copilot-chat/118693c5/sessions
 
-# dependencies
-/node_modules
-/.pnp
+# Yarn
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -80,28 +75,20 @@ public/uploads/
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Production
+build/
 
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
+# Misc
 *.pem
 
-# debug
+# Debug
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# Environment variables (can opt-in for committing if needed)
 .env*
 
-# vercel
+# Vercel
 .vercel
 
-# typescript
+# TypeScript
 *.tsbuildinfo
-next-env.d.ts
