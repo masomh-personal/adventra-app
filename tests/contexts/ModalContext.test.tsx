@@ -2,18 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ModalProvider, useModal } from '@/contexts/ModalContext';
+import { vi } from 'vitest';
 
 // Mock next/router for ModalContext use
-jest.mock('next/router', () => ({
+vi.mock('next/router', () => ({
   useRouter: () => ({
     events: {
-      on: jest.fn(),
-      off: jest.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
     },
   }),
 }));
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // 🔧 Test component to interact with modal
 const TestComponent: React.FC = () => {
@@ -42,10 +43,16 @@ const renderWithProvider = () =>
 
 describe('ModalContext', () => {
   afterEach(() => {
-    jest.clearAllTimers();
+    act(() => {
+      vi.clearAllTimers();
+    });
   });
 
-  it('shows and closes an error modal', () => {
+  afterAll(() => {
+    vi.useRealTimers();
+  });
+
+  it('shows and closes an error modal', async () => {
     renderWithProvider();
 
     fireEvent.click(screen.getByText('Error'));
@@ -55,7 +62,7 @@ describe('ModalContext', () => {
     fireEvent.click(screen.getByText('Close'));
 
     act(() => {
-      jest.advanceTimersByTime(750);
+      vi.advanceTimersByTime(750);
     });
 
     expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
@@ -88,7 +95,7 @@ describe('ModalContext', () => {
     fireEvent.click(screen.getByText('Close Manually'));
 
     act(() => {
-      jest.advanceTimersByTime(750);
+      vi.advanceTimersByTime(750);
     });
 
     expect(screen.queryByText('FYI only')).not.toBeInTheDocument();

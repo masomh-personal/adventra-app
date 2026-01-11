@@ -2,15 +2,16 @@ import { render, screen, fireEvent, act, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom';
 import ContactPage from '@/pages/contact';
 import { useRouter } from 'next/router';
+import { vi } from 'vitest';
 
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: vi.fn(),
 }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockedUseRouter = vi.mocked(useRouter);
 
 // Silence test logs
-jest.spyOn(console, 'log').mockImplementation(() => {});
+vi.spyOn(console, 'log').mockImplementation(() => {});
 
 interface ContactFormData {
   name?: string;
@@ -19,7 +20,7 @@ interface ContactFormData {
 }
 
 describe('ContactPage', () => {
-  const mockPush = jest.fn();
+  const mockPush = vi.fn();
 
   const fillContactForm = ({
     name = 'John Doe',
@@ -39,16 +40,16 @@ describe('ContactPage', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<typeof useRouter>);
 
     // Global mock for fetch (instant response)
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ message: 'Mock success' }),
       })
-    ) as jest.Mock;
+    ) as typeof fetch;
   });
 
   afterEach(() => {
@@ -304,9 +305,9 @@ describe('ContactPage', () => {
 
   describe('Performance (Realistic API Delay)', () => {
     it('waits 1500ms before showing success message', async () => {
-      jest.useFakeTimers(); // Control time manually
+      vi.useFakeTimers();
 
-      const fetchMock = jest.fn(
+      const fetchMock = vi.fn(
         () =>
           new Promise<Response>((resolve) => {
             setTimeout(() => {
@@ -343,7 +344,7 @@ describe('ContactPage', () => {
 
       // Fast-forward time by 1500ms
       await act(async () => {
-        jest.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(1500);
       });
 
       // Wait for fetch resolution + DOM update
@@ -351,7 +352,7 @@ describe('ContactPage', () => {
 
       expect(screen.getByTestId('success-message')).toBeInTheDocument();
 
-      jest.useRealTimers(); // Reset for other tests
+      vi.useRealTimers();
     });
   });
 });

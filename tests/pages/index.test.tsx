@@ -2,16 +2,17 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import HomePage from '@/pages/index';
 import { useRouter } from 'next/router';
+import { vi } from 'vitest';
 
 // Mock the router
-jest.mock('next/router', () => ({
-  useRouter: jest.fn(),
+vi.mock('next/router', () => ({
+  useRouter: vi.fn(),
 }));
 
-const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockedUseRouter = vi.mocked(useRouter);
 
 // Mock the next/link component
-jest.mock('next/link', () => {
+vi.mock('next/link', () => {
   const Link = ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   );
@@ -20,17 +21,19 @@ jest.mock('next/link', () => {
 });
 
 // Mock withAuth to just return the component without Supabase check
-jest.mock('@/lib/withAuth', () => (Component: React.ComponentType<unknown>) => {
-  const Wrapped = (props: Record<string, unknown>) => <Component {...props} />;
-  Wrapped.displayName = 'MockWithAuth';
-  return Wrapped;
-});
+vi.mock('@/lib/withAuth', () => ({
+  default: (Component: React.ComponentType<unknown>) => {
+    const Wrapped = (props: Record<string, unknown>) => <Component {...props} />;
+    Wrapped.displayName = 'MockWithAuth';
+    return Wrapped;
+  },
+}));
 
 describe('HomePage', () => {
-  const mockPush = jest.fn();
+  const mockPush = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockedUseRouter.mockReturnValue({
       push: mockPush,
     } as unknown as ReturnType<typeof useRouter>);

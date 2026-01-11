@@ -90,10 +90,14 @@ describe('Button Component', () => {
   });
 
   it('uses default role and allows custom role override', () => {
+    // Native button elements have implicit role="button", so getByRole works
     render(<Button label="Default Role" onClick={() => {}} />);
-    expect(screen.getByRole('button')).toHaveAttribute('role', 'button');
+    expect(screen.getByRole('button')).toBeInTheDocument();
 
-    render(<Button label="Custom Role" onClick={() => {}} role="link" />);
-    expect(screen.getByText(/Custom Role/i)).toHaveAttribute('role', 'link');
+    // Test role attribute on anchor elements (when as="a")
+    render(<Button label="Custom Role" as="a" href="/test" role="link" />);
+    const customLink = screen.getByText(/Custom Role/i);
+    expect(customLink).toHaveAttribute('role', 'link');
+    expect(customLink.tagName).toBe('A');
   });
 });

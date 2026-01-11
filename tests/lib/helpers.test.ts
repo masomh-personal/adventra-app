@@ -1,15 +1,19 @@
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
+import { vi } from 'vitest';
 
-// Create mocks that we can access in tests
-const mockGetSession = jest.fn();
-const mockSingle = jest.fn();
+// Hoist mock functions so they can be used in the mock factory
+const { mockGetSession, mockSingle } = vi.hoisted(() => {
+  const mockGetSession = vi.fn();
+  const mockSingle = vi.fn();
+  return { mockGetSession, mockSingle };
+});
 
-jest.mock('@/lib/supabaseClient', () => {
-  const mockEq = jest.fn(() => ({ single: mockSingle }));
-  const mockSelect = jest.fn(() => ({ eq: mockEq }));
-  const mockFrom = jest.fn(() => ({ select: mockSelect }));
+vi.mock('@/lib/supabaseClient', () => {
+  const mockEq = vi.fn(() => ({ single: mockSingle }));
+  const mockSelect = vi.fn(() => ({ eq: mockEq }));
+  const mockFrom = vi.fn(() => ({ select: mockSelect }));
 
   return {
     __esModule: true,
@@ -21,9 +25,9 @@ jest.mock('@/lib/supabaseClient', () => {
 });
 
 // Silence expected console errors
-beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
+beforeAll(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
 afterAll(() => {
-  (console.error as jest.Mock).mockRestore();
+  vi.restoreAllMocks();
 });
 
 describe('calcAgeFromBirthdate', () => {
@@ -50,8 +54,12 @@ describe('calcAgeFromBirthdate', () => {
 });
 
 describe('getCurrentUserId', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('returns user ID when session is valid', async () => {
-    (mockGetSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
     });
@@ -61,7 +69,7 @@ describe('getCurrentUserId', () => {
   });
 
   it('returns null when no session exists', async () => {
-    (mockGetSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: { session: null },
       error: null,
     });
@@ -71,7 +79,7 @@ describe('getCurrentUserId', () => {
   });
 
   it('throws error if Supabase fails', async () => {
-    (mockGetSession as jest.Mock).mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       data: {},
       error: new Error('Session error'),
     });
@@ -82,7 +90,8 @@ describe('getCurrentUserId', () => {
 
 describe('getFullUserProfile', () => {
   beforeEach(() => {
-    (mockSingle as jest.Mock).mockReset();
+    vi.clearAllMocks();
+    mockSingle.mockReset();
   });
 
   it('returns hydrated profile with age', async () => {
@@ -96,7 +105,7 @@ describe('getFullUserProfile', () => {
       user_id: 'user-123',
     };
 
-    (mockSingle as jest.Mock).mockResolvedValue({ data: profile, error: null });
+    mockSingle.mockResolvedValue({ data: profile, error: null });
 
     const result = await getFullUserProfile('user-123');
     expect(result).toMatchObject({
@@ -106,7 +115,7 @@ describe('getFullUserProfile', () => {
   });
 
   it('returns null if Supabase throws error', async () => {
-    (mockSingle as jest.Mock).mockResolvedValue({ data: null, error: new Error('fail') });
+    mockSingle.mockResolvedValue({ data: null, error: new Error('fail') });
 
     const result = await getFullUserProfile('user-123');
     expect(result).toBeNull();
