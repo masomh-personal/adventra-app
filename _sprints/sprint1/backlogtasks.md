@@ -5,6 +5,7 @@
 ## Entity Creation & ERD Design
 
 ### Tasks:
+
 1. Define key **entities** and their **relationships**.
 2. Identify **attributes** for each entity.
 3. Specify **primary** and **foreign keys**.
@@ -17,6 +18,7 @@
 ## UML Diagram Design
 
 ### Tasks:
+
 1. Define **classes** and **objects** used in the app.
 2. Map **relationships between classes**.
 3. Create a **Use Case Diagram** for user interaction flows.
@@ -27,6 +29,7 @@
 ## Database Schema & Design
 
 ### Tasks:
+
 1. Define **database schema** based on finalized ERD.
 2. Write **SQL scripts** for table creation.
 3. Team review and schema refinement.
@@ -37,6 +40,7 @@
 ## Standard Layout – Header & Footer
 
 ### Tasks:
+
 1. Define content for **header** and **footer**.
 2. Design **wireframes** for both components.
 3. Develop with **HTML & Tailwind CSS**.
@@ -49,6 +53,7 @@
 ## Homepage Development
 
 ### Tasks:
+
 1. Design **wireframe/mockup** for homepage.
 2. Implement **navigation bar** with logo and menu items.
 3. Add **user profile section** with login/signup buttons.
@@ -59,6 +64,7 @@
 ## Profile Page Development
 
 ### Tasks:
+
 1. Define **profile schema** for database.
 2. Implement **profile form** (name, age, email, password).
 3. Build **adventure preference** selector (hiking, skiing, etc.).
@@ -71,6 +77,7 @@
 ## Create Profile – Functionality Implementation
 
 ### Tasks:
+
 1. Design **user-friendly input forms** with validation.
 2. Implement **email verification**.
 3. Check for **existing email/username**.
@@ -83,6 +90,7 @@
 ## User Authentication – Signup/Login
 
 ### Tasks:
+
 1. Create **signup page** and support **email/password** registration.
 2. Add **third-party login** (e.g., Google) if time allows.
 3. Implement **form validation** and password rules.
@@ -96,6 +104,7 @@
 ## Login Security
 
 ### Tasks:
+
 1. Set up secure **credentials schema**.
 2. Ensure **SSL transmission** for data (if possible).
 3. Add **account lock** on failed login attempts.
@@ -106,6 +115,7 @@
 ## Matching Feature
 
 ### Tasks:
+
 1. Design **Matching UI** (swipe left/right, profile previews).
 2. Develop **matching algorithm** using preferences/swipe data.
 3. Store **match responses** in the database securely.
@@ -116,6 +126,7 @@
 ## Matching Functionality Implementation
 
 ### Tasks:
+
 1. Research and implement **matching algorithm**.
 2. Store **algorithm data** efficiently.
 3. Display **matches** in real-time.
@@ -126,6 +137,7 @@
 ## Messaging Page UI
 
 ### Tasks:
+
 1. Design **messaging interface wireframe**.
 2. Build **chat UI** with Tailwind (text input, send button).
 3. Add **scrollable chat history**.
@@ -138,6 +150,7 @@
 ## Messaging Functionality Implementation
 
 ### Tasks:
+
 1. Create **API endpoints** for messaging.
 2. Add **WebSocket or polling** for real-time.
 3. Integrate with frontend UI.
@@ -150,6 +163,7 @@
 ## Manage Profile Page
 
 ### Tasks:
+
 1. Display **user info** and preferences.
 2. Implement **photo upload** (limit to 10?).
 3. Enable **data validation** and **editing UI**.
@@ -160,6 +174,7 @@
 ## Social Media Integration
 
 ### Tasks:
+
 1. Set up **OAuth login** for platforms (e.g., Instagram).
 2. Design **connect/disconnect UI**.
 3. Ensure **cross-platform support**.
@@ -169,6 +184,7 @@
 ## Reporting & Blocking Features
 
 ### Tasks:
+
 1. Design **UI** for reporting/blocking users.
 2. Define **schema** for reports/blocks.
 3. Create **report dropdown** and **free-text**.
@@ -180,6 +196,7 @@
 ## User Status Indicator
 
 ### Tasks:
+
 1. UI for selecting status (active, busy, offline).
 2. Implement **status toggles** in profile/settings.
 3. Enable **real-time updates**.

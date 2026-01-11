@@ -8,7 +8,7 @@ import type { ApiError, ApiSuccess } from '@/types/api';
  */
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ): void {
   if (req.method === 'POST') {
     // TODO: Authenticate user with Supabase (or placeholder logic for now)

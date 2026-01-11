@@ -5,18 +5,18 @@ import { passwordCriteria } from '@/validation/validationUtils';
 
 describe('PasswordStrengthMeter', () => {
   const getStrengthLabel = (password: string): string => {
-    const passed = passwordCriteria.filter((rule) => rule.test(password)).length;
+    const passed = passwordCriteria.filter(rule => rule.test(password)).length;
     if (passed <= 2) return 'WEAK';
     if (passed === 3 || passed === 4) return 'MEDIUM';
     return 'STRONG';
   };
 
-test('renders nothing if password is empty', () => {
+  test('renders nothing if password is empty', () => {
     const { container } = render(<PasswordStrengthMeter password="" />);
     expect(container.firstChild).toBeNull();
   });
 
-test('renders strength label and bar correctly based on password', () => {
+  test('renders strength label and bar correctly based on password', () => {
     const password = 'Password1'; // Medium strength
     render(<PasswordStrengthMeter password={password} />);
 
@@ -27,18 +27,18 @@ test('renders strength label and bar correctly based on password', () => {
     expect(bar).toBeInTheDocument();
   });
 
-test('renders all password criteria in the checklist when not all are passed', () => {
+  test('renders all password criteria in the checklist when not all are passed', () => {
     render(<PasswordStrengthMeter password="weak" />);
-    passwordCriteria.forEach((rule) => {
+    passwordCriteria.forEach(rule => {
       expect(screen.getByText(rule.label)).toBeInTheDocument();
     });
   });
 
-test('displays passed rules in green and failed rules in red when checklist is visible', () => {
+  test('displays passed rules in green and failed rules in red when checklist is visible', () => {
     const password = 'Password1'; // Not strong enough to hide checklist
     render(<PasswordStrengthMeter password={password} />);
 
-    passwordCriteria.forEach((rule) => {
+    passwordCriteria.forEach(rule => {
       const item = screen.getByText(rule.label);
       if (rule.test(password)) {
         expect(item).toHaveClass('text-green-700');
@@ -48,7 +48,7 @@ test('displays passed rules in green and failed rules in red when checklist is v
     });
   });
 
-test('correctly switches strength label based on password strength', () => {
+  test('correctly switches strength label based on password strength', () => {
     const testCases = [
       { password: 'pw', label: 'WEAK' },
       { password: 'Password1', label: 'MEDIUM' },
@@ -62,7 +62,7 @@ test('correctly switches strength label based on password strength', () => {
     });
   });
 
-test('displays success message and hides checklist when all password criteria are satisfied', () => {
+  test('displays success message and hides checklist when all password criteria are satisfied', () => {
     const password = 'Password1@'; // Assumes this satisfies all criteria
     render(<PasswordStrengthMeter password={password} />);
 
@@ -72,7 +72,7 @@ test('displays success message and hides checklist when all password criteria ar
     // Success message should be shown
     expect(screen.getByTestId('all-passed-message')).toBeInTheDocument();
     expect(screen.getByTestId('all-passed-message')).toHaveTextContent(
-      'Fantastic! Your password meets all requirements'
+      'Fantastic! Your password meets all requirements',
     );
   });
 });

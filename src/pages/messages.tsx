@@ -55,13 +55,13 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
             last_message_timestamp,
             user_1:user_1_id(name),
             user_2:user_2_id(name)
-          `
+          `,
           )
           .or(`user_1_id.eq.${currentUserId},user_2_id.eq.${currentUserId}`)
           .order('last_message_timestamp', { ascending: false });
 
         if (error) throw error;
-        
+
         // Transform Supabase response (joined relations are arrays) to match our type
         const conversations: Conversation[] = (data || []).map((item: any) => ({
           conversation_id: item.conversation_id,
@@ -72,7 +72,7 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
           user_1: Array.isArray(item.user_1) && item.user_1.length > 0 ? item.user_1[0] : null,
           user_2: Array.isArray(item.user_2) && item.user_2.length > 0 ? item.user_2[0] : null,
         }));
-        
+
         setConversations(conversations);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -139,7 +139,7 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
                 <p>No conversations yet!</p>
               ) : (
                 <ul>
-                  {conversations.map((conv) => {
+                  {conversations.map(conv => {
                     const otherName =
                       conv.user_1_id === userId ? conv.user_2?.name : conv.user_1?.name;
                     const isSelected = conv.conversation_id === selectedConversation;
@@ -167,7 +167,7 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
                   {messages.length === 0 ? (
                     <p>No messages in this conversation.</p>
                   ) : (
-                    messages.map((msg) => {
+                    messages.map(msg => {
                       const isOutgoing = msg.sender_id === userId;
                       return (
                         <div
@@ -198,9 +198,11 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
           <div className="mt-8 flex justify-center">
             <Button
               label={
-                <>
-                  <FiArrowLeft className="text-sm" /> Back to Dashboard
-                </> as unknown as string
+                (
+                  <>
+                    <FiArrowLeft className="text-sm" /> Back to Dashboard
+                  </>
+                ) as unknown as string
               }
               variant="secondary"
               onClick={() => router.push('/dashboard')}

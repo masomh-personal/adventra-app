@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 describe('LoadingSpinner', () => {
-test('renders the spinner and default label', () => {
+  test('renders the spinner and default label', () => {
     render(<LoadingSpinner />);
 
     const spinner = screen.getByTestId('loading-icon');
@@ -15,7 +15,7 @@ test('renders the spinner and default label', () => {
     expect(label).toBeInTheDocument();
   });
 
-test('renders a custom label when provided', () => {
+  test('renders a custom label when provided', () => {
     render(<LoadingSpinner label="Fetching profile..." />);
 
     const label = screen.getByText(/fetching profile/i);

@@ -13,7 +13,7 @@ interface WithAuthProps {
 
 export default function withAuth<P extends object>(
   Component: ComponentType<P & WithAuthProps>,
-  options: WithAuthOptions = {}
+  options: WithAuthOptions = {},
 ) {
   // It's good practice to give HOCs a display name for debugging
   const displayName = `WithAuth(${Component.displayName || Component.name || 'Component'})`;

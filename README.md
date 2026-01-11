@@ -21,16 +21,16 @@ Adventra is a **social networking app** designed to connect outdoor adventurers 
 
 ## **Tech Stack**
 
-| **Technology**    | **Purpose**                    |
-|-------------------|--------------------------------|
-| **Next.js**       | Frontend framework             |
-| **React**         | UI components                  |
-| **Tailwind CSS**  | Styling framework              |
-| **PostgreSQL**    | Database                       |
-| **Supabase**      | Backend-as-a-service (BaaS)    |
-| **Vercel**        | Hosting & deployment           |
-| **GitHub Projects** | Agile project management       |
-| **GitHub**        | Version control & documentation |
+| **Technology**      | **Purpose**                     |
+| ------------------- | ------------------------------- |
+| **Next.js**         | Frontend framework              |
+| **React**           | UI components                   |
+| **Tailwind CSS**    | Styling framework               |
+| **PostgreSQL**      | Database                        |
+| **Supabase**        | Backend-as-a-service (BaaS)     |
+| **Vercel**          | Hosting & deployment            |
+| **GitHub Projects** | Agile project management        |
+| **GitHub**          | Version control & documentation |
 
 ---
 
@@ -41,7 +41,9 @@ Our project uses a combination of **Vercel** and **GitHub Actions** to implement
 ![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
 
 ### Vercel Deployment
+
 We use **Vercel** for automatic deployments. Every time code is pushed to the `main` branch (or a feature branch with an open pull request), Vercel:
+
 - Builds the application
 - Runs basic checks
 - Deploys to a preview or production environment
@@ -49,7 +51,9 @@ We use **Vercel** for automatic deployments. Every time code is pushed to the `m
 This allows for continuous feedback and seamless collaboration with live previews.
 
 ### GitHub Actions for Testing
+
 We use **GitHub Actions** to automate testing. Whenever code is pushed or a pull request is opened:
+
 - GitHub Actions runs our test suite
 - Ensures that all tests pass before changes are merged
 - Helps maintain code quality and catch bugs early
@@ -115,6 +119,7 @@ Each Product Backlog Item (PBI) must include:
 - **Additional Details** (API integration, UI requirements, dependencies, etc.)
 - **Story Point Estimation**
 - **Acceptance Criteria**
+
 ---
 
 ## **Useful Links**
@@ -131,6 +136,7 @@ Follow these steps to run the Adventra app locally on your machine.
 ---
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/masomh-personal/adventra-app
 
@@ -140,16 +146,19 @@ git checkout main # if needed
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install # within the root directory
 ```
 
 ### 3. Run Development Server locally
+
 ```bash
 npm run dev # can access site via localhost:3000
 ```
 
 ### 4. Run Tests and Check Test Coverage
+
 ```bash
 jest # run all tests
 

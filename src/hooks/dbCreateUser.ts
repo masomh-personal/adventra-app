@@ -18,10 +18,21 @@ export interface DbCreateUserParams {
  * @param userData.birthdate - Optional ISO string
  * @returns The inserted user record
  */
-export async function dbCreateUser({ user_id, name, email, birthdate }: DbCreateUserParams): Promise<User> {
-  const { data: userData, error: userError } = await (supabase.from('user') as unknown as {
-    insert: (values: unknown[]) => { select: () => { single: () => Promise<{ data: User | null; error: { message: string } | null }> } };
-  })
+export async function dbCreateUser({
+  user_id,
+  name,
+  email,
+  birthdate,
+}: DbCreateUserParams): Promise<User> {
+  const { data: userData, error: userError } = await (
+    supabase.from('user') as unknown as {
+      insert: (values: unknown[]) => {
+        select: () => {
+          single: () => Promise<{ data: User | null; error: { message: string } | null }>;
+        };
+      };
+    }
+  )
     .insert([{ user_id, name, email }])
     .select()
     .single();
@@ -32,13 +43,18 @@ export async function dbCreateUser({ user_id, name, email, birthdate }: DbCreate
     throw new Error('Failed to create user in database');
   }
 
-  const { error: profileError } = await (supabase.from('userprofile') as unknown as {
-    upsert: (values: unknown[], options?: { onConflict?: string }) => Promise<{ error: { message: string } | null }>;
-  })
-    .upsert([{ user_id, birthdate }], { onConflict: 'user_id' });
+  const { error: profileError } = await (
+    supabase.from('userprofile') as unknown as {
+      upsert: (
+        values: unknown[],
+        options?: { onConflict?: string },
+      ) => Promise<{ error: { message: string } | null }>;
+    }
+  ).upsert([{ user_id, birthdate }], { onConflict: 'user_id' });
 
   if (profileError) {
-    const errorMessage = profileError instanceof Error ? profileError.message : String(profileError);
+    const errorMessage =
+      profileError instanceof Error ? profileError.message : String(profileError);
     console.error('[DB Insert Error] Failed to create userprofile:', errorMessage);
     throw new Error('Failed to create user profile in database');
   }

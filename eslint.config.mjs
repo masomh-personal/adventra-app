@@ -1,5 +1,6 @@
 import nextPlugin from 'eslint-config-next';
 import vitest from 'eslint-plugin-vitest';
+import prettierConfig from 'eslint-config-prettier';
 
 const eslintConfig = [
   {
@@ -8,6 +9,7 @@ const eslintConfig = [
   ...nextPlugin,
   {
     rules: {
+      ...prettierConfig.rules,
       'react/no-unescaped-entities': 'off',
       '@next/next/no-img-element': 'off',
     },
@@ -19,6 +21,7 @@ const eslintConfig = [
     },
     rules: {
       ...vitest.configs.recommended.rules,
+      ...prettierConfig.rules,
     },
   },
 ];

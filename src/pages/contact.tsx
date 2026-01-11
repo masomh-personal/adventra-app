@@ -16,7 +16,10 @@ export default function ContactPage(): React.JSX.Element {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = async (data: FieldValues, { reset }: { reset: () => void }): Promise<void> => {
+  const handleSubmit = async (
+    data: FieldValues,
+    { reset }: { reset: () => void },
+  ): Promise<void> => {
     try {
       const response = await fetch('/api/fakeContact', {
         method: 'POST',

@@ -11,7 +11,20 @@ export interface InfoCardProps {
   imgAlt?: string;
   buttonIcon?: ReactNode;
   testId?: string;
-  buttonVariant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'subtle' | 'danger' | 'green' | 'tertiary' | 'link' | 'muted' | 'clean' | 'inverse' | 'ksu';
+  buttonVariant?:
+    | 'primary'
+    | 'secondary'
+    | 'outline'
+    | 'ghost'
+    | 'subtle'
+    | 'danger'
+    | 'green'
+    | 'tertiary'
+    | 'link'
+    | 'muted'
+    | 'clean'
+    | 'inverse'
+    | 'ksu';
 }
 
 export default function InfoCard({

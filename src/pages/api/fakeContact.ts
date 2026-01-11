@@ -14,14 +14,14 @@ interface ContactError {
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ContactResponse | ContactError>
+  res: NextApiResponse<ContactResponse | ContactError>,
 ): Promise<void> {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   // Simulate 1.5 second processing delay
-  await new Promise<void>((resolve) => setTimeout(resolve, 2000));
+  await new Promise<void>(resolve => setTimeout(resolve, 2000));
 
   // Return mock success
   return res.status(200).json({

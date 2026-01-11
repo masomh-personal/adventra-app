@@ -32,7 +32,8 @@ interface BaseButtonProps {
   testId?: string;
 }
 
-interface ButtonAsButtonProps extends BaseButtonProps, Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+interface ButtonAsButtonProps
+  extends BaseButtonProps, Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   as?: 'button';
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';

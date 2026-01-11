@@ -8,7 +8,12 @@ import {
   FaRainbow,
   FaHandshake,
 } from 'react-icons/fa';
-import type { DatingPreferenceOption, AdventurePreferenceOption, SkillLevelOption, SkillColors } from '@/types/index';
+import type {
+  DatingPreferenceOption,
+  AdventurePreferenceOption,
+  SkillLevelOption,
+  SkillColors,
+} from '@/types/index';
 
 export const datingPreferences: DatingPreferenceOption[] = [
   {

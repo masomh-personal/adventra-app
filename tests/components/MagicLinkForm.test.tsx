@@ -3,7 +3,6 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import MagicLinkForm from '@/components/MagicLinkForm';
 
-
 const safeRender = async (ui: React.ReactElement): Promise<void> => {
   await act(async () => {
     render(ui);
@@ -21,7 +20,9 @@ describe('MagicLinkForm', () => {
 
   describe('Rendering', () => {
     test('renders email input and both buttons', async () => {
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /send one-time link/i })).toBeInTheDocument();
@@ -29,7 +30,9 @@ describe('MagicLinkForm', () => {
     });
 
     test('renders the back arrow icon in "Back to Login" button', async () => {
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       const backBtn = screen.getByRole('button', { name: /back to login/i });
       const svg = backBtn.querySelector('svg');
@@ -40,7 +43,9 @@ describe('MagicLinkForm', () => {
   describe('Validation', () => {
     test('shows error message for empty email on blur', async () => {
       const user = userEvent.setup();
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       const input = screen.getByLabelText(/email/i);
       await user.click(input);
@@ -51,7 +56,9 @@ describe('MagicLinkForm', () => {
 
     test('shows error for invalid email like "user@local"', async () => {
       const user = userEvent.setup();
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       const input = screen.getByLabelText(/email/i);
       await user.type(input, 'user@local');
@@ -64,7 +71,9 @@ describe('MagicLinkForm', () => {
   describe('Submission', () => {
     test('calls onSubmit with lowercase email when valid', async () => {
       const user = userEvent.setup();
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       const input = screen.getByLabelText(/email/i);
       await user.type(input, 'Test@Example.COM');
@@ -78,7 +87,9 @@ describe('MagicLinkForm', () => {
     });
 
     test('disables the submit button while loading', async () => {
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={true} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={true} />,
+      );
 
       const submitBtn = screen.getByTestId('submit-magic');
       expect(submitBtn).toBeDisabled();
@@ -90,7 +101,9 @@ describe('MagicLinkForm', () => {
   describe('Cancel Action', () => {
     test('calls onCancel when "Back to Login" button is clicked', async () => {
       const user = userEvent.setup();
-      await safeRender(<MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />);
+      await safeRender(
+        <MagicLinkForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} loading={false} />,
+      );
 
       await user.click(screen.getByRole('button', { name: /back to login/i }));
 

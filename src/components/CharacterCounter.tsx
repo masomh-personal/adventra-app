@@ -13,7 +13,11 @@ interface CharacterCounterProps {
  * @param maxLength - Maximum allowed characters
  * @param className - Additional CSS classes
  */
-export function CharacterCounter({ value = '', maxLength, className = '' }: CharacterCounterProps): React.JSX.Element {
+export function CharacterCounter({
+  value = '',
+  maxLength,
+  className = '',
+}: CharacterCounterProps): React.JSX.Element {
   const charCount = value ? value.length : 0;
   const isNearLimit = charCount > maxLength * 0.8;
   const isAtLimit = charCount >= maxLength;

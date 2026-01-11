@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode, type JSX } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
+  type JSX,
+} from 'react';
 import { useRouter } from 'next/router';
 import { FiAlertCircle, FiCheckCircle, FiInfo } from 'react-icons/fi';
 
@@ -7,9 +15,24 @@ type ModalVariant = 'error' | 'success' | 'info';
 interface ModalContextType {
   openModal: (content: JSX.Element | null) => void;
   closeModal: () => void;
-  showErrorModal: (message: string, title?: string, onClose?: () => void, closeButtonLabel?: string) => void;
-  showSuccessModal: (message: string, title?: string, onClose?: () => void, closeButtonLabel?: string) => void;
-  showInfoModal: (message: string, title?: string, onClose?: () => void, closeButtonLabel?: string) => void;
+  showErrorModal: (
+    message: string,
+    title?: string,
+    onClose?: () => void,
+    closeButtonLabel?: string,
+  ) => void;
+  showSuccessModal: (
+    message: string,
+    title?: string,
+    onClose?: () => void,
+    closeButtonLabel?: string,
+  ) => void;
+  showInfoModal: (
+    message: string,
+    title?: string,
+    onClose?: () => void,
+    closeButtonLabel?: string,
+  ) => void;
   showConfirmationModal: (message: string, title?: string) => Promise<boolean>;
 }
 
@@ -129,13 +152,13 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
         openModal(modal);
       },
-    [openModal, closeModal]
+    [openModal, closeModal],
   );
 
   // New showConfirmationModal function
   const showConfirmationModal = useCallback(
     (message: string, title = 'Confirm'): Promise<boolean> => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         const confirmModal = (
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
             <div className="flex justify-between items-center border-b pb-3 mb-4">
@@ -171,7 +194,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         openModal(confirmModal);
       });
     },
-    [closeModal, openModal]
+    [closeModal, openModal],
   );
 
   const showErrorModal = showModal('error');
@@ -228,7 +251,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         >
           <div
             className="relative transform scale-95 animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             {modalContent}
             {isClosing && (

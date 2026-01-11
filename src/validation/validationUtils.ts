@@ -25,14 +25,15 @@ export const passwordCriteria = [
   {
     label: 'Special character',
     test: (val: string | undefined): boolean => /[^A-Za-z0-9]/.test(val ?? ''),
-    yup: (schema: yup.StringSchema) => schema.matches(/[^A-Za-z0-9]/, 'Must include a special character'),
+    yup: (schema: yup.StringSchema) =>
+      schema.matches(/[^A-Za-z0-9]/, 'Must include a special character'),
   },
 ] as const;
 
 // Dynamically build Yup schema from criteria array
 export const passwordValidation: yup.StringSchema<string> = passwordCriteria.reduce(
   (schema: yup.StringSchema<string>, rule) => rule.yup(schema) as yup.StringSchema<string>,
-  yup.string().required('Password is required')
+  yup.string().required('Password is required'),
 ) as yup.StringSchema<string>;
 
 export const emailValidation = yup

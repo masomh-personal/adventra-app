@@ -20,10 +20,10 @@ export default function ForgotPasswordPage(): React.JSX.Element {
     setLoading(true);
     setMessage('');
 
-    await new Promise<void>((res) => setTimeout(res, 1000)); // Simulated delay
+    await new Promise<void>(res => setTimeout(res, 1000)); // Simulated delay
 
     setMessage(
-      `Hi! The forgot password feature is currently under development. Please contact support or try again later.`
+      `Hi! The forgot password feature is currently under development. Please contact support or try again later.`,
     );
 
     setLoading(false);

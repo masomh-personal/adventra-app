@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import Button from '@/components/Button';
 import { FaCheck, FaArrowRight } from 'react-icons/fa';
 
-
 describe('Button Component', () => {
   test('renders with the correct label', () => {
     render(<Button label="Click Me" onClick={() => {}} />);
@@ -48,7 +47,7 @@ describe('Button Component', () => {
         onClick={() => {}}
         leftIcon={<FaCheck data-testid="left-icon" />}
         rightIcon={<FaArrowRight data-testid="right-icon" />}
-      />
+      />,
     );
     expect(screen.getByTestId('left-icon')).toBeInTheDocument();
     expect(screen.getByTestId('right-icon')).toBeInTheDocument();

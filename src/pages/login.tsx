@@ -101,7 +101,7 @@ export default function LoginPage(): React.JSX.Element {
   const handleSSOLogin = (provider: string): void => {
     showErrorModal(
       `We are so sorry, SSO login with ${provider} is currently under development.`,
-      'SSO Under Development'
+      'SSO Under Development',
     );
   };
 

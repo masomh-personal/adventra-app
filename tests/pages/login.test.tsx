@@ -4,15 +4,26 @@ import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
 import supabase from '@/lib/supabaseClient';
 
-
 // Hoist mocks using vi.hoisted
-const { mockShowErrorModal, mockShowSuccessModal, mockReplace, mockSignInWithPassword, mockSignInWithOtp } = vi.hoisted(() => {
+const {
+  mockShowErrorModal,
+  mockShowSuccessModal,
+  mockReplace,
+  mockSignInWithPassword,
+  mockSignInWithOtp,
+} = vi.hoisted(() => {
   const mockShowErrorModal = vi.fn();
   const mockShowSuccessModal = vi.fn();
   const mockReplace = vi.fn();
   const mockSignInWithPassword = vi.fn();
   const mockSignInWithOtp = vi.fn();
-  return { mockShowErrorModal, mockShowSuccessModal, mockReplace, mockSignInWithPassword, mockSignInWithOtp };
+  return {
+    mockShowErrorModal,
+    mockShowSuccessModal,
+    mockReplace,
+    mockSignInWithPassword,
+    mockSignInWithOtp,
+  };
 });
 
 vi.mock('next/router', () => ({
@@ -36,7 +47,12 @@ vi.mock('@/lib/supabaseClient', () => ({
   },
 }));
 
-const mockedSupabase = supabase as { auth: { signInWithPassword: typeof mockSignInWithPassword; signInWithOtp: typeof mockSignInWithOtp } };
+const mockedSupabase = supabase as {
+  auth: {
+    signInWithPassword: typeof mockSignInWithPassword;
+    signInWithOtp: typeof mockSignInWithOtp;
+  };
+};
 
 // Helpers
 const renderPage = () => render(<LoginPage />);
@@ -44,7 +60,7 @@ const setupUser = () => userEvent.setup();
 const fillLoginForm = async (
   user: ReturnType<typeof userEvent.setup>,
   email: string,
-  password: string
+  password: string,
 ): Promise<void> => {
   await user.type(screen.getByLabelText(/email address/i), email);
   await user.type(screen.getByLabelText(/password/i), password);
@@ -55,27 +71,27 @@ describe('LoginPage', () => {
     vi.clearAllMocks();
   });
 
-test('renders the login form initially', () => {
+  test('renders the login form initially', () => {
     renderPage();
     expect(screen.getByTestId('login-form')).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
   });
 
-test('shows signup and forgot password links', () => {
+  test('shows signup and forgot password links', () => {
     renderPage();
     expect(screen.getByTestId('signup-button')).toBeInTheDocument();
     expect(screen.getByText(/forgot your password/i)).toBeInTheDocument();
   });
 
-test('shows all SSO login buttons', () => {
+  test('shows all SSO login buttons', () => {
     renderPage();
-    ['google', 'facebook', 'instagram', 'apple'].forEach((provider) => {
+    ['google', 'facebook', 'instagram', 'apple'].forEach(provider => {
       expect(screen.getByTestId(`sso-${provider}`)).toBeInTheDocument();
     });
   });
 
-test('switches to magic link form when clicked', async () => {
+  test('switches to magic link form when clicked', async () => {
     renderPage();
     const user = setupUser();
     await user.click(screen.getByTestId('show-magic'));
@@ -85,7 +101,7 @@ test('switches to magic link form when clicked', async () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
-test('submits magic link request and shows success modal', async () => {
+  test('submits magic link request and shows success modal', async () => {
     mockSignInWithOtp.mockResolvedValueOnce({ error: null });
 
     renderPage();
@@ -97,16 +113,16 @@ test('submits magic link request and shows success modal', async () => {
 
     await waitFor(() => {
       expect(mockSignInWithOtp).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'magic@example.com' })
+        expect.objectContaining({ email: 'magic@example.com' }),
       );
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         'Check your email inbox for a secure login link!',
-        'Magic Link Sent'
+        'Magic Link Sent',
       );
     });
   });
 
-test('handles successful email/password login', async () => {
+  test('handles successful email/password login', async () => {
     mockSignInWithPassword.mockResolvedValueOnce({
       data: { user: {} },
       error: null,
@@ -126,7 +142,7 @@ test('handles successful email/password login', async () => {
     });
   });
 
-test('shows error modal when login fails', async () => {
+  test('shows error modal when login fails', async () => {
     mockSignInWithPassword.mockResolvedValueOnce({
       data: null,
       error: { message: 'Invalid login credentials' },
@@ -141,12 +157,12 @@ test('shows error modal when login fails', async () => {
     await waitFor(() => {
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         'Invalid email or password. Please try again. Please contact support if this error persists',
-        'Login Failed'
+        'Login Failed',
       );
     });
   });
 
-test('handles magic link request error and shows error modal', async () => {
+  test('handles magic link request error and shows error modal', async () => {
     mockSignInWithOtp.mockResolvedValueOnce({
       error: { message: 'Some magic link error' },
     });
@@ -162,12 +178,12 @@ test('handles magic link request error and shows error modal', async () => {
       expect(mockSignInWithOtp).toHaveBeenCalled();
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         'Unable to send magic link. Please try again.',
-        'Magic Link Error'
+        'Magic Link Error',
       );
     });
   });
 
-test('shows SSO under development modal when SSO button is clicked', async () => {
+  test('shows SSO under development modal when SSO button is clicked', async () => {
     renderPage();
     const user = setupUser();
     await user.click(screen.getByTestId('sso-google'));
@@ -175,7 +191,7 @@ test('shows SSO under development modal when SSO button is clicked', async () =>
     await waitFor(() => {
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         'We are so sorry, SSO login with Google is currently under development.',
-        'SSO Under Development'
+        'SSO Under Development',
       );
     });
   });

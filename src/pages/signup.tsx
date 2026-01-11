@@ -48,10 +48,11 @@ export default function SignupPage(): React.JSX.Element {
 
       // Create custom user record in public.user (after adding to auth.user with Supabase)
       try {
-        const birthdateStr = signupData.birthdate instanceof Date 
-          ? signupData.birthdate.toISOString().split('T')[0]
-          : String(signupData.birthdate);
-        
+        const birthdateStr =
+          signupData.birthdate instanceof Date
+            ? signupData.birthdate.toISOString().split('T')[0]
+            : String(signupData.birthdate);
+
         await dbCreateUser({
           user_id: authData.user.id,
           name: signupData.name,
@@ -63,7 +64,7 @@ export default function SignupPage(): React.JSX.Element {
         console.error('User created in auth but failed in custom DB:', errorMessage);
         return showErrorModal(
           'Signup succeeded but an internal error occurred when saving your profile. Please contact support.',
-          'Signup Incomplete'
+          'Signup Incomplete',
         );
       }
 
@@ -72,7 +73,7 @@ export default function SignupPage(): React.JSX.Element {
         'Your account is all set — time to lace up those hiking boots and find your next adventuring partner!',
         'Signup Successful!',
         () => router.push('/'),
-        'Go to Homepage'
+        'Go to Homepage',
       );
     } catch (err) {
       console.error('Unexpected signup error:', err);

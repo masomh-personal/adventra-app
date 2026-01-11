@@ -15,7 +15,9 @@ describe('AboutPage', () => {
     expect(screen.getByRole('heading', { name: /why adventra/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /what makes us different/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /our future vision/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /frequently asked questions/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /frequently asked questions/i }),
+    ).toBeInTheDocument();
 
     // Check for intro paragraph content
     expect(screen.getByText(/we believe the best memories are made outside/i)).toBeInTheDocument();

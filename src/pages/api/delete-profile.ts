@@ -8,7 +8,7 @@ interface DeleteProfileRequestBody {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ): Promise<void> {
   if (req.method !== 'DELETE') {
     return res.status(405).json({ error: 'Method Not Allowed' });

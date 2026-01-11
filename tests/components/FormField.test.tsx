@@ -24,13 +24,13 @@ describe('FormField', () => {
   });
 
   describe('Basic rendering', () => {
-test('renders label and input', () => {
+    test('renders label and input', () => {
       render(<FormField {...baseProps} />);
       expect(screen.getByText('Email')).toBeInTheDocument();
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
     });
 
-test('applies placeholder, id, and type', () => {
+    test('applies placeholder, id, and type', () => {
       render(<FormField {...baseProps} />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('type', 'email');
@@ -38,20 +38,20 @@ test('applies placeholder, id, and type', () => {
       expect(input).toHaveAttribute('id', 'email');
     });
 
-test('adds custom className if provided', () => {
+    test('adds custom className if provided', () => {
       render(<FormField {...baseProps} className="custom-style" />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveClass('custom-style');
     });
 
-test('disables input when disabled', () => {
+    test('disables input when disabled', () => {
       render(<FormField {...baseProps} disabled />);
       expect(screen.getByLabelText('Email')).toBeDisabled();
     });
   });
 
   describe('Error + help text', () => {
-test('shows error message and red border when error exists', () => {
+    test('shows error message and red border when error exists', () => {
       const props = {
         ...baseProps,
         errors: {
@@ -63,12 +63,12 @@ test('shows error message and red border when error exists', () => {
       expect(screen.getByLabelText('Email')).toHaveClass('border-red-500');
     });
 
-test('shows help text when no error exists', () => {
+    test('shows help text when no error exists', () => {
       render(<FormField {...baseProps} helpText="Helpful hint" />);
       expect(screen.getByText('Helpful hint')).toBeInTheDocument();
     });
 
-test('hides help text when error exists', () => {
+    test('hides help text when error exists', () => {
       const props = {
         ...baseProps,
         helpText: 'Helpful hint',
@@ -82,19 +82,19 @@ test('hides help text when error exists', () => {
   });
 
   describe('Supported input types', () => {
-test('renders a textarea for type="textarea"', () => {
+    test('renders a textarea for type="textarea"', () => {
       render(<FormField {...baseProps} type="textarea" />);
       const textarea = screen.getByLabelText('Email');
       expect(textarea.tagName).toBe('TEXTAREA');
     });
 
-test('renders a date input for type="date"', () => {
+    test('renders a date input for type="date"', () => {
       render(<FormField {...baseProps} type="date" />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('type', 'date');
     });
 
-test('renders radio buttons with correct labels', () => {
+    test('renders radio buttons with correct labels', () => {
       const mockRegister = jest.fn().mockReturnValue({
         onChange: jest.fn(),
         onBlur: jest.fn(),
@@ -117,7 +117,7 @@ test('renders radio buttons with correct labels', () => {
       expect(screen.getByLabelText('Female')).toBeInTheDocument();
     });
 
-test('renders checkboxes with correct labels', () => {
+    test('renders checkboxes with correct labels', () => {
       const mockRegister = jest.fn().mockReturnValue({
         onChange: jest.fn(),
         onBlur: jest.fn(),
@@ -142,7 +142,7 @@ test('renders checkboxes with correct labels', () => {
   });
 
   describe('CharacterCounter', () => {
-test('displays character count when characterCountOptions are provided', () => {
+    test('displays character count when characterCountOptions are provided', () => {
       const props = {
         ...baseProps,
         characterCountOptions: {
@@ -156,7 +156,7 @@ test('displays character count when characterCountOptions are provided', () => {
   });
 
   describe('react-hook-form registration', () => {
-test('calls register with correct options', () => {
+    test('calls register with correct options', () => {
       const props = {
         ...baseProps,
         registerOptions: { required: 'This field is required' },
@@ -166,13 +166,13 @@ test('calls register with correct options', () => {
         'email',
         expect.objectContaining({
           required: 'This field is required',
-        })
+        }),
       );
     });
   });
 
   describe('Accessibility', () => {
-test('label and input are associated by id', () => {
+    test('label and input are associated by id', () => {
       render(<FormField {...baseProps} />);
       const label = screen.getByText('Email');
       const input = screen.getByLabelText('Email');

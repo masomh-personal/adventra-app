@@ -45,7 +45,9 @@ export default function FormField<T extends FieldValues = FieldValues>({
   characterCountOptions,
 }: FormFieldProps<T>): React.JSX.Element {
   if (!register) {
-    throw new Error('FormField requires register prop. Make sure it is used within a FormWrapper or pass register explicitly.');
+    throw new Error(
+      'FormField requires register prop. Make sure it is used within a FormWrapper or pass register explicitly.',
+    );
   }
 
   const hasError = errors?.[id];
@@ -70,13 +72,21 @@ export default function FormField<T extends FieldValues = FieldValues>({
       ...registerOptions,
       onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (registerOptions?.onChange) {
-          (registerOptions.onChange as (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void)(e);
+          (
+            registerOptions.onChange as (
+              e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+            ) => void
+          )(e);
         }
         onChange?.(e);
       },
       onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (registerOptions?.onBlur) {
-          (registerOptions.onBlur as (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void)(e);
+          (
+            registerOptions.onBlur as (
+              e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+            ) => void
+          )(e);
         }
         onBlur?.(e);
       },
@@ -108,7 +118,7 @@ export default function FormField<T extends FieldValues = FieldValues>({
         if (options.length > 0) {
           return (
             <div className="flex flex-col gap-1">
-              {options.map((option) => (
+              {options.map(option => (
                 <label
                   key={option.value}
                   htmlFor={`${String(id)}-${option.value}`}
@@ -153,7 +163,7 @@ export default function FormField<T extends FieldValues = FieldValues>({
       case 'radio':
         return (
           <div className="space-y-3">
-            {options.map((option) => (
+            {options.map(option => (
               <label
                 key={option.value}
                 htmlFor={`${String(id)}-${option.value}`}

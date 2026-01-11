@@ -16,7 +16,7 @@ import type { ApiError, ApiSuccess } from '@/types/api';
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ): Promise<void> {
   const {
     query: { id },

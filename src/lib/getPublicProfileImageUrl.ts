@@ -8,7 +8,7 @@
  */
 export default function getPublicProfileImageUrl(
   userId: string | null | undefined,
-  options: { bustCache?: boolean } = {}
+  options: { bustCache?: boolean } = {},
 ): string {
   if (!userId || typeof userId !== 'string') return '';
 

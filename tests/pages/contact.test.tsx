@@ -28,7 +28,7 @@ describe('ContactPage', () => {
       name = 'John Doe',
       email = 'john@example.com',
       message = 'Hello Adventra!',
-    }: ContactFormData = {}
+    }: ContactFormData = {},
   ): Promise<void> => {
     const nameInput = screen.getByLabelText(/name/i);
     const emailInput = screen.getByLabelText(/email/i);
@@ -44,7 +44,7 @@ describe('ContactPage', () => {
 
   const submitForm = async (
     user: ReturnType<typeof userEvent.setup>,
-    formData?: ContactFormData
+    formData?: ContactFormData,
   ): Promise<void> => {
     await fillContactForm(user, formData);
     await user.click(screen.getByRole('button', { name: /send message/i }));
@@ -59,7 +59,7 @@ describe('ContactPage', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ message: 'Mock success' }),
-      })
+      }),
     ) as typeof fetch;
   });
 
@@ -318,14 +318,14 @@ describe('ContactPage', () => {
 
       const fetchMock = vi.fn(
         () =>
-          new Promise<Response>((resolve) => {
+          new Promise<Response>(resolve => {
             setTimeout(() => {
               resolve({
                 ok: true,
                 json: () => Promise.resolve({ message: 'Simulated delayed success' }),
               } as Response);
             }, 1500);
-          })
+          }),
       );
 
       global.fetch = fetchMock;

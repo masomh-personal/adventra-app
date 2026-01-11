@@ -51,7 +51,7 @@ describe('HomePage', () => {
         render(<HomePage user={null} />);
       });
       expect(
-        screen.getByText('A social network for outdoor adventurers. Connect, share, and explore!')
+        screen.getByText('A social network for outdoor adventurers. Connect, share, and explore!'),
       ).toBeInTheDocument();
     });
   });

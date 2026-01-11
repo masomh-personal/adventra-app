@@ -58,7 +58,7 @@ export default function AboutPage(): React.JSX.Element {
   const [openFAQs, setOpenFAQs] = useState<Set<string>>(new Set());
 
   const toggleFAQ = (id: string): void => {
-    setOpenFAQs((prev) => {
+    setOpenFAQs(prev => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);

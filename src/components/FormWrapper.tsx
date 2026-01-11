@@ -1,6 +1,25 @@
 import React, { forwardRef, useImperativeHandle, type ReactNode } from 'react';
 import FormField from '@/components/FormField';
-import { useForm, type UseFormReturn, type FieldValues, type UseFormRegister, type FieldErrors, type Control, type UseFormWatch, type UseFormSetValue, type UseFormGetValues, type UseFormTrigger, type UseFormGetFieldState, type UseFormResetField, type UseFormClearErrors, type UseFormSetError, type UseFormSetFocus, type UseFormUnregister, type UseFormReset, type FormState } from 'react-hook-form';
+import {
+  useForm,
+  type UseFormReturn,
+  type FieldValues,
+  type UseFormRegister,
+  type FieldErrors,
+  type Control,
+  type UseFormWatch,
+  type UseFormSetValue,
+  type UseFormGetValues,
+  type UseFormTrigger,
+  type UseFormGetFieldState,
+  type UseFormResetField,
+  type UseFormClearErrors,
+  type UseFormSetError,
+  type UseFormSetFocus,
+  type UseFormUnregister,
+  type UseFormReset,
+  type FormState,
+} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { AnyObjectSchema } from 'yup';
 import Button from '@/components/Button';
@@ -29,7 +48,14 @@ export interface FormContext {
 interface FormWrapperProps {
   title?: string;
   validationSchema?: AnyObjectSchema;
-  onSubmit: (data: FieldValues, helpers: { reset: () => void; setValue: UseFormReturn<FieldValues>['setValue']; getValues: UseFormReturn<FieldValues>['getValues'] }) => Promise<void> | void;
+  onSubmit: (
+    data: FieldValues,
+    helpers: {
+      reset: () => void;
+      setValue: UseFormReturn<FieldValues>['setValue'];
+      getValues: UseFormReturn<FieldValues>['getValues'];
+    },
+  ) => Promise<void> | void;
   onError?: (errors: FieldValues) => void;
   children: ReactNode | ((context: FormContext) => ReactNode);
   defaultValues?: FieldValues;
@@ -56,7 +82,7 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
     className = '',
     formProps = {},
   },
-  ref
+  ref,
 ) {
   const {
     register,
@@ -103,7 +129,13 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
     setValue,
     getValues,
     trigger: async () => true,
-    getFieldState: () => ({ invalid: false, isDirty: false, isTouched: false, isValidating: false, error: undefined }),
+    getFieldState: () => ({
+      invalid: false,
+      isDirty: false,
+      isTouched: false,
+      isValidating: false,
+      error: undefined,
+    }),
     resetField: () => {},
     reset: reset,
     clearErrors: () => {},
@@ -140,12 +172,12 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
       <div className="space-y-4">
         {typeof children === 'function'
           ? children(formContext)
-          : React.Children.map(children, (child) => {
+          : React.Children.map(children, child => {
               if (!React.isValidElement(child)) return child;
               const childComponent = child.type as React.ComponentType<unknown>;
               const isFormField = childComponent === FormField;
               if (isFormField) {
-                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { 
+                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, {
                   register: formContext.register,
                   errors: formContext.errors,
                   ...(child.props as Record<string, unknown>),
@@ -153,7 +185,10 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
               }
               const isCustomComponent = typeof childComponent === 'function';
               if (isCustomComponent) {
-                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, { ...formContext, ...(child.props as Record<string, unknown>) });
+                return React.cloneElement(child as React.ReactElement<Record<string, unknown>>, {
+                  ...formContext,
+                  ...(child.props as Record<string, unknown>),
+                });
               }
               return child;
             })}

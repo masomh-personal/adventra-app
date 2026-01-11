@@ -8,7 +8,6 @@ import { useModal } from '@/contexts/ModalContext';
 import supabase from '@/lib/supabaseClient';
 import { useRouter } from 'next/router';
 
-
 // Hoist mocks
 const { mockUpsert, mockUpload, mockUseRouter, mockUseModal } = vi.hoisted(() => {
   const mockUpsert = vi.fn().mockResolvedValue({ error: null });
@@ -77,7 +76,9 @@ describe('EditProfile Page', () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockClear();
 
     (getUserModule.getCurrentUserId as ReturnType<typeof vi.fn>).mockResolvedValue('user-123');
-    (getProfileModule.getFullUserProfile as ReturnType<typeof vi.fn>).mockResolvedValue(hydratedProfile);
+    (getProfileModule.getFullUserProfile as ReturnType<typeof vi.fn>).mockResolvedValue(
+      hydratedProfile,
+    );
 
     mockedUseModal.mockReturnValue({
       showSuccessModal: mockShowSuccessModal,
@@ -95,13 +96,13 @@ describe('EditProfile Page', () => {
     });
   });
 
-test('renders initial values and disables save button', async () => {
+  test('renders initial values and disables save button', async () => {
     const bioInput = await screen.findByLabelText('Bio');
     expect(bioInput).toHaveValue('Nature lover');
     expect(screen.getByRole('button', { name: /save changes/i })).toBeDisabled();
   });
 
-test('enables save on form change and submits', async () => {
+  test('enables save on form change and submits', async () => {
     const user = userEvent.setup();
 
     const bioInput = await screen.findByLabelText('Bio');
@@ -120,12 +121,12 @@ test('enables save on form change and submits', async () => {
       expect(mockUpsert).toHaveBeenCalled();
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         expect.stringContaining('Profile updated'),
-        'Saved'
+        'Saved',
       );
     });
   });
 
-test('enables save on multiple form changes and submits', async () => {
+  test('enables save on multiple form changes and submits', async () => {
     const user = userEvent.setup();
 
     const bioInput = await screen.findByLabelText('Bio');
@@ -155,12 +156,12 @@ test('enables save on multiple form changes and submits', async () => {
       expect(mockUpsert).toHaveBeenCalled();
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         expect.stringContaining('Profile updated'),
-        'Saved'
+        'Saved',
       );
     });
   });
 
-test('shows error if supabase upsert fails', async () => {
+  test('shows error if supabase upsert fails', async () => {
     const user = userEvent.setup();
     mockUpsert.mockResolvedValueOnce({ error: new Error('DB error') });
 
@@ -178,7 +179,7 @@ test('shows error if supabase upsert fails', async () => {
     consoleErrorSpy.mockRestore();
   });
 
-test('uploads image and shows success', async () => {
+  test('uploads image and shows success', async () => {
     const user = userEvent.setup();
     const file = new File(['image'], 'profile.jpg', { type: 'image/jpeg' });
 
@@ -192,18 +193,18 @@ test('uploads image and shows success', async () => {
       expect(mockUpload).toHaveBeenCalled();
       expect(mockShowSuccessModal).toHaveBeenCalledWith(
         'Profile image uploaded successfully!',
-        'Upload OK'
+        'Upload OK',
       );
     });
   });
 
-test('navigates to dashboard on back button click', async () => {
+  test('navigates to dashboard on back button click', async () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: /back to dashboard/i }));
     expect(mockPush).toHaveBeenCalledWith('/dashboard');
   });
 
-test('correctly handles Instagram URL input', async () => {
+  test('correctly handles Instagram URL input', async () => {
     const user = userEvent.setup();
     const instagramInput = await screen.findByLabelText('Instagram URL');
     expect(instagramInput).toHaveValue('https://instagram.com/aleexample');
@@ -219,7 +220,7 @@ test('correctly handles Instagram URL input', async () => {
     });
   });
 
-test('correctly handles Facebook URL input', async () => {
+  test('correctly handles Facebook URL input', async () => {
     const user = userEvent.setup();
     const facebookInput = await screen.findByLabelText('Facebook URL');
     expect(facebookInput).toHaveValue('https://facebook.com/aleexample');

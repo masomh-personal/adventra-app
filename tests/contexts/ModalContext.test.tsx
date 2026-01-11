@@ -38,7 +38,7 @@ const renderWithProvider = () =>
   render(
     <ModalProvider>
       <TestComponent />
-    </ModalProvider>
+    </ModalProvider>,
   );
 
 describe('ModalContext', () => {

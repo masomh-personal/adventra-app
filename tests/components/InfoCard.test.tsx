@@ -6,9 +6,10 @@ import type { InfoCardProps } from '@/components/InfoCard';
 
 describe('InfoCard', () => {
   const setup = () => userEvent.setup();
-  const renderComponent = (props: Partial<InfoCardProps>) => render(<InfoCard {...(props as InfoCardProps)} />);
+  const renderComponent = (props: Partial<InfoCardProps>) =>
+    render(<InfoCard {...(props as InfoCardProps)} />);
 
-test('renders title, description, and button label', () => {
+  test('renders title, description, and button label', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -22,7 +23,7 @@ test('renders title, description, and button label', () => {
     expect(screen.getByTestId('infocard-button-test-button')).toBeInTheDocument();
   });
 
-test('calls onClick when the button is clicked', async () => {
+  test('calls onClick when the button is clicked', async () => {
     const user = setup();
     const onClick = jest.fn();
     renderComponent({
@@ -36,7 +37,7 @@ test('calls onClick when the button is clicked', async () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-test('renders an image when imgSrc is provided', () => {
+  test('renders an image when imgSrc is provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -50,7 +51,7 @@ test('renders an image when imgSrc is provided', () => {
     expect(image).toHaveAttribute('src');
   });
 
-test('does not render an image when imgSrc is not provided', () => {
+  test('does not render an image when imgSrc is not provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -60,7 +61,7 @@ test('does not render an image when imgSrc is not provided', () => {
     expect(screen.queryByTestId('infocard-image')).not.toBeInTheDocument();
   });
 
-test('renders a button icon when buttonIcon is provided', () => {
+  test('renders a button icon when buttonIcon is provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -72,7 +73,7 @@ test('renders a button icon when buttonIcon is provided', () => {
     expect(button.querySelector('svg')).toBeTruthy();
   });
 
-test('does not render a button when buttonLabel is not provided', () => {
+  test('does not render a button when buttonLabel is not provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',

@@ -8,7 +8,7 @@ import type { ApiError, ApiSuccess } from '@/types/api';
  */
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ): void {
   const { id } = req.query;
   const profileId = Array.isArray(id) ? id[0] : id;

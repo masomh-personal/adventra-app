@@ -15,7 +15,7 @@ interface SignupRequestBody {
  */
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ): Promise<void> {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -52,7 +52,8 @@ export default async function handler(
     ]);
 
     if (profileError) {
-      const errorMessage = profileError instanceof Error ? profileError.message : String(profileError);
+      const errorMessage =
+        profileError instanceof Error ? profileError.message : String(profileError);
       return res.status(500).json({ error: errorMessage });
     }
 

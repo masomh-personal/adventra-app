@@ -19,7 +19,7 @@ describe('FormWrapper + FormField Integration', () => {
     await user.type(input, value);
   };
 
-test('submits form successfully with all supported field types', async () => {
+  test('submits form successfully with all supported field types', async () => {
     const schema = yup.object({
       name: yup.string().required('Name is required'),
       email: yup.string().email().required(),
@@ -45,7 +45,7 @@ test('submits form successfully with all supported field types', async () => {
         />
         <FormField label="Birth Date" id="birthDate" type="date" />
         <FormField label="Subscribe to newsletter" id="subscribe" type="checkbox" />
-      </FormWrapper>
+      </FormWrapper>,
     );
 
     await fill('Name', 'Alex');
@@ -77,12 +77,12 @@ test('submits form successfully with all supported field types', async () => {
           birthDate: '1990-05-01',
           subscribe: true,
         },
-        expect.anything()
+        expect.anything(),
       );
     });
   });
 
-test('disables button if validation fails on any field', async () => {
+  test('disables button if validation fails on any field', async () => {
     const schema = yup.object({
       name: yup.string().required(),
       email: yup.string().required(),
@@ -92,7 +92,7 @@ test('disables button if validation fails on any field', async () => {
       <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
         <FormField label="Name" id="name" />
         <FormField label="Email" id="email" />
-      </FormWrapper>
+      </FormWrapper>,
     );
 
     // Fill one field only
@@ -106,7 +106,7 @@ test('disables button if validation fails on any field', async () => {
     expect(button).toBeEnabled();
   });
 
-test('displays validation messages for all types', async () => {
+  test('displays validation messages for all types', async () => {
     const schema = yup.object({
       name: yup.string().required('Name is required'),
       email: yup.string().email().required('Email required'),
@@ -130,7 +130,7 @@ test('displays validation messages for all types', async () => {
           ]}
         />
         <FormField label="Birth Date" id="birthDate" type="date" />
-      </FormWrapper>
+      </FormWrapper>,
     );
 
     // Trigger blur on all fields

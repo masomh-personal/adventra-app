@@ -2,7 +2,6 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 
-
 // Hoist mock functions so they can be used in the mock factory
 const { mockGetSession, mockSingle } = vi.hoisted(() => {
   const mockGetSession = vi.fn();
@@ -31,7 +30,7 @@ afterAll(() => {
 });
 
 describe('calcAgeFromBirthdate', () => {
-test('returns correct age when birthday has passed this year', () => {
+  test('returns correct age when birthday has passed this year', () => {
     const birthdate = new Date();
     birthdate.setFullYear(birthdate.getFullYear() - 25);
     birthdate.setMonth(birthdate.getMonth() - 1);
@@ -39,7 +38,7 @@ test('returns correct age when birthday has passed this year', () => {
     expect(calcAgeFromBirthdate(birthdate.toISOString())).toBe(25);
   });
 
-test('returns correct age when birthday is yet to come this year', () => {
+  test('returns correct age when birthday is yet to come this year', () => {
     const birthdate = new Date();
     birthdate.setFullYear(birthdate.getFullYear() - 30);
     birthdate.setMonth(birthdate.getMonth() + 1);
@@ -47,7 +46,7 @@ test('returns correct age when birthday is yet to come this year', () => {
     expect(calcAgeFromBirthdate(birthdate.toISOString())).toBe(29);
   });
 
-test('returns null for invalid input', () => {
+  test('returns null for invalid input', () => {
     expect(calcAgeFromBirthdate(null)).toBeNull();
     expect(calcAgeFromBirthdate('invalid-date')).toBeNull();
   });
@@ -58,7 +57,7 @@ describe('getCurrentUserId', () => {
     vi.clearAllMocks();
   });
 
-test('returns user ID when session is valid', async () => {
+  test('returns user ID when session is valid', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
@@ -68,7 +67,7 @@ test('returns user ID when session is valid', async () => {
     expect(result).toBe('abc123');
   });
 
-test('returns null when no session exists', async () => {
+  test('returns null when no session exists', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: null },
       error: null,
@@ -78,7 +77,7 @@ test('returns null when no session exists', async () => {
     expect(result).toBeNull();
   });
 
-test('throws error if Supabase fails', async () => {
+  test('throws error if Supabase fails', async () => {
     mockGetSession.mockResolvedValue({
       data: {},
       error: new Error('Session error'),
@@ -94,7 +93,7 @@ describe('getFullUserProfile', () => {
     mockSingle.mockReset();
   });
 
-test('returns hydrated profile with age', async () => {
+  test('returns hydrated profile with age', async () => {
     const profile = {
       bio: 'Explorer',
       adventure_preferences: ['climbing'],
@@ -114,14 +113,14 @@ test('returns hydrated profile with age', async () => {
     });
   });
 
-test('returns null if Supabase throws error', async () => {
+  test('returns null if Supabase throws error', async () => {
     mockSingle.mockResolvedValue({ data: null, error: new Error('fail') });
 
     const result = await getFullUserProfile('user-123');
     expect(result).toBeNull();
   });
 
-test('returns null if no UID provided', async () => {
+  test('returns null if no UID provided', async () => {
     const result = await getFullUserProfile(null);
     expect(result).toBeNull();
   });

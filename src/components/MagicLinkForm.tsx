@@ -24,11 +24,15 @@ interface MagicLinkFormProps {
  * @param onCancel - Handles closing the form
  * @param loading - Whether the form is submitting
  */
-export default function MagicLinkForm({ onSubmit, onCancel, loading = false }: MagicLinkFormProps): React.JSX.Element {
+export default function MagicLinkForm({
+  onSubmit,
+  onCancel,
+  loading = false,
+}: MagicLinkFormProps): React.JSX.Element {
   return (
     <FormWrapper
       validationSchema={schema}
-      onSubmit={(data) => {
+      onSubmit={data => {
         const email = (data.email as string)?.toLowerCase() || '';
         return onSubmit({ email });
       }}
@@ -36,7 +40,7 @@ export default function MagicLinkForm({ onSubmit, onCancel, loading = false }: M
       className="animate-fade-in"
       submitLabel="" // Hides FormWrapper's default submit
     >
-      {(formContext) => (
+      {formContext => (
         <>
           <FormField
             id="email"

@@ -40,7 +40,9 @@ export default function PersonCard({
   const fallbackImgSrc = '/member_pictures/default.png';
   const [source, setSource] = useState<string>(() => (imgSrc?.trim() ? imgSrc : fallbackImgSrc));
   const [isImgLoading, setIsImgLoading] = useState<boolean>(true);
-  const skill = skillLevel?.toLowerCase() ? skillColors[skillLevel.toLowerCase() as SkillLevel] || null : null;
+  const skill = skillLevel?.toLowerCase()
+    ? skillColors[skillLevel.toLowerCase() as SkillLevel] || null
+    : null;
 
   // Reset the loading state when the image source changes
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function PersonCard({
     <div
       className={clsx(
         'relative bg-slate-100 rounded-md shadow-md border border-gray-300 w-full max-w-[22rem] transition-all duration-300 group overflow-hidden hover:shadow-xl',
-        swipeClass
+        swipeClass,
       )}
     >
       {/* Banner Strip */}
@@ -106,7 +108,7 @@ export default function PersonCard({
                 }}
                 className={clsx(
                   'w-full h-full object-cover rounded-md border border-gray-200 shadow-sm transition-opacity duration-500',
-                  isImgLoading ? 'opacity-0' : 'opacity-100'
+                  isImgLoading ? 'opacity-0' : 'opacity-100',
                 )}
                 loading="lazy"
                 data-testid="person-card-image"
@@ -124,7 +126,7 @@ export default function PersonCard({
           {age ? (
             <span
               className={clsx(
-                'inline-block px-1 py-0 rounded font-bold text-sm uppercase border bg-tertiary/20 font-accent text-tertiary'
+                'inline-block px-1 py-0 rounded font-bold text-sm uppercase border bg-tertiary/20 font-accent text-tertiary',
               )}
             >
               AGE: {age}
@@ -140,7 +142,7 @@ export default function PersonCard({
                 'inline-block px-3 py-0.5 rounded font-bold uppercase border',
                 skill.border,
                 skill.text,
-                skill.bg
+                skill.bg,
               )}
             >
               {skill.label}
@@ -172,8 +174,8 @@ export default function PersonCard({
             data-testid="person-card-preferences"
           >
             {adventurePreferences && adventurePreferences.length > 0 ? (
-              adventurePreferences.map((pref) => {
-                const config = preferenceConfig.find((p) => p.value === pref);
+              adventurePreferences.map(pref => {
+                const config = preferenceConfig.find(p => p.value === pref);
                 if (!config) return null;
 
                 const Icon = config.icon;
@@ -186,7 +188,7 @@ export default function PersonCard({
                       config.bg,
                       config.border,
                       config.text,
-                      'transition-transform duration-200 hover:scale-105'
+                      'transition-transform duration-200 hover:scale-105',
                     )}
                   >
                     <Icon className={`w-4 h-4 ${config.text}`} />
@@ -206,8 +208,8 @@ export default function PersonCard({
           <div className="flex justify-center gap-2" data-testid="person-card-dating-preference">
             {datingPreference ? (
               datingConfig
-                .filter((pref) => pref.value === datingPreference)
-                .map((pref) => {
+                .filter(pref => pref.value === datingPreference)
+                .map(pref => {
                   const Icon = pref.icon;
                   return (
                     <span
@@ -217,7 +219,7 @@ export default function PersonCard({
                         pref.bg,
                         pref.border,
                         pref.text,
-                        'transition-transform duration-200 hover:scale-105'
+                        'transition-transform duration-200 hover:scale-105',
                       )}
                     >
                       <Icon className={`w-4 h-4 ${pref.text}`} />
@@ -244,16 +246,13 @@ export default function PersonCard({
             className={clsx(
               'transition',
               !instagramUrl && 'opacity-50 cursor-not-allowed',
-              'cursor-pointer text-pink-600 hover:text-pink-800'
+              'cursor-pointer text-pink-600 hover:text-pink-800',
             )}
             title="Instagram Profile"
             aria-label="Instagram Profile"
           >
             <FaInstagram
-              className={clsx(
-                'w-6 h-6',
-                !instagramUrl && 'opacity-50 cursor-not-allowed'
-              )}
+              className={clsx('w-6 h-6', !instagramUrl && 'opacity-50 cursor-not-allowed')}
             />
           </a>
 
@@ -265,16 +264,13 @@ export default function PersonCard({
             className={clsx(
               'transition',
               !facebookUrl && 'opacity-50 cursor-not-allowed',
-              'cursor-pointer text-blue-600 hover:text-blue-800'
+              'cursor-pointer text-blue-600 hover:text-blue-800',
             )}
             title="Facebook Profile"
             aria-label="Facebook Profile"
           >
             <FaFacebook
-              className={clsx(
-                'w-6 h-6',
-                !facebookUrl && 'opacity-50 cursor-not-allowed'
-              )}
+              className={clsx('w-6 h-6', !facebookUrl && 'opacity-50 cursor-not-allowed')}
             />
           </a>
         </div>

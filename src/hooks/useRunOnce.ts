@@ -6,7 +6,9 @@ import { useEffect, useRef } from 'react';
  *
  * @param callback - Async or sync function to run once on mount.
  */
-export default function useRunOnce(callback: (() => void) | (() => Promise<void>) | undefined): void {
+export default function useRunOnce(
+  callback: (() => void) | (() => Promise<void>) | undefined,
+): void {
   const hasRun = useRef(false);
 
   useEffect(() => {

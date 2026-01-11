@@ -10,7 +10,7 @@ export async function getAllUserProfiles(): Promise<FullUserProfile[]> {
   const { data, error } = await supabase
     .from('userprofile')
     .select(
-      `user_id, bio, adventure_preferences, skill_summary, profile_image_url, birthdate, instagram_url, facebook_url, dating_preferences, user:user_id (name, email)`
+      `user_id, bio, adventure_preferences, skill_summary, profile_image_url, birthdate, instagram_url, facebook_url, dating_preferences, user:user_id (name, email)`,
     );
 
   if (error) {

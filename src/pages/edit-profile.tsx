@@ -129,14 +129,16 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
     const cleanUrl = getPublicProfileImageUrl(userId);
     const busted = getPublicProfileImageUrl(userId, { bustCache: true });
 
-    const { error: dbErr } = await (supabase.from('userprofile') as any)
-      .upsert({ user_id: userId, profile_image_url: cleanUrl }, { onConflict: 'user_id' });
+    const { error: dbErr } = await (supabase.from('userprofile') as any).upsert(
+      { user_id: userId, profile_image_url: cleanUrl },
+      { onConflict: 'user_id' },
+    );
 
     if (dbErr) {
       console.error(dbErr);
       showErrorModal('Image uploaded, but DB update failed.', 'Save Error');
     } else {
-      setProfile((p) => (p ? { ...p, profileImageUrl: cleanUrl } : null));
+      setProfile(p => (p ? { ...p, profileImageUrl: cleanUrl } : null));
       setPreviewImageUrl(busted);
       showSuccessModal('Profile image uploaded successfully!', 'Upload OK');
     }
@@ -177,7 +179,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
           instagram_url: formData.instagramUrl,
           facebook_url: formData.facebookUrl,
         },
-        { onConflict: 'user_id' }
+        { onConflict: 'user_id' },
       );
 
       if (error) {
@@ -186,7 +188,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
         return;
       }
 
-      setProfile((p) =>
+      setProfile(p =>
         p
           ? {
               ...p,
@@ -197,7 +199,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
               instagramUrl: formData.instagramUrl || '',
               facebookUrl: formData.facebookUrl || '',
             }
-          : (null as ProfileData | null)
+          : (null as ProfileData | null),
       );
 
       showSuccessModal('Profile updated successfully!', 'Saved');
@@ -212,7 +214,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
   const handleDeleteProfile = async (): Promise<void> => {
     const ok = await showConfirmationModal(
       'Are you sure you want to delete your profile? This cannot be undone.',
-      'Delete Profile'
+      'Delete Profile',
     );
     if (!ok) return;
 
@@ -254,7 +256,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
           onSubmit={handleSave}
           defaultValues={profile}
           submitLabel=""
-          onError={(e) => {
+          onError={e => {
             console.error('[FORM]', e);
             showErrorModal('Validation errors; please check fields.', 'Invalid');
           }}
@@ -292,19 +294,21 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
 
                     <div className="flex items-center gap-3">
                       <Button
-                      label={
-                        <span className="flex items-center gap-2">
-                          {selectedFile ? (
-                            <>
-                              <FiUpload /> Upload Photo
-                            </>
-                          ) : (
-                            <>
-                              <FiFolder /> Choose File
-                            </>
-                          )}
-                        </span> as unknown as string
-                      }
+                        label={
+                          (
+                            <span className="flex items-center gap-2">
+                              {selectedFile ? (
+                                <>
+                                  <FiUpload /> Upload Photo
+                                </>
+                              ) : (
+                                <>
+                                  <FiFolder /> Choose File
+                                </>
+                              )}
+                            </span>
+                          ) as unknown as string
+                        }
                         variant={selectedFile ? 'primary' : 'tertiary'}
                         onClick={async () => {
                           if (selectedFile) await handleImageUpload();
@@ -340,7 +344,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                       ref={fileInputRef}
                       type="file"
                       accept="image/png,image/jpeg"
-                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                      onChange={e => setSelectedFile(e.target.files?.[0] || null)}
                       className="hidden"
                     />
                   </div>
@@ -414,9 +418,11 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                   <div className="pt-4">
                     <Button
                       label={
-                        <>
-                          <FiSave /> Save Changes
-                        </> as unknown as string
+                        (
+                          <>
+                            <FiSave /> Save Changes
+                          </>
+                        ) as unknown as string
                       }
                       variant="primary"
                       type="submit"
@@ -447,8 +453,8 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                           })()
                         : null
                     }
-                    adventurePreferences={(adv as unknown) as AdventurePreference[]}
-                    datingPreference={(dat as unknown) as DatingPreference | null}
+                    adventurePreferences={adv as unknown as AdventurePreference[]}
+                    datingPreference={dat as unknown as DatingPreference | null}
                     instagramUrl={ig || undefined}
                     facebookUrl={fb || undefined}
                     imgSrc={previewImageUrl || undefined}
@@ -465,9 +471,11 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
       <div className="mt-4 flex gap-4">
         <Button
           label={
-            <>
-              <FiArrowLeft className="text-sm" /> Back to Dashboard
-            </> as unknown as string
+            (
+              <>
+                <FiArrowLeft className="text-sm" /> Back to Dashboard
+              </>
+            ) as unknown as string
           }
           variant="secondary"
           onClick={() => router.push('/dashboard')}
@@ -475,9 +483,11 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
 
         <Button
           label={
-            <>
-              <FiTrash2 className="text-sm" /> Delete Profile
-            </> as unknown as string
+            (
+              <>
+                <FiTrash2 className="text-sm" /> Delete Profile
+              </>
+            ) as unknown as string
           }
           variant="danger"
           onClick={handleDeleteProfile}

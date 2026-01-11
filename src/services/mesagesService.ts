@@ -13,7 +13,10 @@ export interface MessageData {
  * @returns New message record
  */
 export async function sendMessage(messageData: MessageData): Promise<MessageData> {
-  const { data, error } = await (supabase.from('messages') as any).insert([messageData]).select().single();
+  const { data, error } = await (supabase.from('messages') as any)
+    .insert([messageData])
+    .select()
+    .single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));
   if (!data) throw new Error('Message data was not returned from database');
@@ -35,9 +38,11 @@ export async function getConversation(user1: string, user2: string): Promise<Mes
 
   if (error) throw new Error(error.message);
 
-  return (data as MessageData[])?.filter(
-    (msg) =>
-      (msg.sender_id === user1 && msg.receiver_id === user2) ||
-      (msg.sender_id === user2 && msg.receiver_id === user1)
-  ) ?? [];
+  return (
+    (data as MessageData[])?.filter(
+      msg =>
+        (msg.sender_id === user1 && msg.receiver_id === user2) ||
+        (msg.sender_id === user2 && msg.receiver_id === user1),
+    ) ?? []
+  );
 }

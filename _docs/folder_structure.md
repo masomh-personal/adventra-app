@@ -3,6 +3,7 @@
 This document outlines the **folder structure** of the Adventra project. It serves as a guide for team members to understand how files are organized.
 
 ## Directory Structure
+
 ```
 ...\adventra-app
 ├── eslint.config.mjs

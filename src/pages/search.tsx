@@ -29,13 +29,10 @@ export default function SearchPage(): React.JSX.Element {
     // IIFE to handle async call inside useEffect
     (async (): Promise<void> => {
       try {
-        const [allUsers, userId] = await Promise.all([
-          getAllUserProfiles(),
-          getCurrentUserId(),
-        ]);
+        const [allUsers, userId] = await Promise.all([getAllUserProfiles(), getCurrentUserId()]);
 
         // Calculate age for each user and add it to the user object
-        const usersWithAge: UserWithAge[] = allUsers.map((user) => {
+        const usersWithAge: UserWithAge[] = allUsers.map(user => {
           const age = user.birthdate ? calcAgeFromBirthdate(user.birthdate) : null;
           return { ...user, age };
         });
@@ -54,7 +51,7 @@ export default function SearchPage(): React.JSX.Element {
   const handleSwipeLeft = (): void => {
     setSwipeDirection('left');
     setTimeout(() => {
-      setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length);
+      setCurrentUserIndex(prevIndex => (prevIndex + 1) % users.length);
       setSwipeDirection(null);
     }, 300);
   };
@@ -63,13 +60,13 @@ export default function SearchPage(): React.JSX.Element {
   const handleSwipeRight = (): void => {
     setSwipeDirection('right');
     setTimeout(() => {
-      setCurrentUserIndex((prevIndex) => (prevIndex + 1) % users.length);
+      setCurrentUserIndex(prevIndex => (prevIndex + 1) % users.length);
       setSwipeDirection(null);
     }, 300);
   };
 
   // Exclude the current user from the list of users displayed
-  const filteredUsers = users.filter((user) => user.user_id !== currentUserId);
+  const filteredUsers = users.filter(user => user.user_id !== currentUserId);
 
   if (loading)
     return (
@@ -107,10 +104,17 @@ export default function SearchPage(): React.JSX.Element {
             key={currentUser.profile_image_url || currentUser.user_id}
             name={currentUser.user?.name}
             age={currentUser.age}
-            skillLevel={currentUser.skill_summary ? Object.keys(currentUser.skill_summary)[0] : null}
+            skillLevel={
+              currentUser.skill_summary ? Object.keys(currentUser.skill_summary)[0] : null
+            }
             bio={currentUser.bio}
-            adventurePreferences={((currentUser.adventure_preferences || []) as unknown) as AdventurePreference[]}
-            datingPreference={((currentUser.dating_preferences as string) || null as unknown) as DatingPreference | null}
+            adventurePreferences={
+              (currentUser.adventure_preferences || []) as unknown as AdventurePreference[]
+            }
+            datingPreference={
+              ((currentUser.dating_preferences as string) ||
+                (null as unknown)) as DatingPreference | null
+            }
             instagramUrl={currentUser.instagram_url}
             facebookUrl={currentUser.facebook_url}
             imgSrc={currentUser.profile_image_url}

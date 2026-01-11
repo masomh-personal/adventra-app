@@ -19,10 +19,12 @@ interface PasswordStrengthMeterProps {
   password?: string;
 }
 
-export default function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps): React.JSX.Element | null {
+export default function PasswordStrengthMeter({
+  password,
+}: PasswordStrengthMeterProps): React.JSX.Element | null {
   if (!password) return null;
 
-  const passed = passwordCriteria.filter((rule) => rule.test(password));
+  const passed = passwordCriteria.filter(rule => rule.test(password));
   const score = passed.length;
   const { label, color, bar } = getStrengthLabel(score);
   const allPassed = score === passwordCriteria.length;

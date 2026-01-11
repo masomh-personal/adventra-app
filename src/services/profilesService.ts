@@ -7,7 +7,10 @@ import type { CreateProfileData, UserProfile } from '@/types/user';
  * @returns Updated profile
  */
 export async function upsertProfile(profileData: CreateProfileData): Promise<UserProfile> {
-  const { data, error } = await (supabase.from('profiles') as any).upsert(profileData).select().single();
+  const { data, error } = await (supabase.from('profiles') as any)
+    .upsert(profileData)
+    .select()
+    .single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));
   if (!data) throw new Error('Profile data was not returned from database');

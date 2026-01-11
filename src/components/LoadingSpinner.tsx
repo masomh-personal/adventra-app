@@ -4,7 +4,9 @@ interface LoadingSpinnerProps {
   label?: string;
 }
 
-export default function LoadingSpinner({ label = 'Loading...' }: LoadingSpinnerProps): React.JSX.Element {
+export default function LoadingSpinner({
+  label = 'Loading...',
+}: LoadingSpinnerProps): React.JSX.Element {
   return (
     <div className="flex items-center justify-center w-full h-full py-24">
       <div

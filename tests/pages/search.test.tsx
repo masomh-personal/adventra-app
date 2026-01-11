@@ -7,9 +7,14 @@ import { getAllUserProfiles } from '@/lib/getAllUserProfiles';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 
-
 // Hoist mocks
-const { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalcAgeFromBirthdate, mockUseRouter } = vi.hoisted(() => {
+const {
+  mockCreateClient,
+  mockGetAllUserProfiles,
+  mockGetCurrentUserId,
+  mockCalcAgeFromBirthdate,
+  mockUseRouter,
+} = vi.hoisted(() => {
   const mockCreateClient = vi.fn(() => ({
     from: () => ({ select: vi.fn().mockResolvedValue({ data: [], error: null }) }),
   }));
@@ -17,7 +22,13 @@ const { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalc
   const mockGetCurrentUserId = vi.fn();
   const mockCalcAgeFromBirthdate = vi.fn();
   const mockUseRouter = vi.fn();
-  return { mockCreateClient, mockGetAllUserProfiles, mockGetCurrentUserId, mockCalcAgeFromBirthdate, mockUseRouter };
+  return {
+    mockCreateClient,
+    mockGetAllUserProfiles,
+    mockGetCurrentUserId,
+    mockCalcAgeFromBirthdate,
+    mockUseRouter,
+  };
 });
 
 // 1) Mock supabaseClient so it never throws
@@ -95,14 +106,14 @@ describe('SearchPage', () => {
     mockedCalcAgeFromBirthdate.mockReturnValue(30);
   });
 
-test('shows loading then renders Alice', async () => {
+  test('shows loading then renders Alice', async () => {
     render(<SearchPage />);
     expect(screen.getByText('Fetching profiles...')).toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-test('advances to Bob when No Match is clicked', async () => {
+  test('advances to Bob when No Match is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
@@ -111,7 +122,7 @@ test('advances to Bob when No Match is clicked', async () => {
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-test('advances to Bob when Interested is clicked', async () => {
+  test('advances to Bob when Interested is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
@@ -120,7 +131,7 @@ test('advances to Bob when Interested is clicked', async () => {
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-test('navigates to messages when Message is clicked', async () => {
+  test('navigates to messages when Message is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 

@@ -7,7 +7,10 @@ import type { User, CreateUserData } from '@/types/user';
  * @returns Result or error
  */
 export async function createUser(userData: CreateUserData): Promise<User> {
-  const { data, error } = await (supabase.from('users') as any).insert([userData]).select().single();
+  const { data, error } = await (supabase.from('users') as any)
+    .insert([userData])
+    .select()
+    .single();
 
   if (error) throw new Error(error instanceof Error ? error.message : String(error));
   if (!data) throw new Error('User data was not returned from database');

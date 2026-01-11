@@ -8,19 +8,11 @@ export default defineConfig({
     globals: true, // Enable global test APIs (describe, it, expect, vi, etc.)
     environment: 'jsdom', // Use jsdom for DOM testing
     setupFiles: ['./vitest.setup.ts'],
-    include: [
-      'tests/**/*.{test,spec}.{ts,tsx}',
-      'src/**/*.{test,spec}.{ts,tsx}',
-    ],
+    include: ['tests/**/*.{test,spec}.{ts,tsx}', 'src/**/*.{test,spec}.{ts,tsx}'],
     typecheck: {
       tsconfig: './tsconfig.json',
     },
-    exclude: [
-      'node_modules',
-      '.next',
-      'coverage',
-      'dist',
-    ],
+    exclude: ['node_modules', '.next', 'coverage', 'dist'],
     coverage: {
       provider: 'v8', // Native V8 coverage (faster, recommended by Vitest)
       reporter: ['text', 'json', 'html', 'lcov'],

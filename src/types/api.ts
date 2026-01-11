@@ -13,7 +13,7 @@ export interface ApiSuccess<T = unknown> {
 
 export type ApiHandler = (
   req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>
+  res: NextApiResponse<ApiSuccess | ApiError>,
 ) => Promise<void> | void;
 
 export interface ProfileResponse extends UserProfile {}

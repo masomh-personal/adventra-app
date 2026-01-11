@@ -9,7 +9,9 @@ import type { FullUserProfile } from '@/types/user';
  * @param uid - Supabase Auth UUID (user_id)
  * @returns Full user profile or null on error
  */
-export async function getFullUserProfile(uid: string | null | undefined): Promise<FullUserProfile | null> {
+export async function getFullUserProfile(
+  uid: string | null | undefined,
+): Promise<FullUserProfile | null> {
   if (!uid) return null;
 
   const { data, error } = await supabase
@@ -29,7 +31,7 @@ export async function getFullUserProfile(uid: string | null | undefined): Promis
         name,
         email
       )
-    `
+    `,
     )
     .eq('user_id', uid)
     .single();
@@ -66,7 +68,12 @@ export async function getFullUserProfile(uid: string | null | undefined): Promis
     dating_preferences: dataTyped.dating_preferences,
     user_id: dataTyped.user_id,
     // Supabase returns joined relations as arrays, take first element
-    user: Array.isArray(dataTyped.user) && dataTyped.user.length > 0 ? dataTyped.user[0] : (!Array.isArray(dataTyped.user) ? dataTyped.user : null),
+    user:
+      Array.isArray(dataTyped.user) && dataTyped.user.length > 0
+        ? dataTyped.user[0]
+        : !Array.isArray(dataTyped.user)
+          ? dataTyped.user
+          : null,
   };
 
   // Compute age from birthdate in userprofile table

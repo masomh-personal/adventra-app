@@ -6,7 +6,6 @@ import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import { useRouter } from 'next/router';
 import supabase from '@/lib/supabaseClient';
 
-
 // Hoist mocks
 const { mockFrom, mockGetCurrentUserId, mockUseRouter } = vi.hoisted(() => {
   const mockFrom = vi.fn();
@@ -106,13 +105,13 @@ describe('MessagesPage', () => {
     });
   });
 
-test('shows spinner then loads inbox', async () => {
+  test('shows spinner then loads inbox', async () => {
     render(<MessagesPage />);
     expect(screen.getByText(/Loading messages/i)).toBeInTheDocument();
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
   });
 
-test('loads messages when clicking a conversation', async () => {
+  test('loads messages when clicking a conversation', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
     const user = userEvent.setup();
@@ -121,7 +120,7 @@ test('loads messages when clicking a conversation', async () => {
     expect(screen.getByText('Hello Alice!')).toBeInTheDocument();
   });
 
-test('navigates back on button click', async () => {
+  test('navigates back on button click', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByRole('button', { name: /Back to Dashboard/i }));
     const user = userEvent.setup();

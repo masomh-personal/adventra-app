@@ -7,7 +7,6 @@ import { dbCreateUser } from '@/hooks/dbCreateUser';
 import { useModal } from '@/contexts/ModalContext';
 import { useRouter } from 'next/router';
 
-
 // Hoist mocks - these will be available in mock factories
 const { mockSignUp, mockDbCreateUser, mockUseModal, mockUseRouter } = vi.hoisted(() => {
   const mockSignUp = vi.fn();
@@ -69,7 +68,7 @@ describe('SignupPage', () => {
     await user.type(screen.getByLabelText('Confirm Password'), 'Password123!');
   };
 
-test('renders all expected fields and buttons', () => {
+  test('renders all expected fields and buttons', () => {
     render(<SignupPage />);
 
     expect(screen.getByText(/Create Your Account/i)).toBeInTheDocument();
@@ -82,7 +81,7 @@ test('renders all expected fields and buttons', () => {
     expect(screen.getByTestId('login-button')).toBeInTheDocument();
   });
 
-test('validates required fields and shows errors', async () => {
+  test('validates required fields and shows errors', async () => {
     const user = userEvent.setup();
     render(<SignupPage />);
 
@@ -101,7 +100,7 @@ test('validates required fields and shows errors', async () => {
     expect(screen.getByText(/Please confirm your password/i)).toBeInTheDocument();
   });
 
-test('shows password strength meter once password is typed', async () => {
+  test('shows password strength meter once password is typed', async () => {
     const user = userEvent.setup();
     render(<SignupPage />);
 
@@ -112,7 +111,7 @@ test('shows password strength meter once password is typed', async () => {
     expect(screen.getByTestId('strength-value')).toBeInTheDocument();
   });
 
-test('submits successfully with valid fields', async () => {
+  test('submits successfully with valid fields', async () => {
     const user = userEvent.setup();
 
     const fakeUser = { id: 'fake-user-id' };
@@ -145,7 +144,7 @@ test('submits successfully with valid fields', async () => {
           user_id: 'fake-user-id',
           name: 'Alex Example',
           email: 'alex@example.com',
-        })
+        }),
       );
 
       // Ensure the birthdate matches (it might be a Date or string depending on implementation)
@@ -162,12 +161,12 @@ test('submits successfully with valid fields', async () => {
         expect.stringContaining('Your account is all set'),
         'Signup Successful!',
         expect.any(Function),
-        'Go to Homepage'
+        'Go to Homepage',
       );
     });
   });
 
-test('shows error modal when Supabase fails', async () => {
+  test('shows error modal when Supabase fails', async () => {
     const user = userEvent.setup();
     mockSignUp.mockResolvedValue({
       error: { message: 'User already registered' },
@@ -181,12 +180,12 @@ test('shows error modal when Supabase fails', async () => {
     await waitFor(() => {
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         expect.stringContaining('already registered'),
-        'Email Already Registered'
+        'Email Already Registered',
       );
     });
   });
 
-test('shows error modal if dbCreateUser fails after signup', async () => {
+  test('shows error modal if dbCreateUser fails after signup', async () => {
     const user = userEvent.setup();
 
     mockSignUp.mockResolvedValue({
@@ -207,7 +206,7 @@ test('shows error modal if dbCreateUser fails after signup', async () => {
     await waitFor(() => {
       expect(mockShowErrorModal).toHaveBeenCalledWith(
         expect.stringContaining('internal error occurred'),
-        'Signup Incomplete'
+        'Signup Incomplete',
       );
     });
 

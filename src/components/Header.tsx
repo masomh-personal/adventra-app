@@ -108,13 +108,7 @@ export default function Header(): React.JSX.Element {
     <header className="flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30">
       {/* Logo + Text Link to Home */}
       <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
-        <Image
-          src="/adventra-logo.png"
-          alt="Adventra Logo"
-          width={48}
-          height={48}
-          priority
-        />
+        <Image src="/adventra-logo.png" alt="Adventra Logo" width={48} height={48} priority />
         <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
           adventra
         </span>
@@ -139,7 +133,7 @@ export default function Header(): React.JSX.Element {
         className="hidden md:flex space-x-6 font-heading font-bold text-white"
         data-testid="desktop-nav"
       >
-        {navLinks.map((link) => (
+        {navLinks.map(link => (
           <Link
             key={link.href}
             href={link.href}
@@ -178,7 +172,7 @@ export default function Header(): React.JSX.Element {
             className="flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white"
             data-testid="mobile-nav"
           >
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
