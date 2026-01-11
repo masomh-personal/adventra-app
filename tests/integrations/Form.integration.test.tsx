@@ -19,7 +19,7 @@ describe('FormWrapper + FormField Integration', () => {
     await user.type(input, value);
   };
 
-  it('submits form successfully with all supported field types', async () => {
+test('submits form successfully with all supported field types', async () => {
     const schema = yup.object({
       name: yup.string().required('Name is required'),
       email: yup.string().email().required(),
@@ -82,7 +82,7 @@ describe('FormWrapper + FormField Integration', () => {
     });
   });
 
-  it('disables button if validation fails on any field', async () => {
+test('disables button if validation fails on any field', async () => {
     const schema = yup.object({
       name: yup.string().required(),
       email: yup.string().required(),
@@ -106,7 +106,7 @@ describe('FormWrapper + FormField Integration', () => {
     expect(button).toBeEnabled();
   });
 
-  it('displays validation messages for all types', async () => {
+test('displays validation messages for all types', async () => {
     const schema = yup.object({
       name: yup.string().required('Name is required'),
       email: yup.string().email().required('Email required'),

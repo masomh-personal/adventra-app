@@ -75,7 +75,7 @@ describe('Header Component', () => {
     vi.clearAllMocks();
   });
 
-  it('renders logo and default links when logged out', async () => {
+test('renders logo and default links when logged out', async () => {
     await act(async () => {
       render(<Header />);
     });
@@ -93,7 +93,7 @@ describe('Header Component', () => {
     expect(screen.queryByTestId('logout-button')).not.toBeInTheDocument();
   });
 
-  it('renders dashboard and logout buttons when user is logged in', async () => {
+test('renders dashboard and logout buttons when user is logged in', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
@@ -114,7 +114,7 @@ describe('Header Component', () => {
     expect(screen.queryByTestId('login-link')).not.toBeInTheDocument();
   });
 
-  it('toggles mobile menu', async () => {
+test('toggles mobile menu', async () => {
     await act(async () => {
       render(<Header />);
     });
@@ -135,7 +135,7 @@ describe('Header Component', () => {
     expect(screen.queryByTestId('mobile-menu-times')).not.toBeInTheDocument();
   });
 
-  it('calls signOut and navigates to /login on logout', async () => {
+test('calls signOut and navigates to /login on logout', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
@@ -156,7 +156,7 @@ describe('Header Component', () => {
     });
   });
 
-  it('cleans up event listeners on unmount', async () => {
+test('cleans up event listeners on unmount', async () => {
     const unsubscribeMock = vi.fn();
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: unsubscribeMock } },
@@ -171,7 +171,7 @@ describe('Header Component', () => {
     expect(unsubscribeMock).toHaveBeenCalled();
   });
 
-  it('logs an error if signOut fails', async () => {
+test('logs an error if signOut fails', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
@@ -192,7 +192,7 @@ describe('Header Component', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('logs an error if getSession fails', async () => {
+test('logs an error if getSession fails', async () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     mockGetSession.mockRejectedValueOnce(new Error('Get session failed'));
 
@@ -207,7 +207,7 @@ describe('Header Component', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('renders correct links in mobile menu when logged out', async () => {
+test('renders correct links in mobile menu when logged out', async () => {
     await act(async () => {
       render(<Header />);
     });
@@ -230,7 +230,7 @@ describe('Header Component', () => {
     expect(within(mobileMenu).queryByTestId('logout-button')).not.toBeInTheDocument();
   });
 
-  it('renders correct links in mobile menu when logged in', async () => {
+test('renders correct links in mobile menu when logged in', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,
@@ -256,7 +256,7 @@ describe('Header Component', () => {
     expect(within(mobileMenu).queryByTestId('login-link')).not.toBeInTheDocument();
   });
 
-  it('renders correct links in desktop nav when logged out', async () => {
+test('renders correct links in desktop nav when logged out', async () => {
     await act(async () => {
       render(<Header />);
     });
@@ -273,7 +273,7 @@ describe('Header Component', () => {
     expect(screen.queryByTestId('logout-button')).not.toBeInTheDocument();
   });
 
-  it('renders correct links in desktop nav when logged in', async () => {
+test('renders correct links in desktop nav when logged in', async () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: 'abc123' } } },
       error: null,

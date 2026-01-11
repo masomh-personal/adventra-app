@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import Footer from '@/components/Footer';
 
 describe('Footer', () => {
-  it('renders footer navigation links', () => {
+test('renders footer navigation links', () => {
     render(<Footer />);
 
     expect(screen.getByText(/About/i)).toBeInTheDocument();
@@ -11,13 +11,13 @@ describe('Footer', () => {
     expect(screen.getByText(/Contact/i)).toBeInTheDocument();
   });
 
-  it('renders copyright text with current year', () => {
+test('renders copyright text with current year', () => {
     render(<Footer />);
     const year = new Date().getFullYear();
     expect(screen.getByText(`© ${year} Adventra. All rights reserved.`)).toBeInTheDocument();
   });
 
-  it('renders the KSU button correctly', () => {
+test('renders the KSU button correctly', () => {
     render(<Footer />);
     const ksuButton = screen.getByTestId('ksu-button');
     expect(ksuButton).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('Footer', () => {
     expect(ksuButton).toHaveAttribute('data-testid', 'ksu-button');
   });
 
-  it('renders the "Made with ❤️" text and heart icon', () => {
+test('renders the "Made with ❤️" text and heart icon', () => {
     render(<Footer />);
     expect(screen.getByText(/Made with/i)).toBeInTheDocument();
     const heartIcon = screen.getByTestId('ksu-button').previousElementSibling;

@@ -41,13 +41,13 @@ describe('PrivacyPolicyPage', () => {
     return { user }; // Return user even if not used in all tests
   };
 
-  it('should render the main title', () => {
+test('should render the main title', () => {
     setup();
     // Use getByRole for semantic querying where possible
     expect(screen.getByRole('heading', { name: /privacy policy/i, level: 1 })).toBeInTheDocument();
   });
 
-  it('should render the introduction paragraph', () => {
+test('should render the introduction paragraph', () => {
     setup();
     expect(
       screen.getByText(
@@ -56,12 +56,12 @@ describe('PrivacyPolicyPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('should display the last updated date correctly', () => {
+test('should display the last updated date correctly', () => {
     setup();
     expect(screen.getByText(/Last updated:\s*March 25, 2025/i)).toBeInTheDocument();
   });
 
-  it('should render all section headings', () => {
+test('should render all section headings', () => {
     setup();
     const sections = [
       /1\. Information We Collect/i,
@@ -79,7 +79,7 @@ describe('PrivacyPolicyPage', () => {
     });
   });
 
-  it('should render the information collection list items', () => {
+test('should render the information collection list items', () => {
     setup();
     const collectionItems = [
       /Account Information:/i,
@@ -93,7 +93,7 @@ describe('PrivacyPolicyPage', () => {
     });
   });
 
-  it('should render the information usage list items', () => {
+test('should render the information usage list items', () => {
     setup();
     const usageItems = [
       /Create and manage your account/i,
@@ -108,7 +108,7 @@ describe('PrivacyPolicyPage', () => {
     });
   });
 
-  it('should render the contact email as a correct mailto link', () => {
+test('should render the contact email as a correct mailto link', () => {
     setup();
     // Find the link specifically by its text content
     const emailLink = screen.getByRole('link', { name: /privacy@adventra\.com/i });

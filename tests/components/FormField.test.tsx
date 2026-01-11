@@ -24,13 +24,13 @@ describe('FormField', () => {
   });
 
   describe('Basic rendering', () => {
-    it('renders label and input', () => {
+test('renders label and input', () => {
       render(<FormField {...baseProps} />);
       expect(screen.getByText('Email')).toBeInTheDocument();
       expect(screen.getByLabelText('Email')).toBeInTheDocument();
     });
 
-    it('applies placeholder, id, and type', () => {
+test('applies placeholder, id, and type', () => {
       render(<FormField {...baseProps} />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('type', 'email');
@@ -38,20 +38,20 @@ describe('FormField', () => {
       expect(input).toHaveAttribute('id', 'email');
     });
 
-    it('adds custom className if provided', () => {
+test('adds custom className if provided', () => {
       render(<FormField {...baseProps} className="custom-style" />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveClass('custom-style');
     });
 
-    it('disables input when disabled', () => {
+test('disables input when disabled', () => {
       render(<FormField {...baseProps} disabled />);
       expect(screen.getByLabelText('Email')).toBeDisabled();
     });
   });
 
   describe('Error + help text', () => {
-    it('shows error message and red border when error exists', () => {
+test('shows error message and red border when error exists', () => {
       const props = {
         ...baseProps,
         errors: {
@@ -63,12 +63,12 @@ describe('FormField', () => {
       expect(screen.getByLabelText('Email')).toHaveClass('border-red-500');
     });
 
-    it('shows help text when no error exists', () => {
+test('shows help text when no error exists', () => {
       render(<FormField {...baseProps} helpText="Helpful hint" />);
       expect(screen.getByText('Helpful hint')).toBeInTheDocument();
     });
 
-    it('hides help text when error exists', () => {
+test('hides help text when error exists', () => {
       const props = {
         ...baseProps,
         helpText: 'Helpful hint',
@@ -82,19 +82,19 @@ describe('FormField', () => {
   });
 
   describe('Supported input types', () => {
-    it('renders a textarea for type="textarea"', () => {
+test('renders a textarea for type="textarea"', () => {
       render(<FormField {...baseProps} type="textarea" />);
       const textarea = screen.getByLabelText('Email');
       expect(textarea.tagName).toBe('TEXTAREA');
     });
 
-    it('renders a date input for type="date"', () => {
+test('renders a date input for type="date"', () => {
       render(<FormField {...baseProps} type="date" />);
       const input = screen.getByLabelText('Email');
       expect(input).toHaveAttribute('type', 'date');
     });
 
-    it('renders radio buttons with correct labels', () => {
+test('renders radio buttons with correct labels', () => {
       const mockRegister = jest.fn().mockReturnValue({
         onChange: jest.fn(),
         onBlur: jest.fn(),
@@ -117,7 +117,7 @@ describe('FormField', () => {
       expect(screen.getByLabelText('Female')).toBeInTheDocument();
     });
 
-    it('renders checkboxes with correct labels', () => {
+test('renders checkboxes with correct labels', () => {
       const mockRegister = jest.fn().mockReturnValue({
         onChange: jest.fn(),
         onBlur: jest.fn(),
@@ -142,7 +142,7 @@ describe('FormField', () => {
   });
 
   describe('CharacterCounter', () => {
-    it('displays character count when characterCountOptions are provided', () => {
+test('displays character count when characterCountOptions are provided', () => {
       const props = {
         ...baseProps,
         characterCountOptions: {
@@ -156,7 +156,7 @@ describe('FormField', () => {
   });
 
   describe('react-hook-form registration', () => {
-    it('calls register with correct options', () => {
+test('calls register with correct options', () => {
       const props = {
         ...baseProps,
         registerOptions: { required: 'This field is required' },
@@ -172,7 +172,7 @@ describe('FormField', () => {
   });
 
   describe('Accessibility', () => {
-    it('label and input are associated by id', () => {
+test('label and input are associated by id', () => {
       render(<FormField {...baseProps} />);
       const label = screen.getByText('Email');
       const input = screen.getByLabelText('Email');

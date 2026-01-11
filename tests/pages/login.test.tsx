@@ -55,27 +55,27 @@ describe('LoginPage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the login form initially', () => {
+test('renders the login form initially', () => {
     renderPage();
     expect(screen.getByTestId('login-form')).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
   });
 
-  it('shows signup and forgot password links', () => {
+test('shows signup and forgot password links', () => {
     renderPage();
     expect(screen.getByTestId('signup-button')).toBeInTheDocument();
     expect(screen.getByText(/forgot your password/i)).toBeInTheDocument();
   });
 
-  it('shows all SSO login buttons', () => {
+test('shows all SSO login buttons', () => {
     renderPage();
     ['google', 'facebook', 'instagram', 'apple'].forEach((provider) => {
       expect(screen.getByTestId(`sso-${provider}`)).toBeInTheDocument();
     });
   });
 
-  it('switches to magic link form when clicked', async () => {
+test('switches to magic link form when clicked', async () => {
     renderPage();
     const user = setupUser();
     await user.click(screen.getByTestId('show-magic'));
@@ -85,7 +85,7 @@ describe('LoginPage', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
-  it('submits magic link request and shows success modal', async () => {
+test('submits magic link request and shows success modal', async () => {
     mockSignInWithOtp.mockResolvedValueOnce({ error: null });
 
     renderPage();
@@ -106,7 +106,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('handles successful email/password login', async () => {
+test('handles successful email/password login', async () => {
     mockSignInWithPassword.mockResolvedValueOnce({
       data: { user: {} },
       error: null,
@@ -126,7 +126,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('shows error modal when login fails', async () => {
+test('shows error modal when login fails', async () => {
     mockSignInWithPassword.mockResolvedValueOnce({
       data: null,
       error: { message: 'Invalid login credentials' },
@@ -146,7 +146,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('handles magic link request error and shows error modal', async () => {
+test('handles magic link request error and shows error modal', async () => {
     mockSignInWithOtp.mockResolvedValueOnce({
       error: { message: 'Some magic link error' },
     });
@@ -167,7 +167,7 @@ describe('LoginPage', () => {
     });
   });
 
-  it('shows SSO under development modal when SSO button is clicked', async () => {
+test('shows SSO under development modal when SSO button is clicked', async () => {
     renderPage();
     const user = setupUser();
     await user.click(screen.getByTestId('sso-google'));

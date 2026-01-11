@@ -1,21 +1,28 @@
 import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import * as yup from 'yup';
 import FormWrapper from '@/components/FormWrapper';
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { vi } from 'vitest';
 
 /**
  * Simple mock field to simulate form contexts usage
  * Note: FormWrapper will inject register and errors automatically
  */
-const MockFormField = ({ id, label, register, errors }: {
+const MockFormField = ({
+  id,
+  label,
+  register,
+  errors,
+}: {
   id: string;
   label: string;
   register?: UseFormRegister<{ name: string; email: string }>;
   errors?: FieldErrors<{ name: string; email: string }>;
 }): React.JSX.Element => {
-  const fieldRegister = register || (() => ({ onChange: jest.fn(), onBlur: jest.fn(), name: id, ref: jest.fn() }));
+  const fieldRegister = register || (() => ({ onChange: vi.fn(), onBlur: vi.fn(), name: id, ref: vi.fn() }));
   return (
     <div>
       <label htmlFor={id}>{label}</label>
@@ -32,16 +39,16 @@ const safeRender = async (ui: React.ReactElement): Promise<void> => {
   });
 };
 
-// Helper to change field values safely
-const fillField = async (label: string, value: string): Promise<void> => {
-  await act(async () => {
-    fireEvent.change(screen.getByLabelText(label), { target: { value } });
-  });
+// Helper to change field values safely using userEvent
+const fillField = async (user: ReturnType<typeof userEvent.setup>, label: string, value: string): Promise<void> => {
+  const input = screen.getByLabelText(label);
+  await user.clear(input);
+  await user.type(input, value);
 };
 
 describe('FormWrapper', () => {
-  const mockOnSubmit = jest.fn();
-  const mockOnError = jest.fn();
+  const mockOnSubmit = vi.fn();
+  const mockOnError = vi.fn();
 
   const schema = yup.object({
     name: yup.string().required('Name is required'),
@@ -54,7 +61,7 @@ describe('FormWrapper', () => {
   });
 
   describe('rendering', () => {
-    it('renders form title, fields, and submit button', async () => {
+    test('renders form title, fields, and submit button', async () => {
       await safeRender(
         <FormWrapper title="Test Form" validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -69,7 +76,7 @@ describe('FormWrapper', () => {
       expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
     });
 
-    it('renders custom submit button label', async () => {
+    test('renders custom submit button label', async () => {
       await safeRender(
         <FormWrapper submitLabel="Send" validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -79,7 +86,7 @@ describe('FormWrapper', () => {
       expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
     });
 
-    it('does not render submit button if submitLabel is an empty string', async () => {
+    test('does not render submit button if submitLabel is an empty string', async () => {
       await safeRender(
         <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -91,7 +98,7 @@ describe('FormWrapper', () => {
       expect(buttons.length).toBe(0);
     });
 
-    it('renders without title if not provided', async () => {
+    test('renders without title if not provided', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -101,7 +108,7 @@ describe('FormWrapper', () => {
       expect(screen.queryByText('Test Form')).not.toBeInTheDocument();
     });
 
-    it('disables the submit button when form is invalid', async () => {
+    test('disables the submit button when form is invalid', async () => {
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -115,7 +122,8 @@ describe('FormWrapper', () => {
   });
 
   describe('validation', () => {
-    it('shows error messages when fields are empty after blur', async () => {
+    test('shows error messages when fields are empty after blur', async () => {
+      const user = userEvent.setup();
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit} onError={mockOnError}>
           <MockFormField id="name" label="Name" />
@@ -123,26 +131,30 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      await act(async () => {
-        fireEvent.focus(screen.getByLabelText('Name'));
-        fireEvent.blur(screen.getByLabelText('Name'));
-        fireEvent.focus(screen.getByLabelText('Email'));
-        fireEvent.blur(screen.getByLabelText('Email'));
-      });
+      const nameInput = screen.getByLabelText('Name');
+      const emailInput = screen.getByLabelText('Email');
 
-      await act(async () => {
-        fireEvent.submit(screen.getByRole('form'));
-      });
+      await user.click(nameInput);
+      await user.tab(); // Blur name field
+      await user.click(emailInput);
+      await user.tab(); // Blur email field
+
+      const submitButton = screen.getByRole('button', { name: /submit/i });
+      await user.click(submitButton);
 
       expect(await screen.findByText('Name is required')).toBeInTheDocument();
       expect(await screen.findByText('Email is required')).toBeInTheDocument();
       expect(mockOnSubmit).not.toHaveBeenCalled();
-      expect(mockOnError).toHaveBeenCalled();
+      // onError is called when form submission fails validation
+      await waitFor(() => {
+        expect(mockOnError).toHaveBeenCalled();
+      });
     });
   });
 
   describe('submission', () => {
-    it('calls onSubmit with valid form data', async () => {
+    test('calls onSubmit with valid form data', async () => {
+      const user = userEvent.setup();
       await safeRender(
         <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />
@@ -150,12 +162,11 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      await fillField('Name', 'Test User');
-      await fillField('Email', 'test@example.com');
+      await fillField(user, 'Name', 'Test User');
+      await fillField(user, 'Email', 'test@example.com');
 
-      await act(async () => {
-        fireEvent.submit(screen.getByRole('form'));
-      });
+      const submitButton = screen.getByRole('button', { name: /submit/i });
+      await user.click(submitButton);
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -169,7 +180,8 @@ describe('FormWrapper', () => {
       });
     });
 
-    it('displays loading state during async submission', async () => {
+    test('displays loading state during async submission', async () => {
+      const user = userEvent.setup();
       mockOnSubmit.mockImplementation(() => new Promise((res) => setTimeout(res, 100)));
 
       await safeRender(
@@ -179,14 +191,11 @@ describe('FormWrapper', () => {
         </FormWrapper>
       );
 
-      await fillField('Name', 'Test User');
-      await fillField('Email', 'test@example.com');
+      await fillField(user, 'Name', 'Test User');
+      await fillField(user, 'Email', 'test@example.com');
 
       const button = screen.getByRole('button', { name: /submit/i });
-
-      await act(async () => {
-        fireEvent.click(button);
-      });
+      await user.click(button);
 
       expect(button).toBeDisabled();
       expect(button).toHaveTextContent(/processing/i);
@@ -199,7 +208,7 @@ describe('FormWrapper', () => {
   });
 
   describe('defaultValues', () => {
-    it('pre-fills inputs using defaultValues', async () => {
+    test('pre-fills inputs using defaultValues', async () => {
       await safeRender(
         <FormWrapper
           validationSchema={schema}
@@ -217,12 +226,14 @@ describe('FormWrapper', () => {
   });
 
   describe('formProps and className', () => {
-    it('passes additional formProps and applies custom class', async () => {
+    test('passes additional formProps and applies custom class', async () => {
       await safeRender(
         <FormWrapper
           validationSchema={schema}
           onSubmit={mockOnSubmit}
-          formProps={{ 'data-testid': 'test-form', className: 'extra-class' } as React.FormHTMLAttributes<HTMLFormElement>}
+          formProps={
+            { 'data-testid': 'test-form', className: 'extra-class' } as React.FormHTMLAttributes<HTMLFormElement>
+          }
         >
           <MockFormField id="name" label="Name" />
         </FormWrapper>
@@ -232,7 +243,7 @@ describe('FormWrapper', () => {
       expect(form).toHaveClass('extra-class');
     });
 
-    it('applies className directly to form wrapper', async () => {
+    test('applies className directly to form wrapper', async () => {
       await safeRender(
         <FormWrapper className="custom-form" validationSchema={schema} onSubmit={mockOnSubmit}>
           <MockFormField id="name" label="Name" />

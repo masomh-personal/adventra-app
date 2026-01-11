@@ -76,25 +76,25 @@ describe('Dashboard', () => {
   // Dashboard is wrapped with withAuth, so we need to cast it to accept user prop
   const DashboardPage = DashboardPageModule as React.ComponentType<{ user: User | null }>;
 
-  it('renders the dashboard header and welcome message', () => {
+test('renders the dashboard header and welcome message', () => {
     render(<DashboardPage user={mockUser} />);
     expect(screen.getByText(/Welcome,/i)).toBeInTheDocument();
     expect(screen.getByText(/Test/i)).toBeInTheDocument();
   });
 
-  it('renders the Edit Profile and Log Out buttons', () => {
+test('renders the Edit Profile and Log Out buttons', () => {
     render(<DashboardPage user={mockUser} />);
     expect(screen.getByTestId('edit-profile-button')).toBeInTheDocument();
     expect(screen.getByTestId('log-out-button')).toBeInTheDocument();
   });
 
-  it('renders the InfoCards', () => {
+test('renders the InfoCards', () => {
     render(<DashboardPage user={mockUser} />);
     expect(screen.getByTestId('adventurers-infocard')).toBeInTheDocument();
     expect(screen.getByTestId('messages-infocard')).toBeInTheDocument();
   });
 
-  it('calls signOut and redirects to login when Log Out is clicked', async () => {
+test('calls signOut and redirects to login when Log Out is clicked', async () => {
     const user = setup();
     mockSignOut.mockResolvedValueOnce({ error: null });
 
@@ -107,7 +107,7 @@ describe('Dashboard', () => {
     });
   });
 
-  it('logs an error if signOut fails', async () => {
+test('logs an error if signOut fails', async () => {
     const user = setup();
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     mockSignOut.mockResolvedValueOnce({
@@ -124,7 +124,7 @@ describe('Dashboard', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('calls router.push when Edit Profile is clicked', async () => {
+test('calls router.push when Edit Profile is clicked', async () => {
     const user = setup();
 
     render(<DashboardPage user={mockUser} />);

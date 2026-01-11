@@ -95,14 +95,14 @@ describe('SearchPage', () => {
     mockedCalcAgeFromBirthdate.mockReturnValue(30);
   });
 
-  it('shows loading then renders Alice', async () => {
+test('shows loading then renders Alice', async () => {
     render(<SearchPage />);
     expect(screen.getByText('Fetching profiles...')).toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-  it('advances to Bob when No Match is clicked', async () => {
+test('advances to Bob when No Match is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
@@ -111,7 +111,7 @@ describe('SearchPage', () => {
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-  it('advances to Bob when Interested is clicked', async () => {
+test('advances to Bob when Interested is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 
@@ -120,7 +120,7 @@ describe('SearchPage', () => {
     await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
   });
 
-  it('navigates to messages when Message is clicked', async () => {
+test('navigates to messages when Message is clicked', async () => {
     render(<SearchPage />);
     await waitFor(() => screen.getByTestId('person-card'));
 

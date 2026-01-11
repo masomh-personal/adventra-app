@@ -69,7 +69,7 @@ describe('SignupPage', () => {
     await user.type(screen.getByLabelText('Confirm Password'), 'Password123!');
   };
 
-  it('renders all expected fields and buttons', () => {
+test('renders all expected fields and buttons', () => {
     render(<SignupPage />);
 
     expect(screen.getByText(/Create Your Account/i)).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('SignupPage', () => {
     expect(screen.getByTestId('login-button')).toBeInTheDocument();
   });
 
-  it('validates required fields and shows errors', async () => {
+test('validates required fields and shows errors', async () => {
     const user = userEvent.setup();
     render(<SignupPage />);
 
@@ -101,7 +101,7 @@ describe('SignupPage', () => {
     expect(screen.getByText(/Please confirm your password/i)).toBeInTheDocument();
   });
 
-  it('shows password strength meter once password is typed', async () => {
+test('shows password strength meter once password is typed', async () => {
     const user = userEvent.setup();
     render(<SignupPage />);
 
@@ -112,7 +112,7 @@ describe('SignupPage', () => {
     expect(screen.getByTestId('strength-value')).toBeInTheDocument();
   });
 
-  it('submits successfully with valid fields', async () => {
+test('submits successfully with valid fields', async () => {
     const user = userEvent.setup();
 
     const fakeUser = { id: 'fake-user-id' };
@@ -167,7 +167,7 @@ describe('SignupPage', () => {
     });
   });
 
-  it('shows error modal when Supabase fails', async () => {
+test('shows error modal when Supabase fails', async () => {
     const user = userEvent.setup();
     mockSignUp.mockResolvedValue({
       error: { message: 'User already registered' },
@@ -186,7 +186,7 @@ describe('SignupPage', () => {
     });
   });
 
-  it('shows error modal if dbCreateUser fails after signup', async () => {
+test('shows error modal if dbCreateUser fails after signup', async () => {
     const user = userEvent.setup();
 
     mockSignUp.mockResolvedValue({

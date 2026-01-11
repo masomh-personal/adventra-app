@@ -106,13 +106,13 @@ describe('MessagesPage', () => {
     });
   });
 
-  it('shows spinner then loads inbox', async () => {
+test('shows spinner then loads inbox', async () => {
     render(<MessagesPage />);
     expect(screen.getByText(/Loading messages/i)).toBeInTheDocument();
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
   });
 
-  it('loads messages when clicking a conversation', async () => {
+test('loads messages when clicking a conversation', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
     const user = userEvent.setup();
@@ -121,7 +121,7 @@ describe('MessagesPage', () => {
     expect(screen.getByText('Hello Alice!')).toBeInTheDocument();
   });
 
-  it('navigates back on button click', async () => {
+test('navigates back on button click', async () => {
     render(<MessagesPage />);
     await waitFor(() => screen.getByRole('button', { name: /Back to Dashboard/i }));
     const user = userEvent.setup();

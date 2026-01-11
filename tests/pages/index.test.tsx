@@ -1,5 +1,6 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import HomePage from '@/pages/index';
 import { useRouter } from 'next/router';
 import { vi } from 'vitest';
@@ -12,13 +13,11 @@ vi.mock('next/router', () => ({
 const mockedUseRouter = vi.mocked(useRouter);
 
 // Mock the next/link component
-vi.mock('next/link', () => {
-  const Link = ({ children, href }: { children: React.ReactNode; href: string }) => (
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
-  );
-  Link.displayName = 'MockLink';
-  return Link;
-});
+  ),
+}));
 
 // Mock withAuth to just return the component without Supabase check
 vi.mock('@/lib/withAuth', () => ({
@@ -40,14 +39,14 @@ describe('HomePage', () => {
   });
 
   describe('Content', () => {
-    it('should render the welcome heading with emoji', () => {
+    test('should render the welcome heading with emoji', () => {
       act(() => {
         render(<HomePage user={null} />);
       });
       expect(screen.getByText('🏕️ Welcome to Adventra')).toBeInTheDocument();
     });
 
-    it('should render the descriptive tagline', () => {
+    test('should render the descriptive tagline', () => {
       act(() => {
         render(<HomePage user={null} />);
       });
@@ -58,16 +57,17 @@ describe('HomePage', () => {
   });
 
   describe('Navigation', () => {
-    it('should navigate to login page when login button is clicked', () => {
+    test('should navigate to login page when login button is clicked', async () => {
+      const user = userEvent.setup();
       act(() => {
         render(<HomePage user={null} />);
       });
       const loginButton = screen.getByText('Login');
-      fireEvent.click(loginButton);
+      await user.click(loginButton);
       expect(mockPush).toHaveBeenCalledWith('/login');
     });
 
-    it('should render the signup button as a link with correct href', async () => {
+    test('should render the signup button as a link with correct href', async () => {
       await act(async () => {
         render(<HomePage user={null} />);
       });
@@ -78,17 +78,18 @@ describe('HomePage', () => {
   });
 
   describe('Background', () => {
-    it('should show video by default', () => {
+    test('should show video by default', () => {
       const { container } = render(<HomePage user={null} />);
       const video = container.querySelector('video');
       expect(video).not.toBeNull();
       expect(video?.tagName.toLowerCase()).toBe('video');
     });
 
-    it('should display gradient fallback when video errors', () => {
+    test('should display gradient fallback when video errors', () => {
       const { container } = render(<HomePage user={null} />);
       const video = container.querySelector('video');
       if (video) {
+        // fireEvent.error is appropriate for video error events (no userEvent equivalent)
         fireEvent.error(video);
       }
 
@@ -96,7 +97,7 @@ describe('HomePage', () => {
       expect(fallback).toBeInTheDocument();
     });
 
-    it('should render dark overlay for better text readability', () => {
+    test('should render dark overlay for better text readability', () => {
       render(<HomePage user={null} />);
       const overlay = screen.getByTestId('dark-overlay');
       expect(overlay).toBeInTheDocument();

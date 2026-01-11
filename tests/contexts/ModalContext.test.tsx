@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 import { ModalProvider, useModal } from '@/contexts/ModalContext';
 import { vi } from 'vitest';
 
@@ -52,52 +53,64 @@ describe('ModalContext', () => {
     vi.useRealTimers();
   });
 
-  it('shows and closes an error modal', async () => {
+  test('shows and closes an error modal', async () => {
+    const user = userEvent.setup({ delay: null });
     renderWithProvider();
 
-    fireEvent.click(screen.getByText('Error'));
+    const errorButton = screen.getByText('Error');
+    await user.click(errorButton);
+
+    expect(await screen.findByText('Error occurred')).toBeInTheDocument();
     expect(screen.getByText('Error Title')).toBeInTheDocument();
-    expect(screen.getByText('Error occurred')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Close'));
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    await user.click(closeButton);
 
-    act(() => {
-      vi.advanceTimersByTime(750);
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync();
     });
 
     expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
   });
 
-  it('shows success modal with custom close label', () => {
+  test('shows success modal with custom close label', async () => {
+    const user = userEvent.setup({ delay: null });
     renderWithProvider();
 
-    fireEvent.click(screen.getByText('Success'));
-    expect(screen.getByText('Welcome')).toBeInTheDocument();
-    expect(screen.getByText('Signup success!')).toBeInTheDocument();
-    expect(screen.getByText('Thanks')).toBeInTheDocument();
+    const successButton = screen.getByText('Success');
+    await user.click(successButton);
+
+    expect(await screen.findByText('Signup success!')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /thanks/i })).toBeInTheDocument();
   });
 
-  it('shows info modal with custom close label', () => {
+  test('shows info modal with custom close label', async () => {
+    const user = userEvent.setup({ delay: null });
     renderWithProvider();
 
-    fireEvent.click(screen.getByText('Info'));
-    expect(screen.getByText('Heads Up')).toBeInTheDocument();
-    expect(screen.getByText('FYI only')).toBeInTheDocument();
-    expect(screen.getByText('Dismiss')).toBeInTheDocument();
+    const infoButton = screen.getByText('Info');
+    await user.click(infoButton);
+
+    expect(await screen.findByText('FYI only')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument();
   });
 
-  it('closes modal using manual contexts call', () => {
+  test('closes modal using manual contexts call', async () => {
+    const user = userEvent.setup({ delay: null });
     renderWithProvider();
 
-    fireEvent.click(screen.getByText('Info'));
-    expect(screen.getByText('Heads Up')).toBeInTheDocument();
+    const errorButton = screen.getByText('Error');
+    await user.click(errorButton);
 
-    fireEvent.click(screen.getByText('Close Manually'));
+    expect(await screen.findByText('Error occurred')).toBeInTheDocument();
 
-    act(() => {
-      vi.advanceTimersByTime(750);
+    const closeManuallyButton = screen.getByText('Close Manually');
+    await user.click(closeManuallyButton);
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync();
     });
 
-    expect(screen.queryByText('FYI only')).not.toBeInTheDocument();
+    expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
   });
 });

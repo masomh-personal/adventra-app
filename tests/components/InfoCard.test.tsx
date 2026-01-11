@@ -8,7 +8,7 @@ describe('InfoCard', () => {
   const setup = () => userEvent.setup();
   const renderComponent = (props: Partial<InfoCardProps>) => render(<InfoCard {...(props as InfoCardProps)} />);
 
-  it('renders title, description, and button label', () => {
+test('renders title, description, and button label', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -22,7 +22,7 @@ describe('InfoCard', () => {
     expect(screen.getByTestId('infocard-button-test-button')).toBeInTheDocument();
   });
 
-  it('calls onClick when the button is clicked', async () => {
+test('calls onClick when the button is clicked', async () => {
     const user = setup();
     const onClick = jest.fn();
     renderComponent({
@@ -36,7 +36,7 @@ describe('InfoCard', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('renders an image when imgSrc is provided', () => {
+test('renders an image when imgSrc is provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -50,7 +50,7 @@ describe('InfoCard', () => {
     expect(image).toHaveAttribute('src');
   });
 
-  it('does not render an image when imgSrc is not provided', () => {
+test('does not render an image when imgSrc is not provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -60,7 +60,7 @@ describe('InfoCard', () => {
     expect(screen.queryByTestId('infocard-image')).not.toBeInTheDocument();
   });
 
-  it('renders a button icon when buttonIcon is provided', () => {
+test('renders a button icon when buttonIcon is provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',
@@ -72,7 +72,7 @@ describe('InfoCard', () => {
     expect(button.querySelector('svg')).toBeTruthy();
   });
 
-  it('does not render a button when buttonLabel is not provided', () => {
+test('does not render a button when buttonLabel is not provided', () => {
     renderComponent({
       title: 'Test Title',
       description: 'Test Description',

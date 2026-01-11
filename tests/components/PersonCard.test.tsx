@@ -14,14 +14,14 @@ describe('PersonCard Component', () => {
   };
 
   describe('1. Core Content Rendering', () => {
-    it('1.1 Renders the user name', () => {
+test('1.1 Renders the user name', () => {
       const { name } = baseProps;
       render(<PersonCard {...baseProps} />);
       const result = screen.getByTestId('person-card-name');
       expect(result).toHaveTextContent(name);
     });
 
-    it('1.2 Renders age and skill tags', () => {
+test('1.2 Renders age and skill tags', () => {
       const { age, skillLevel } = baseProps;
       render(<PersonCard {...baseProps} />);
       const ageTag = screen.getByText(`AGE: ${age}`);
@@ -30,14 +30,14 @@ describe('PersonCard Component', () => {
       expect(skillTag).toBeInTheDocument();
     });
 
-    it('1.3 Renders the user bio', () => {
+test('1.3 Renders the user bio', () => {
       const { bio } = baseProps;
       render(<PersonCard {...baseProps} />);
       const result = screen.getByTestId('person-card-bio');
       expect(result).toHaveTextContent(bio);
     });
 
-    it('1.4 Renders adventure preferences', () => {
+test('1.4 Renders adventure preferences', () => {
       const { adventurePreferences } = baseProps;
       render(<PersonCard {...baseProps} />);
       const result = screen.getByTestId('person-card-preferences');
@@ -51,7 +51,7 @@ describe('PersonCard Component', () => {
       });
     });
 
-    it('1.5 Renders an image element', () => {
+test('1.5 Renders an image element', () => {
       render(<PersonCard {...baseProps} />);
       const result = screen.getByTestId('person-card-image');
       expect(result).toBeInTheDocument();
@@ -59,28 +59,28 @@ describe('PersonCard Component', () => {
   });
 
   describe('2. Fallback Rendering', () => {
-    it('2.1 Displays "Unnamed Explorer" if name is missing', () => {
+test('2.1 Displays "Unnamed Explorer" if name is missing', () => {
       const expected = 'Unnamed Explorer';
       render(<PersonCard {...baseProps} name={undefined} />);
       const result = screen.getByTestId('person-card-name');
       expect(result).toHaveTextContent(expected);
     });
 
-    it('2.2 Displays "Not specified" if skillLevel and age are missing', () => {
+test('2.2 Displays "Not specified" if skillLevel and age are missing', () => {
       const expected = 'Not specified';
       render(<PersonCard {...baseProps} skillLevel={null} age={null} />);
       const result = screen.getAllByText(/Not specified/i); // Use getAllByText
       expect(result[0]).toHaveTextContent(expected); // Assert on the correct element
     });
 
-    it('2.3 Shows fallback bio if bio is null or empty', () => {
+test('2.3 Shows fallback bio if bio is null or empty', () => {
       const expected = "This adventurer hasn't written a bio yet.";
       render(<PersonCard {...baseProps} bio={null} />);
       const result = screen.getByTestId('person-card-bio');
       expect(result).toHaveTextContent(expected);
     });
 
-    it('2.4 Displays "None selected" when no preferences are given', () => {
+test('2.4 Displays "None selected" when no preferences are given', () => {
       const expected = 'None selected';
       render(<PersonCard {...baseProps} adventurePreferences={[]} />);
       const result = screen.getByTestId('person-card-preferences');
@@ -89,25 +89,25 @@ describe('PersonCard Component', () => {
   });
 
   describe('3. Image Handling', () => {
-    it('3.1 Renders fallback image if imgSrc is missing', () => {
+test('3.1 Renders fallback image if imgSrc is missing', () => {
       render(<PersonCard {...baseProps} imgSrc={null} />);
       const result = screen.getByTestId('person-card-image');
       expect(result).toBeInTheDocument();
     });
 
-    it('3.2 Renders a loading spinner for fallback img with useNextImage = false', () => {
+test('3.2 Renders a loading spinner for fallback img with useNextImage = false', () => {
       render(<PersonCard {...baseProps} useNextImage={false} />);
       const result = screen.getByTestId('person-card-image');
       expect(result).toBeInTheDocument();
     });
 
-    it('3.3 Does not render age tag if age is missing', () => {
+test('3.3 Does not render age tag if age is missing', () => {
       render(<PersonCard {...baseProps} age={null} />);
       const result = screen.queryByText(/AGE:/i);
       expect(result).not.toBeInTheDocument();
     });
 
-    it('3.4 Does not render skill tag if skillLevel is missing', () => {
+test('3.4 Does not render skill tag if skillLevel is missing', () => {
       render(<PersonCard {...baseProps} skillLevel={null} />);
       const result = screen.queryByText(/Intermediate/i);
       expect(result).not.toBeInTheDocument();

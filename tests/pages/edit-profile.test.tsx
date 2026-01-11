@@ -95,13 +95,13 @@ describe('EditProfile Page', () => {
     });
   });
 
-  it('renders initial values and disables save button', async () => {
+test('renders initial values and disables save button', async () => {
     const bioInput = await screen.findByLabelText('Bio');
     expect(bioInput).toHaveValue('Nature lover');
     expect(screen.getByRole('button', { name: /save changes/i })).toBeDisabled();
   });
 
-  it('enables save on form change and submits', async () => {
+test('enables save on form change and submits', async () => {
     const user = userEvent.setup();
 
     const bioInput = await screen.findByLabelText('Bio');
@@ -125,7 +125,7 @@ describe('EditProfile Page', () => {
     });
   });
 
-  it('enables save on multiple form changes and submits', async () => {
+test('enables save on multiple form changes and submits', async () => {
     const user = userEvent.setup();
 
     const bioInput = await screen.findByLabelText('Bio');
@@ -160,7 +160,7 @@ describe('EditProfile Page', () => {
     });
   });
 
-  it('shows error if supabase upsert fails', async () => {
+test('shows error if supabase upsert fails', async () => {
     const user = userEvent.setup();
     mockUpsert.mockResolvedValueOnce({ error: new Error('DB error') });
 
@@ -178,7 +178,7 @@ describe('EditProfile Page', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('uploads image and shows success', async () => {
+test('uploads image and shows success', async () => {
     const user = userEvent.setup();
     const file = new File(['image'], 'profile.jpg', { type: 'image/jpeg' });
 
@@ -197,13 +197,13 @@ describe('EditProfile Page', () => {
     });
   });
 
-  it('navigates to dashboard on back button click', async () => {
+test('navigates to dashboard on back button click', async () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: /back to dashboard/i }));
     expect(mockPush).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('correctly handles Instagram URL input', async () => {
+test('correctly handles Instagram URL input', async () => {
     const user = userEvent.setup();
     const instagramInput = await screen.findByLabelText('Instagram URL');
     expect(instagramInput).toHaveValue('https://instagram.com/aleexample');
@@ -219,7 +219,7 @@ describe('EditProfile Page', () => {
     });
   });
 
-  it('correctly handles Facebook URL input', async () => {
+test('correctly handles Facebook URL input', async () => {
     const user = userEvent.setup();
     const facebookInput = await screen.findByLabelText('Facebook URL');
     expect(facebookInput).toHaveValue('https://facebook.com/aleexample');
