@@ -4,13 +4,13 @@ import { signupSchema } from '@/validation/signupSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
-import supabase from '@/lib/supabaseClient';
+import { account } from '@/lib/appwriteClient';
 import { useModal } from '@/contexts/ModalContext';
 import Button from '@/components/Button';
 import { dbCreateUser } from '@/hooks/dbCreateUser';
 import type { SignupFormData } from '@/types/form';
-import type { AuthError } from '@supabase/supabase-js';
 import type { FieldValues } from 'react-hook-form';
+import { ID } from 'appwrite';
 
 export default function SignupPage(): React.JSX.Element {
     const router = useRouter();
@@ -23,30 +23,19 @@ export default function SignupPage(): React.JSX.Element {
         setIsSubmitting(true);
 
         try {
-            const { data: authData, error } = await supabase.auth.signUp({
-                email: signupData.email,
-                password: signupData.password,
-                options: {
-                    data: { full_name: signupData.name },
-                    emailRedirectTo: `${window.location.origin}/dashboard`,
-                },
-            });
+            // Create user account in Appwrite Auth
+            const user = await account.create(
+                ID.unique(),
+                signupData.email,
+                signupData.password,
+                signupData.name,
+            );
 
-            // Case: Duplicate email or other Supabase signup error
-            // NOTE: we turned off email confirmation requirement
-            if (error || !authData?.user) {
-                const isDuplicate = (error as AuthError)?.message === 'User already registered';
-
-                const errMsg = isDuplicate
-                    ? 'This email is already registered. Please log in instead or reset your password if needed.'
-                    : (error as AuthError)?.message || 'Signup failed. Please try again.';
-
-                const title = isDuplicate ? 'Email Already Registered' : 'Signup Error';
-
-                return showErrorModal(errMsg, title);
+            if (!user) {
+                return showErrorModal('Signup failed. Please try again.', 'Signup Error');
             }
 
-            // Create custom user record in public.user (after adding to auth.user with Supabase)
+            // Create custom user record in database (after creating auth user with Appwrite)
             try {
                 const birthdateStr =
                     signupData.birthdate instanceof Date
@@ -54,7 +43,7 @@ export default function SignupPage(): React.JSX.Element {
                         : String(signupData.birthdate);
 
                 await dbCreateUser({
-                    user_id: authData.user.id,
+                    user_id: user.$id,
                     name: signupData.name,
                     email: signupData.email,
                     birthdate: birthdateStr,
@@ -68,6 +57,14 @@ export default function SignupPage(): React.JSX.Element {
                 );
             }
 
+            // Auto-login after signup (create session)
+            try {
+                await account.createEmailSession(signupData.email, signupData.password);
+            } catch (sessionError) {
+                console.error('Session creation error:', sessionError);
+                // Continue even if session creation fails - user can log in manually
+            }
+
             // Final success message
             showSuccessModal(
                 'Your account is all set — time to lace up those hiking boots and find your next adventuring partner!',
@@ -77,7 +74,21 @@ export default function SignupPage(): React.JSX.Element {
             );
         } catch (err) {
             console.error('Unexpected signup error:', err);
-            showErrorModal('An unexpected error occurred. Please try again.', 'Signup Error');
+            let errorMessage = 'An unexpected error occurred. Please try again.';
+            let errorTitle = 'Signup Error';
+
+            if (err instanceof Error) {
+                errorMessage = err.message;
+
+                // Handle duplicate email error
+                if (err.message.includes('already') || err.message.includes('exists')) {
+                    errorMessage =
+                        'This email is already registered. Please log in instead or reset your password if needed.';
+                    errorTitle = 'Email Already Registered';
+                }
+            }
+
+            showErrorModal(errorMessage, errorTitle);
         } finally {
             setIsSubmitting(false);
         }

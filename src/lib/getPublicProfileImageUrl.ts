@@ -1,7 +1,7 @@
 /**
- * Generates the public image URL for a user's profile photo stored in Supabase Storage.
+ * Generates the public image URL for a user's profile photo stored in Appwrite Storage.
  *
- * @param userId - The user's UUID.
+ * @param userId - The user's ID.
  * @param options - Optional settings.
  * @param options.bustCache - If true, adds a timestamp to the URL.
  * @returns Full public URL to the image.
@@ -12,11 +12,16 @@ export default function getPublicProfileImageUrl(
 ): string {
     if (!userId || typeof userId !== 'string') return '';
 
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
-    const cacheBuster = options.bustCache ? `?t=${Date.now()}` : '';
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+    const bucketId = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_BUCKET_ID;
+    const cacheBuster = options.bustCache ? `&t=${Date.now()}` : '';
 
-    if (!baseUrl || !bucket) return '';
+    if (!endpoint || !projectId || !bucketId) return '';
 
-    return `${baseUrl}/storage/v1/object/public/${bucket}/user-${userId}.jpg${cacheBuster}`;
+    // Appwrite Storage URL format: {endpoint}/storage/buckets/{bucketId}/files/{fileId}/view?project={projectId}
+    // Assuming file is named: user-{userId}.jpg
+    const fileId = `user-${userId}.jpg`;
+
+    return `${endpoint}/storage/buckets/${bucketId}/files/${fileId}/view?project=${projectId}${cacheBuster}`;
 }

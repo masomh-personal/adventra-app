@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import supabase from '@/lib/supabaseClient';
+import { account, databases, databaseId } from '@/lib/appwriteServer';
+import { COLLECTION_IDS } from '@/types/appwrite';
 import type { ApiError, ApiSuccess } from '@/types/api';
+import { ID } from 'appwrite';
 
 interface SignupRequestBody {
     email?: string;
@@ -28,36 +30,29 @@ export default async function handler(
     }
 
     try {
-        // Sign up the user using Supabase Auth
-        const { data: userData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-        });
+        // Sign up the user using Appwrite Auth (server-side)
+        // Note: Server-side signup creates the user but doesn't create a session
+        // The client should handle session creation after signup
+        const user = await account.create(ID.unique(), email, password, fullName);
 
-        if (signUpError) {
-            return res.status(400).json({ error: signUpError.message });
-        }
-
-        if (!userData?.user) {
+        if (!user) {
             return res.status(400).json({ error: 'User creation failed' });
         }
 
-        // Insert additional user profile data into 'profiles' table
-        const { error: profileError } = await (supabase.from('profiles') as any).insert([
-            {
-                id: userData.user.id, // Supabase assigns a UUID user id
+        // Insert additional user profile data into 'profiles' collection
+        try {
+            await databases.createDocument(databaseId, COLLECTION_IDS.PROFILES, user.$id, {
+                id: user.$id,
                 full_name: fullName,
                 created_at: new Date().toISOString(),
-            },
-        ]);
-
-        if (profileError) {
+            });
+        } catch (profileError) {
             const errorMessage =
                 profileError instanceof Error ? profileError.message : String(profileError);
             return res.status(500).json({ error: errorMessage });
         }
 
-        return res.status(201).json({ message: 'User signed up successfully', data: userData });
+        return res.status(201).json({ message: 'User signed up successfully', data: user });
     } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Server error';
         return res.status(500).json({ error: errorMessage });

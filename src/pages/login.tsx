@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { loginSchema } from '@/validation/loginSchema';
 import FormWrapper from '@/components/FormWrapper';
 import FormField from '@/components/FormField';
-import supabase from '@/lib/supabaseClient';
+import { account } from '@/lib/appwriteClient';
 import { useModal } from '@/contexts/ModalContext';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook, FaInstagram, FaApple } from 'react-icons/fa';
@@ -12,7 +12,6 @@ import Button from '@/components/Button';
 import DividerWithText from '@/components/DividerWithText';
 import MagicLinkForm from '@/components/MagicLinkForm';
 import type { LoginFormData } from '@/types/form';
-import type { AuthError } from '@supabase/supabase-js';
 import type { FieldValues } from 'react-hook-form';
 
 interface SSOProvider {
@@ -31,16 +30,20 @@ export default function LoginPage(): React.JSX.Element {
     const [showMagicForm, setShowMagicForm] = useState<boolean>(false);
 
     // Helper to show contextual login error messages
-    const showLoginError = (error: AuthError | null | undefined): void => {
-        let message = error?.message || 'An unexpected error occurred. Please try again.';
+    const showLoginError = (error: unknown): void => {
+        let message = 'An unexpected error occurred. Please try again.';
         let title = 'Login Error';
 
-        if (message.includes('Invalid login credentials')) {
-            title = 'Login Failed';
-            message =
-                'Invalid email or password. Please try again. Please contact support if this error persists';
-        } else if (message.includes('Email not confirmed')) {
-            title = 'Email Not Confirmed';
+        if (error instanceof Error) {
+            message = error.message;
+
+            if (message.includes('Invalid credentials') || message.includes('Invalid password')) {
+                title = 'Login Failed';
+                message =
+                    'Invalid email or password. Please try again. Please contact support if this error persists';
+            } else if (message.includes('Email not confirmed')) {
+                title = 'Email Not Confirmed';
+            }
         }
 
         showErrorModal(message, title);
@@ -51,19 +54,11 @@ export default function LoginPage(): React.JSX.Element {
         const loginData = data as LoginFormData;
         setLoading(true);
         try {
-            const { data: authData, error } = await supabase.auth.signInWithPassword({
-                email: loginData.email,
-                password: loginData.password,
-            });
-
-            if (error || !authData?.user) {
-                return showLoginError(error);
-            }
-
+            await account.createEmailSession(loginData.email, loginData.password);
             await router.replace('/dashboard');
         } catch (err) {
-            console.error('Unexpected login error:', err);
-            showErrorModal('An unexpected error occurred during login.', 'Login Error');
+            console.error('Login error:', err);
+            showLoginError(err);
         } finally {
             setLoading(false);
         }
@@ -75,20 +70,13 @@ export default function LoginPage(): React.JSX.Element {
         setLoading(true);
 
         try {
-            const { error } = await supabase.auth.signInWithOtp({
-                email,
-                options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-            });
-
-            if (error) {
-                return showErrorModal('Unable to send magic link. Please try again.', modalTitle);
-            }
-
+            const redirectUrl = `${window.location.origin}/dashboard`;
+            await account.createMagicURLSession(email, redirectUrl);
             showSuccessModal('Check your email inbox for a secure login link!', 'Magic Link Sent');
             setShowMagicForm(false);
         } catch (err) {
             console.error('Magic link error:', err);
-            showErrorModal('Something went wrong. Please try again.', modalTitle);
+            showErrorModal('Unable to send magic link. Please try again.', modalTitle);
         } finally {
             setLoading(false);
         }

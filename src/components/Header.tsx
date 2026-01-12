@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import type { User } from '@supabase/supabase-js';
-import supabase from '@/lib/supabaseClient';
+import type { Models } from 'appwrite';
+import { account } from '@/lib/appwriteClient';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
 interface NavLink {
@@ -15,28 +15,22 @@ interface NavLink {
 
 export default function Header(): React.JSX.Element {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
     const router = useRouter();
 
     useEffect(() => {
         // Fetch initial session
         const fetchSession = async (): Promise<void> => {
             try {
-                const {
-                    data: { session },
-                } = await supabase.auth.getSession();
-                setUser(session?.user || null);
-            } catch (error) {
-                console.error('Error fetching session:', error);
+                const currentUser = await account.get();
+                setUser(currentUser || null);
+            } catch (_error) {
+                // User is not authenticated - this is expected
+                setUser(null);
             }
         };
 
         fetchSession();
-
-        // Listen for auth state changes
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user || null);
-        });
 
         // Close menu when route changes
         const handleRouteChange = (): void => {
@@ -48,23 +42,20 @@ export default function Header(): React.JSX.Element {
         // Clean up listeners
         return () => {
             router.events.off('routeChangeStart', handleRouteChange);
-            authListener.subscription.unsubscribe();
         };
+        // Note: Appwrite doesn't have a built-in auth state listener like Supabase
+        // You may need to implement custom polling or use Appwrite's Realtime (if needed)
     }, [router]);
 
     // Logout handler
     const handleLogout = async (): Promise<void> => {
         try {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error logging out:', error);
-                return;
-            }
-
+            await account.deleteSession('current');
+            setUser(null);
             // Properly await router push
             await router.push('/login');
         } catch (error) {
-            console.error('Unexpected logout error:', error);
+            console.error('Error logging out:', error);
         }
     };
 
@@ -105,108 +96,89 @@ export default function Header(): React.JSX.Element {
           };
 
     return (
-        <header className='flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30'>
-            {/* Logo + Text Link to Home */}
-            <Link href='/' className='flex items-center space-x-2' data-testid='logo-link'>
-                <Image
-                    src='/adventra-logo.png'
-                    alt='Adventra Logo'
-                    width={48}
-                    height={48}
-                    priority
-                />
-                <span className='text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md'>
-                    adventra
-                </span>
-            </Link>
+        <header
+            className='bg-white shadow-md sticky top-0 z-50 font-body'
+            role='banner'
+            data-testid='header'
+        >
+            <div className='container mx-auto px-4 py-3 flex items-center justify-between'>
+                {/* Logo */}
+                <Link href='/' className='flex items-center space-x-2' data-testid='logo-link'>
+                    <Image
+                        src='/adventra-logo.png'
+                        alt='Adventra Logo'
+                        width={40}
+                        height={40}
+                        className='rounded-full'
+                        priority
+                    />
+                    <span className='text-2xl font-heading text-primary font-bold'>Adventra</span>
+                </Link>
 
-            {/* Mobile Menu Button */}
-            <button
-                className='md:hidden text-white p-2'
-                onClick={toggleMenu}
-                aria-label='Toggle navigation menu'
-                data-testid='mobile-menu-button'
-            >
-                {isMenuOpen ? (
-                    <FaTimes className='w-6 h-6' data-testid='mobile-menu-times' />
-                ) : (
-                    <FaBars className='w-6 h-6' data-testid='mobile-menu-bars' />
-                )}
-            </button>
-
-            {/* Desktop Navigation */}
-            <nav
-                className='hidden md:flex space-x-6 font-heading font-bold text-white'
-                data-testid='desktop-nav'
-            >
-                {navLinks.map(link => (
-                    <Link
-                        key={link.href}
-                        href={link.href}
-                        className='hover:text-primary'
-                        data-testid={link.dataTestId}
-                    >
-                        {link.label}
-                    </Link>
-                ))}
-                {authLink.label === 'Logout' && authLink.onClick ? (
-                    <button
-                        onClick={authLink.onClick}
-                        className='hover:text-primary'
-                        data-testid={authLink.dataTestId}
-                    >
-                        {authLink.label}
-                    </button>
-                ) : (
+                {/* Desktop Navigation */}
+                <nav className='hidden md:flex items-center space-x-6' role='navigation'>
+                    {navLinks.map(link => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={link.onClick}
+                            className='text-gray-700 hover:text-primary transition-colors duration-200'
+                            data-testid={link.dataTestId}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
                     <Link
                         href={authLink.href}
-                        className='hover:text-primary'
+                        onClick={authLink.onClick}
+                        className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors duration-200'
                         data-testid={authLink.dataTestId}
                     >
                         {authLink.label}
                     </Link>
-                )}
-            </nav>
+                </nav>
 
-            {/* Mobile Navigation Menu (Dropdown) */}
+                {/* Mobile Menu Button */}
+                <button
+                    className='md:hidden text-gray-700 hover:text-primary focus:outline-none'
+                    onClick={toggleMenu}
+                    aria-label='Toggle menu'
+                    aria-expanded={isMenuOpen}
+                    data-testid='menu-toggle'
+                >
+                    {isMenuOpen ? <FaTimes className='h-6 w-6' /> : <FaBars className='h-6 w-6' />}
+                </button>
+            </div>
+
+            {/* Mobile Navigation */}
             {isMenuOpen && (
-                <div
-                    className='absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50'
+                <nav
+                    className='md:hidden bg-white border-t border-gray-200 py-4'
+                    role='navigation'
                     data-testid='mobile-menu'
                 >
-                    <nav
-                        className='flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white'
-                        data-testid='mobile-nav'
-                    >
+                    <div className='container mx-auto px-4 flex flex-col space-y-4'>
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className='hover:text-primary w-full text-center py-2'
-                                data-testid={link.dataTestId}
+                                onClick={link.onClick}
+                                className='text-gray-700 hover:text-primary transition-colors duration-200 py-2'
+                                data-testid={`mobile-${link.dataTestId}`}
                             >
                                 {link.label}
                             </Link>
                         ))}
-                        {authLink.label === 'Logout' && authLink.onClick ? (
-                            <button
-                                onClick={authLink.onClick}
-                                className='hover:text-primary w-full text-center py-2'
-                                data-testid={authLink.dataTestId}
-                            >
-                                {authLink.label}
-                            </button>
-                        ) : (
-                            <Link
-                                href={authLink.href}
-                                className='hover:text-primary w-full text-center py-2'
-                                data-testid={authLink.dataTestId}
-                            >
-                                {authLink.label}
-                            </Link>
-                        )}
-                    </nav>
-                </div>
+                        <Link
+                            href={authLink.href}
+                            onClick={authLink.onClick}
+                            className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors duration-200 text-center'
+                            data-testid={`mobile-${authLink.dataTestId}`}
+                        >
+                            {authLink.label}
+                        </Link>
+                    </div>
+                </nav>
             )}
         </header>
     );

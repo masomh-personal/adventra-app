@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import type { User } from '@supabase/supabase-js';
-import supabase from '@/lib/supabaseClient';
+import type { Models } from 'appwrite';
 import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
@@ -33,7 +32,7 @@ interface ProfileData {
 }
 
 interface EditProfileProps {
-    user: User | null;
+    user: Models.User<Models.Preferences> | null;
 }
 
 function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {

@@ -1,12 +1,13 @@
-import supabase from '@/lib/supabaseClient';
+import { databases, databaseId } from './appwriteClient';
+import { COLLECTION_IDS } from '@/types/appwrite';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 import type { FullUserProfile } from '@/types/user';
 
 /**
  * Fetches the full user profile including profile data and user info (name, email).
- * Requires a foreign key from `userprofile.user_id` → `user.user_id`
+ * Note: Appwrite doesn't support joins, so we fetch userprofile and user separately, then combine.
  *
- * @param uid - Supabase Auth UUID (user_id)
+ * @param uid - Appwrite Auth user ID (user_id)
  * @returns Full user profile or null on error
  */
 export async function getFullUserProfile(
@@ -14,73 +15,46 @@ export async function getFullUserProfile(
 ): Promise<FullUserProfile | null> {
     if (!uid) return null;
 
-    const { data, error } = await supabase
-        .from('userprofile')
-        .select(
-            `
-      bio,
-      adventure_preferences,
-      skill_summary,
-      profile_image_url,
-      birthdate,
-      instagram_url,
-      facebook_url,
-      dating_preferences,
-      user_id,
-      user:user_id (
-        name,
-        email
-      )
-    `,
-        )
-        .eq('user_id', uid)
-        .single();
+    try {
+        // Fetch user profile
+        const profileDoc = await databases.getDocument(
+            databaseId,
+            COLLECTION_IDS.USERPROFILE,
+            uid, // Use uid as document ID
+        );
 
-    if (error) {
+        // Fetch user data
+        let user: { name: string; email: string } | null = null;
+        try {
+            const userDoc = await databases.getDocument(databaseId, COLLECTION_IDS.USER, uid);
+            user = {
+                name: userDoc.name as string,
+                email: userDoc.email as string,
+            };
+        } catch (_userError) {
+            // User not found - this is okay, user will be null
+            console.warn('User not found for profile:', uid);
+        }
+
+        const profileData: FullUserProfile = {
+            user_id: profileDoc.user_id as string,
+            bio: (profileDoc.bio as string) || null,
+            adventure_preferences: (profileDoc.adventure_preferences as string[]) || null,
+            skill_summary: profileDoc.skill_summary
+                ? (JSON.parse(profileDoc.skill_summary as string) as Record<string, string>)
+                : null,
+            profile_image_url: (profileDoc.profile_image_url as string) || null,
+            birthdate: (profileDoc.birthdate as string) || null,
+            instagram_url: (profileDoc.instagram_url as string) || null,
+            facebook_url: (profileDoc.facebook_url as string) || null,
+            dating_preferences: (profileDoc.dating_preferences as string) || null,
+            user,
+            age: profileDoc.birthdate ? calcAgeFromBirthdate(profileDoc.birthdate as string) : null,
+        };
+
+        return profileData;
+    } catch (error) {
         console.error('Error fetching full user profile:', error);
         return null;
     }
-
-    if (!data) return null;
-
-    // Transform Supabase response (joined relations are arrays) to match our type
-    const dataTyped = data as {
-        bio?: string | null;
-        adventure_preferences?: string[] | null;
-        skill_summary?: Record<string, string> | null;
-        profile_image_url?: string | null;
-        birthdate?: string | null;
-        instagram_url?: string | null;
-        facebook_url?: string | null;
-        dating_preferences?: string | null;
-        user_id: string;
-        user?: { name: string; email: string }[] | { name: string; email: string } | null;
-    };
-
-    const profileData = {
-        bio: dataTyped.bio,
-        adventure_preferences: dataTyped.adventure_preferences,
-        skill_summary: dataTyped.skill_summary,
-        profile_image_url: dataTyped.profile_image_url,
-        birthdate: dataTyped.birthdate,
-        instagram_url: dataTyped.instagram_url,
-        facebook_url: dataTyped.facebook_url,
-        dating_preferences: dataTyped.dating_preferences,
-        user_id: dataTyped.user_id,
-        // Supabase returns joined relations as arrays, take first element
-        user:
-            Array.isArray(dataTyped.user) && dataTyped.user.length > 0
-                ? dataTyped.user[0]
-                : !Array.isArray(dataTyped.user)
-                  ? dataTyped.user
-                  : null,
-    };
-
-    // Compute age from birthdate in userprofile table
-    const age = profileData?.birthdate ? calcAgeFromBirthdate(profileData.birthdate) : null;
-
-    return {
-        ...profileData,
-        age, // Add it at the root level for easy consumption
-    } as FullUserProfile;
 }

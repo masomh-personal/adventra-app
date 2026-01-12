@@ -1,4 +1,6 @@
-import supabase from '@/lib/supabaseClient';
+import { databases, databaseId } from '@/lib/appwriteClient';
+import { COLLECTION_IDS } from '@/types/appwrite';
+import { Query, ID } from 'appwrite';
 
 export interface MatchData {
     user_id: string;
@@ -13,14 +15,29 @@ export interface MatchData {
  * @returns New match record
  */
 export async function createMatch(matchData: MatchData): Promise<MatchData> {
-    const { data, error } = await (supabase.from('matches') as any)
-        .insert([matchData])
-        .select()
-        .single();
+    try {
+        const document = await databases.createDocument(
+            databaseId,
+            COLLECTION_IDS.MATCHES,
+            ID.unique(), // Use auto-generated ID
+            {
+                user_id: matchData.user_id,
+                matched_user_id: matchData.matched_user_id,
+                status: matchData.status || null,
+                created_at: matchData.created_at || new Date().toISOString(),
+            },
+        );
 
-    if (error) throw new Error(error instanceof Error ? error.message : String(error));
-    if (!data) throw new Error('Match data was not returned from database');
-    return data as MatchData;
+        return {
+            user_id: document.user_id as string,
+            matched_user_id: document.matched_user_id as string,
+            status: (document.status as string) || null,
+            created_at: (document.created_at as string) || null,
+        };
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(errorMessage);
+    }
 }
 
 /**
@@ -29,8 +46,19 @@ export async function createMatch(matchData: MatchData): Promise<MatchData> {
  * @returns List of matches
  */
 export async function getUserMatches(userId: string): Promise<MatchData[]> {
-    const { data, error } = await supabase.from('matches').select('*').eq('user_id', userId);
+    try {
+        const response = await databases.listDocuments(databaseId, COLLECTION_IDS.MATCHES, [
+            Query.equal('user_id', userId),
+        ]);
 
-    if (error) throw new Error(error.message);
-    return (data as MatchData[]) ?? [];
+        return response.documents.map(doc => ({
+            user_id: doc.user_id as string,
+            matched_user_id: doc.matched_user_id as string,
+            status: (doc.status as string) || null,
+            created_at: (doc.created_at as string) || null,
+        }));
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        throw new Error(errorMessage);
+    }
 }

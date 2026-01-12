@@ -1,4 +1,5 @@
-import supabase from '@/lib/supabaseClient';
+import { databases, databaseId } from '@/lib/appwriteClient';
+import { COLLECTION_IDS } from '@/types/appwrite';
 import type { User } from '@/types/user';
 
 export interface DbCreateUserParams {
@@ -9,10 +10,10 @@ export interface DbCreateUserParams {
 }
 
 /**
- * Inserts a user into `public.user` and a matching profile into `public.userprofile`.
+ * Inserts a user into `user` collection and a matching profile into `userprofile` collection.
  *
  * @param userData
- * @param userData.user_id - Supabase Auth UUID
+ * @param userData.user_id - Appwrite Auth user ID ($id)
  * @param userData.name - Full name
  * @param userData.email - Email
  * @param userData.birthdate - Optional ISO string
@@ -24,44 +25,37 @@ export async function dbCreateUser({
     email,
     birthdate,
 }: DbCreateUserParams): Promise<User> {
-    const { data: userData, error: userError } = await (
-        supabase.from('user') as unknown as {
-            insert: (values: unknown[]) => {
-                select: () => {
-                    single: () => Promise<{ data: User | null; error: { message: string } | null }>;
-                };
-            };
-        }
-    )
-        .insert([{ user_id, name, email }])
-        .select()
-        .single();
+    try {
+        // Create user document (use user_id as document ID)
+        await databases.createDocument(databaseId, COLLECTION_IDS.USER, user_id, {
+            user_id,
+            name,
+            email,
+        });
 
-    if (userError) {
-        const errorMessage = userError instanceof Error ? userError.message : String(userError);
+        // Create or update userprofile document (use user_id as document ID)
+        try {
+            await databases.updateDocument(databaseId, COLLECTION_IDS.USERPROFILE, user_id, {
+                user_id,
+                birthdate: birthdate || null,
+            });
+        } catch (_updateError) {
+            // If document doesn't exist, create it
+            await databases.createDocument(databaseId, COLLECTION_IDS.USERPROFILE, user_id, {
+                user_id,
+                birthdate: birthdate || null,
+            });
+        }
+
+        // Return user data
+        return {
+            user_id,
+            name,
+            email,
+        };
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('[DB Insert Error] Failed to create user:', errorMessage);
         throw new Error('Failed to create user in database');
     }
-
-    const { error: profileError } = await (
-        supabase.from('userprofile') as unknown as {
-            upsert: (
-                values: unknown[],
-                options?: { onConflict?: string },
-            ) => Promise<{ error: { message: string } | null }>;
-        }
-    ).upsert([{ user_id, birthdate }], { onConflict: 'user_id' });
-
-    if (profileError) {
-        const errorMessage =
-            profileError instanceof Error ? profileError.message : String(profileError);
-        console.error('[DB Insert Error] Failed to create userprofile:', errorMessage);
-        throw new Error('Failed to create user profile in database');
-    }
-
-    if (!userData) {
-        throw new Error('User data was not returned from database');
-    }
-
-    return userData as User;
 }

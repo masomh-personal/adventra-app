@@ -1,14 +1,14 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import { useRouter } from 'next/router';
-import type { User } from '@supabase/supabase-js';
-import supabase from '@/lib/supabaseClient';
+import { account } from './appwriteClient';
+import type { Models } from 'appwrite';
 
 interface WithAuthOptions {
     redirectIfAuthenticated?: boolean;
 }
 
 interface WithAuthProps {
-    user: User | null;
+    user: Models.User<Models.Preferences> | null;
 }
 
 export default function withAuth<P extends object>(
@@ -19,7 +19,7 @@ export default function withAuth<P extends object>(
     const displayName = `WithAuth(${Component.displayName || Component.name || 'Component'})`;
 
     function AuthProtected(props: P) {
-        const [user, setUser] = useState<User | null>(null);
+        const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
         const [loading, setLoading] = useState(true);
         const router = useRouter();
         // Move options destructuring inside component to satisfy React hooks rules
@@ -31,23 +31,12 @@ export default function withAuth<P extends object>(
 
             const checkAuth = async (): Promise<void> => {
                 try {
-                    const {
-                        data: { session },
-                        error,
-                    } = await supabase.auth.getSession();
+                    const currentUser = await account.get();
 
                     if (!isMounted) return; // Don't proceed if unmounted
 
-                    // Check for any errors during session retrieval
-                    if (error) {
-                        console.error('Session retrieval error:', error);
-                        setUser(null);
-                        setLoading(false); // Ensure loading stops on error
-                        return;
-                    }
-
-                    if (session) {
-                        setUser(session.user);
+                    if (currentUser) {
+                        setUser(currentUser);
                         // Only redirect if redirectIfAuthenticated is true and component is still mounted
                         if (redirectIfAuthenticated) {
                             // No need to setLoading(false) here as the redirect will unmount
@@ -55,13 +44,14 @@ export default function withAuth<P extends object>(
                             return; // Stop execution after initiating redirect
                         }
                     } else {
-                        // If no session and not redirecting, set user to null
+                        // If no user, set user to null
                         setUser(null);
                     }
-                } catch (err) {
-                    console.error('Unexpected auth check error:', err);
+                } catch (_err) {
+                    // If user is not authenticated, Appwrite throws an error
+                    // This is expected behavior - set user to null
                     if (isMounted) {
-                        setUser(null); // Ensure user is null on unexpected error
+                        setUser(null);
                     }
                 } finally {
                     // Only set loading to false if the component is still mounted
@@ -72,6 +62,10 @@ export default function withAuth<P extends object>(
             };
 
             checkAuth();
+
+            // Note: Appwrite doesn't have a built-in auth state listener like Supabase
+            // You may need to implement custom polling or use Appwrite's Realtime (if needed)
+            // For now, we just check once on mount
 
             // Cleanup function to set the flag when the component unmounts
             return () => {

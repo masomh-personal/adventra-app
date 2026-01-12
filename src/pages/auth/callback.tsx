@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import supabase from '@/lib/supabaseClient';
+import { account } from '@/lib/appwriteClient';
 
 export default function AuthCallback(): React.JSX.Element {
     const router = useRouter();
@@ -9,18 +9,12 @@ export default function AuthCallback(): React.JSX.Element {
     useEffect(() => {
         const handleAuthRedirect = async (): Promise<void> => {
             try {
-                // Supabase automatically handles the OAuth callback URL
-                // and session creation from the URL hash
-                const { data, error } = await supabase.auth.getSession();
+                // Appwrite handles magic link callbacks via URL parameters
+                // The session is automatically created when the user clicks the magic link
+                // Just check if user is authenticated
+                const user = await account.get();
 
-                if (error) {
-                    console.error('Auth callback error:', error);
-                    setError('Authentication failed. Please try again.');
-                    await router.push('/login?error=Authentication failed');
-                    return;
-                }
-
-                if (data?.session) {
+                if (user) {
                     // Successfully authenticated
                     await router.push('/dashboard');
                 } else {

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import type { User } from '@supabase/supabase-js';
-import supabase from '@/lib/supabaseClient';
+import type { Models } from 'appwrite';
+import { databases, databaseId } from '@/lib/appwriteClient';
+import { COLLECTION_IDS } from '@/types/appwrite';
+import { Query } from 'appwrite';
 import withAuth from '@/lib/withAuth';
 import { FaComment } from 'react-icons/fa';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -28,7 +30,7 @@ interface Message {
 }
 
 interface MessagesPageProps {
-    user: User | null;
+    user: Models.User<Models.Preferences> | null;
 }
 
 function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
@@ -44,42 +46,67 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
             try {
                 const currentUserId = await getCurrentUserId();
                 setUserId(currentUserId);
+                if (!currentUserId) return;
 
-                const { data, error } = await supabase
-                    .from('conversations')
-                    .select(
-                        `
-            conversation_id,
-            user_1_id,
-            user_2_id,
-            last_message_timestamp,
-            user_1:user_1_id(name),
-            user_2:user_2_id(name)
-          `,
-                    )
-                    .or(`user_1_id.eq.${currentUserId},user_2_id.eq.${currentUserId}`)
-                    .order('last_message_timestamp', { ascending: false });
+                // Fetch conversations where user is user_1 or user_2
+                // Appwrite doesn't support OR queries directly, so fetch separately and combine
+                const [user1Response, user2Response] = await Promise.all([
+                    databases.listDocuments(databaseId, COLLECTION_IDS.CONVERSATIONS, [
+                        Query.equal('user_1_id', currentUserId),
+                        Query.orderDesc('last_message_timestamp'),
+                    ]),
+                    databases.listDocuments(databaseId, COLLECTION_IDS.CONVERSATIONS, [
+                        Query.equal('user_2_id', currentUserId),
+                        Query.orderDesc('last_message_timestamp'),
+                    ]),
+                ]);
 
-                if (error) throw error;
+                // Combine and deduplicate conversations
+                const allConversations = [...user1Response.documents, ...user2Response.documents];
+                const uniqueConversations = Array.from(
+                    new Map(allConversations.map(doc => [doc.conversation_id, doc])).values(),
+                );
 
-                // Transform Supabase response (joined relations are arrays) to match our type
-                const conversations: Conversation[] = (data || []).map((item: any) => ({
-                    conversation_id: item.conversation_id,
-                    user_1_id: item.user_1_id,
-                    user_2_id: item.user_2_id,
-                    last_message_timestamp: item.last_message_timestamp,
-                    // Supabase returns joined relations as arrays, take first element
-                    user_1:
-                        Array.isArray(item.user_1) && item.user_1.length > 0
-                            ? item.user_1[0]
-                            : null,
-                    user_2:
-                        Array.isArray(item.user_2) && item.user_2.length > 0
-                            ? item.user_2[0]
-                            : null,
-                }));
+                // Fetch user data for each conversation
+                const conversationsWithUsers: Conversation[] = await Promise.all(
+                    uniqueConversations.map(async doc => {
+                        let user1: { name: string } | null = null;
+                        let user2: { name: string } | null = null;
 
-                setConversations(conversations);
+                        try {
+                            const user1Doc = await databases.getDocument(
+                                databaseId,
+                                COLLECTION_IDS.USER,
+                                doc.user_1_id as string,
+                            );
+                            user1 = { name: user1Doc.name as string };
+                        } catch (_e) {
+                            // User not found
+                        }
+
+                        try {
+                            const user2Doc = await databases.getDocument(
+                                databaseId,
+                                COLLECTION_IDS.USER,
+                                doc.user_2_id as string,
+                            );
+                            user2 = { name: user2Doc.name as string };
+                        } catch (_e) {
+                            // User not found
+                        }
+
+                        return {
+                            conversation_id: doc.conversation_id as string,
+                            user_1_id: doc.user_1_id as string,
+                            user_2_id: doc.user_2_id as string,
+                            last_message_timestamp: (doc.last_message_timestamp as string) || null,
+                            user_1: user1,
+                            user_2: user2,
+                        };
+                    }),
+                );
+
+                setConversations(conversationsWithUsers);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -91,13 +118,21 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
     const fetchMessages = async (conversation_id: string): Promise<void> => {
         if (!conversation_id) return;
         try {
-            const { data, error } = await supabase
-                .from('messages')
-                .select('*')
-                .eq('conversation_id', conversation_id)
-                .order('timestamp', { ascending: true });
-            if (error) throw error;
-            setMessages((data as Message[]) || []);
+            const response = await databases.listDocuments(databaseId, COLLECTION_IDS.MESSAGES, [
+                Query.equal('conversation_id', conversation_id),
+                Query.orderAsc('created_at'),
+            ]);
+
+            const messagesData: Message[] = response.documents.map(doc => ({
+                message_id: (doc.message_id as string) || doc.$id,
+                sender_id: doc.sender_id as string,
+                receiver_id: doc.receiver_id as string,
+                message_content: doc.content as string,
+                timestamp: (doc.created_at as string) || '',
+                conversation_id: (doc.conversation_id as string) || null,
+            }));
+
+            setMessages(messagesData);
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
