@@ -238,8 +238,8 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
     /* ---------- early loading ---------- */
     if (!profile) {
         return showSpinner ? (
-            <div className="flex-1 flex items-center justify-center w-full">
-                <LoadingSpinner label="Fetching profile..." />
+            <div className='flex-1 flex items-center justify-center w-full'>
+                <LoadingSpinner label='Fetching profile...' />
             </div>
         ) : (
             <React.Fragment />
@@ -248,14 +248,14 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
 
     /* ---------- UI ---------- */
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-4 font-body w-full">
-            <div className="w-full max-w-4xl bg-white shadow-md rounded-md p-6 mx-auto">
+        <div className='flex-1 flex flex-col items-center justify-center p-4 font-body w-full'>
+            <div className='w-full max-w-4xl bg-white shadow-md rounded-md p-6 mx-auto'>
                 <FormWrapper
                     ref={formRef}
                     validationSchema={validationSchema}
                     onSubmit={handleSave}
                     defaultValues={profile}
-                    submitLabel=""
+                    submitLabel=''
                     onError={e => {
                         console.error('[FORM]', e);
                         showErrorModal('Validation errors; please check fields.', 'Invalid');
@@ -282,24 +282,24 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                             fb !== profile.facebookUrl;
 
                         return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
                                 {/* -------- left column -------- */}
                                 <div>
                                     {/* photo uploader */}
-                                    <div className="mb-4">
-                                        <h4 className="font-bold text-base mb-2">Profile Photo</h4>
+                                    <div className='mb-4'>
+                                        <h4 className='font-bold text-base mb-2'>Profile Photo</h4>
                                         <label
-                                            className="block font-medium mb-1"
-                                            htmlFor="file-upload"
+                                            className='block font-medium mb-1'
+                                            htmlFor='file-upload'
                                         >
                                             Upload (max 2 MB, JPG/PNG)
                                         </label>
 
-                                        <div className="flex items-center gap-3">
+                                        <div className='flex items-center gap-3'>
                                             <Button
                                                 label={
                                                     (
-                                                        <span className="flex items-center gap-2">
+                                                        <span className='flex items-center gap-2'>
                                                             {selectedFile ? (
                                                                 <>
                                                                     <FiUpload /> Upload Photo
@@ -318,63 +318,63 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                                                     else fileInputRef.current?.click();
                                                 }}
                                                 isLoading={isUploading}
-                                                loadingLabel="Uploading..."
+                                                loadingLabel='Uploading...'
                                                 disabled={isUploading}
-                                                size="base"
+                                                size='base'
                                             />
-                                            <div className="flex items-center gap-1 max-w-[220px] truncate text-sm font-bold text-gray-700">
-                                                <span className="truncate">
+                                            <div className='flex items-center gap-1 max-w-[220px] truncate text-sm font-bold text-gray-700'>
+                                                <span className='truncate'>
                                                     {selectedFile
                                                         ? selectedFile.name
                                                         : 'No file chosen'}
                                                 </span>
                                                 {selectedFile && (
                                                     <button
-                                                        type="button"
+                                                        type='button'
                                                         onClick={() => {
                                                             setSelectedFile(null);
                                                             if (fileInputRef.current)
                                                                 fileInputRef.current.value = '';
                                                         }}
-                                                        className="text-gray-500 hover:text-red-600"
-                                                        aria-label="Clear file"
+                                                        className='text-gray-500 hover:text-red-600'
+                                                        aria-label='Clear file'
                                                     >
-                                                        <FiXCircle className="w-4 h-4" />
+                                                        <FiXCircle className='w-4 h-4' />
                                                     </button>
                                                 )}
                                             </div>
                                         </div>
 
                                         <input
-                                            id="file-upload"
+                                            id='file-upload'
                                             ref={fileInputRef}
-                                            type="file"
-                                            accept="image/png,image/jpeg"
+                                            type='file'
+                                            accept='image/png,image/jpeg'
                                             onChange={e =>
                                                 setSelectedFile(e.target.files?.[0] || null)
                                             }
-                                            className="hidden"
+                                            className='hidden'
                                         />
                                     </div>
 
                                     {/* bio */}
                                     <FormField
-                                        label="Bio"
-                                        id="bio"
-                                        type="textarea"
+                                        label='Bio'
+                                        id='bio'
+                                        type='textarea'
                                         register={register}
                                         errors={errors}
-                                        placeholder="Tell us about yourself"
-                                        maxHeight="max-h-48"
+                                        placeholder='Tell us about yourself'
+                                        maxHeight='max-h-48'
                                         characterCountOptions={{ value: b, maxLength: 500 }}
                                     />
 
                                     {/* preferences */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+                                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4'>
                                         <FormField
-                                            label="Seeking"
-                                            id="adventurePreferences"
-                                            type="checkbox"
+                                            label='Seeking'
+                                            id='adventurePreferences'
+                                            type='checkbox'
                                             options={adventurePreferences.map(
                                                 ({ value, label }) => ({
                                                     value,
@@ -386,18 +386,18 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                                         />
 
                                         <FormField
-                                            label="Skill"
-                                            id="skillLevel"
-                                            type="radio"
+                                            label='Skill'
+                                            id='skillLevel'
+                                            type='radio'
                                             options={skillLevels}
                                             register={register}
                                             errors={errors}
                                         />
 
                                         <FormField
-                                            label="Preference"
-                                            id="datingPreferences"
-                                            type="radio"
+                                            label='Preference'
+                                            id='datingPreferences'
+                                            type='radio'
                                             options={datingPreferences.map(({ value, label }) => ({
                                                 value,
                                                 label,
@@ -408,27 +408,27 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                                     </div>
 
                                     {/* socials */}
-                                    <div className="grid grid-cols-1 gap-2 mt-4">
+                                    <div className='grid grid-cols-1 gap-2 mt-4'>
                                         <FormField
-                                            label="Instagram URL"
-                                            id="instagramUrl"
-                                            type="text"
+                                            label='Instagram URL'
+                                            id='instagramUrl'
+                                            type='text'
                                             register={register}
                                             errors={errors}
-                                            placeholder="https://instagram.com/yourprofile"
+                                            placeholder='https://instagram.com/yourprofile'
                                         />
                                         <FormField
-                                            label="Facebook URL"
-                                            id="facebookUrl"
-                                            type="text"
+                                            label='Facebook URL'
+                                            id='facebookUrl'
+                                            type='text'
                                             register={register}
                                             errors={errors}
-                                            placeholder="https://facebook.com/yourprofile"
+                                            placeholder='https://facebook.com/yourprofile'
                                         />
                                     </div>
 
                                     {/* save */}
-                                    <div className="pt-4">
+                                    <div className='pt-4'>
                                         <Button
                                             label={
                                                 (
@@ -437,18 +437,18 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                                                     </>
                                                 ) as unknown as string
                                             }
-                                            variant="primary"
-                                            type="submit"
+                                            variant='primary'
+                                            type='submit'
                                             disabled={!isDirty || !isValid || isUploading}
                                             isLoading={isSubmitting}
-                                            className="w-full"
+                                            className='w-full'
                                         />
                                     </div>
                                 </div>
 
                                 {/* -------- live preview -------- */}
-                                <div className="w-full md:w-[320px] mx-auto space-y-4">
-                                    <h4 className="text-lg font-bold text-center">Live Preview</h4>
+                                <div className='w-full md:w-[320px] mx-auto space-y-4'>
+                                    <h4 className='text-lg font-bold text-center'>Live Preview</h4>
                                     <PersonCard
                                         key={previewImageUrl}
                                         name={profile.name}
@@ -483,16 +483,16 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
             </div>
 
             {/* -------- bottom buttons -------- */}
-            <div className="mt-4 flex gap-4">
+            <div className='mt-4 flex gap-4'>
                 <Button
                     label={
                         (
                             <>
-                                <FiArrowLeft className="text-sm" /> Back to Dashboard
+                                <FiArrowLeft className='text-sm' /> Back to Dashboard
                             </>
                         ) as unknown as string
                     }
-                    variant="secondary"
+                    variant='secondary'
                     onClick={() => router.push('/dashboard')}
                 />
 
@@ -500,11 +500,11 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                     label={
                         (
                             <>
-                                <FiTrash2 className="text-sm" /> Delete Profile
+                                <FiTrash2 className='text-sm' /> Delete Profile
                             </>
                         ) as unknown as string
                     }
-                    variant="danger"
+                    variant='danger'
                     onClick={handleDeleteProfile}
                 />
             </div>

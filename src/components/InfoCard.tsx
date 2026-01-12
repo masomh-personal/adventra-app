@@ -40,7 +40,7 @@ export default function InfoCard({
 }: InfoCardProps): React.JSX.Element {
     return (
         <div
-            className="bg-slate-100 p-6 rounded-lg text-center border border-gray-300 shadow-md"
+            className='bg-slate-100 p-6 rounded-lg text-center border border-gray-300 shadow-md'
             data-testid={testId || 'infocard-container'}
         >
             {imgSrc && (
@@ -49,14 +49,14 @@ export default function InfoCard({
                     alt={imgAlt || title}
                     width={100}
                     height={100}
-                    className="rounded-full mx-auto"
-                    data-testid="infocard-image"
+                    className='rounded-full mx-auto'
+                    data-testid='infocard-image'
                 />
             )}
-            <h3 className="text-lg font-medium leading-none mb-2" data-testid="infocard-title">
+            <h3 className='text-lg font-medium leading-none mb-2' data-testid='infocard-title'>
                 {title}
             </h3>
-            <p className="text-gray-600 mb-4" data-testid="infocard-description">
+            <p className='text-gray-600 mb-4' data-testid='infocard-description'>
                 {description}
             </p>
             {buttonLabel && (

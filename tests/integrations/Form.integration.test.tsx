@@ -31,20 +31,20 @@ describe('FormWrapper + FormField Integration', () => {
 
         render(
             <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
-                <FormField label="Name" id="name" />
-                <FormField label="Email" id="email" type="email" />
-                <FormField label="Bio" id="bio" type="textarea" />
+                <FormField label='Name' id='name' />
+                <FormField label='Email' id='email' type='email' />
+                <FormField label='Bio' id='bio' type='textarea' />
                 <FormField
-                    label="Skill Level"
-                    id="skill"
-                    type="radio"
+                    label='Skill Level'
+                    id='skill'
+                    type='radio'
                     options={[
                         { value: 'beginner', label: 'Beginner' },
                         { value: 'intermediate', label: 'Intermediate' },
                     ]}
                 />
-                <FormField label="Birth Date" id="birthDate" type="date" />
-                <FormField label="Subscribe to newsletter" id="subscribe" type="checkbox" />
+                <FormField label='Birth Date' id='birthDate' type='date' />
+                <FormField label='Subscribe to newsletter' id='subscribe' type='checkbox' />
             </FormWrapper>,
         );
 
@@ -90,8 +90,8 @@ describe('FormWrapper + FormField Integration', () => {
 
         render(
             <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
-                <FormField label="Name" id="name" />
-                <FormField label="Email" id="email" />
+                <FormField label='Name' id='name' />
+                <FormField label='Email' id='email' />
             </FormWrapper>,
         );
 
@@ -117,19 +117,19 @@ describe('FormWrapper + FormField Integration', () => {
 
         render(
             <FormWrapper validationSchema={schema} onSubmit={mockSubmit}>
-                <FormField label="Name" id="name" />
-                <FormField label="Email" id="email" />
-                <FormField label="Bio" id="bio" type="textarea" />
+                <FormField label='Name' id='name' />
+                <FormField label='Email' id='email' />
+                <FormField label='Bio' id='bio' type='textarea' />
                 <FormField
-                    label="Skill"
-                    id="skill"
-                    type="radio"
+                    label='Skill'
+                    id='skill'
+                    type='radio'
                     options={[
                         { value: 'a', label: 'A' },
                         { value: 'b', label: 'B' },
                     ]}
                 />
-                <FormField label="Birth Date" id="birthDate" type="date" />
+                <FormField label='Birth Date' id='birthDate' type='date' />
             </FormWrapper>,
         );
 

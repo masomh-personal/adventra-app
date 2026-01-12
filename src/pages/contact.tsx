@@ -43,20 +43,20 @@ export default function ContactPage(): React.JSX.Element {
     };
 
     return (
-        <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
-            <div className="w-full max-w-md bg-white shadow-md rounded-2xl p-8 my-12">
-                <h2 className="text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2">
-                    <HiOutlineMailOpen className="text-primary text-4xl animate-fade-in-up" />
+        <div className='w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body'>
+            <div className='w-full max-w-md bg-white shadow-md rounded-2xl p-8 my-12'>
+                <h2 className='text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2'>
+                    <HiOutlineMailOpen className='text-primary text-4xl animate-fade-in-up' />
                     Contact Us
                 </h2>
-                <hr className="border-t border-gray-300 mb-6" />
+                <hr className='border-t border-gray-300 mb-6' />
 
-                <p className="text-lg mb-6 text-center">
+                <p className='text-lg mb-6 text-center'>
                     Got questions, feedback, or just want to say hello? Drop us a message below or
                     email us at{' '}
                     <a
-                        href="mailto:support@adventra.com"
-                        className="text-primary hover:underline font-medium"
+                        href='mailto:support@adventra.com'
+                        className='text-primary hover:underline font-medium'
                     >
                         support@adventra.com
                     </a>
@@ -65,26 +65,26 @@ export default function ContactPage(): React.JSX.Element {
                 {submitted ? (
                     <>
                         <InfoBox
-                            variant="success"
-                            message="Thanks for reaching out! Your message has been sent successfully. You should hear back from us within 1–2 business days. Hold tight — we appreciate your patience!"
-                            role="alert"
-                            testId="success-message"
+                            variant='success'
+                            message='Thanks for reaching out! Your message has been sent successfully. You should hear back from us within 1–2 business days. Hold tight — we appreciate your patience!'
+                            role='alert'
+                            testId='success-message'
                         />
-                        <div className="mt-6 flex justify-center gap-4">
+                        <div className='mt-6 flex justify-center gap-4'>
                             <Button
-                                label="Return Home"
-                                leftIcon={<LuArrowLeft className="h-4 w-4" />}
-                                variant="primary"
-                                size="base"
+                                label='Return Home'
+                                leftIcon={<LuArrowLeft className='h-4 w-4' />}
+                                variant='primary'
+                                size='base'
                                 onClick={() => router.push('/')}
-                                testId="return-home-btn"
+                                testId='return-home-btn'
                             />
                             <Button
-                                label="Go to Login"
-                                variant="outline"
-                                size="base"
+                                label='Go to Login'
+                                variant='outline'
+                                size='base'
                                 onClick={() => router.push('/login')}
-                                testId="go-to-login-btn"
+                                testId='go-to-login-btn'
                             />
                         </div>
                     </>
@@ -92,8 +92,8 @@ export default function ContactPage(): React.JSX.Element {
                     <FormWrapper
                         validationSchema={contactFormSchema}
                         onSubmit={handleSubmit}
-                        submitLabel="Send Message"
-                        className="mt-4"
+                        submitLabel='Send Message'
+                        className='mt-4'
                     >
                         {({ register, errors, watch, setValue }) => {
                             const messageValue = (watch('message') as string) || '';
@@ -101,28 +101,28 @@ export default function ContactPage(): React.JSX.Element {
                             return (
                                 <>
                                     <FormField
-                                        label="Name"
-                                        id="name"
-                                        type="text"
-                                        placeholder="Your name"
+                                        label='Name'
+                                        id='name'
+                                        type='text'
+                                        placeholder='Your name'
                                         register={register}
                                         errors={errors}
                                     />
                                     <FormField
-                                        label="Email"
-                                        id="email"
-                                        type="email"
-                                        placeholder="you@example.com"
+                                        label='Email'
+                                        id='email'
+                                        type='email'
+                                        placeholder='you@example.com'
                                         register={register}
                                         errors={errors}
                                     />
-                                    <div className="space-y-1">
+                                    <div className='space-y-1'>
                                         <FormField
-                                            label="Message"
-                                            id="message"
-                                            type="textarea"
-                                            placeholder="How can we help you?"
-                                            className="min-h-[120px]"
+                                            label='Message'
+                                            id='message'
+                                            type='textarea'
+                                            placeholder='How can we help you?'
+                                            className='min-h-[120px]'
                                             register={register}
                                             errors={errors}
                                             registerOptions={{

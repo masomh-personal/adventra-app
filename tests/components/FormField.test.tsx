@@ -39,7 +39,7 @@ describe('FormField', () => {
         });
 
         test('adds custom className if provided', () => {
-            render(<FormField {...baseProps} className="custom-style" />);
+            render(<FormField {...baseProps} className='custom-style' />);
             const input = screen.getByLabelText('Email');
             expect(input).toHaveClass('custom-style');
         });
@@ -64,7 +64,7 @@ describe('FormField', () => {
         });
 
         test('shows help text when no error exists', () => {
-            render(<FormField {...baseProps} helpText="Helpful hint" />);
+            render(<FormField {...baseProps} helpText='Helpful hint' />);
             expect(screen.getByText('Helpful hint')).toBeInTheDocument();
         });
 
@@ -83,13 +83,13 @@ describe('FormField', () => {
 
     describe('Supported input types', () => {
         test('renders a textarea for type="textarea"', () => {
-            render(<FormField {...baseProps} type="textarea" />);
+            render(<FormField {...baseProps} type='textarea' />);
             const textarea = screen.getByLabelText('Email');
             expect(textarea.tagName).toBe('TEXTAREA');
         });
 
         test('renders a date input for type="date"', () => {
-            render(<FormField {...baseProps} type="date" />);
+            render(<FormField {...baseProps} type='date' />);
             const input = screen.getByLabelText('Email');
             expect(input).toHaveAttribute('type', 'date');
         });

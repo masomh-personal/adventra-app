@@ -119,7 +119,7 @@ export default function Button({
         <>
             {isLoading ? (
                 <ImSpinner9
-                    data-testid="spinner"
+                    data-testid='spinner'
                     className={`animate-spin ${size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'}`}
                 />
             ) : (

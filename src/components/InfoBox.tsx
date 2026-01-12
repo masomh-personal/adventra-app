@@ -13,25 +13,25 @@ interface InfoBoxVariantConfig {
 
 const variants: Record<InfoBoxVariant, InfoBoxVariantConfig> = {
     info: {
-        icon: <AiOutlineInfoCircle className="text-blue-500 w-5 h-5 mt-[2px] flex-shrink-0" />,
+        icon: <AiOutlineInfoCircle className='text-blue-500 w-5 h-5 mt-[2px] flex-shrink-0' />,
         bg: 'bg-blue-50',
         border: 'border-blue-200',
         text: 'text-blue-800',
     },
     success: {
-        icon: <MdCheckCircle className="text-green-500 w-5 h-5 mt-[2px] flex-shrink-0" />,
+        icon: <MdCheckCircle className='text-green-500 w-5 h-5 mt-[2px] flex-shrink-0' />,
         bg: 'bg-green-50',
         border: 'border-green-200',
         text: 'text-green-800',
     },
     warning: {
-        icon: <MdWarning className="text-yellow-500 w-5 h-5 mt-[2px] flex-shrink-0" />,
+        icon: <MdWarning className='text-yellow-500 w-5 h-5 mt-[2px] flex-shrink-0' />,
         bg: 'bg-yellow-50',
         border: 'border-yellow-200',
         text: 'text-yellow-800',
     },
     error: {
-        icon: <MdError className="text-red-500 w-5 h-5 mt-[2px] flex-shrink-0" />,
+        icon: <MdError className='text-red-500 w-5 h-5 mt-[2px] flex-shrink-0' />,
         bg: 'bg-red-50',
         border: 'border-red-200',
         text: 'text-red-800',

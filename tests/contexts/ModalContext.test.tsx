@@ -133,7 +133,7 @@ describe('ModalContext', () => {
                 <div>
                     <button onClick={handleClick}>Show Confirm</button>
                     {confirmed !== null && (
-                        <div data-testid="result">{confirmed ? 'Yes' : 'No'}</div>
+                        <div data-testid='result'>{confirmed ? 'Yes' : 'No'}</div>
                     )}
                 </div>
             );
@@ -177,7 +177,7 @@ describe('ModalContext', () => {
                 <div>
                     <button onClick={handleClick}>Show Confirm</button>
                     {confirmed !== null && (
-                        <div data-testid="result">{confirmed ? 'Yes' : 'No'}</div>
+                        <div data-testid='result'>{confirmed ? 'Yes' : 'No'}</div>
                     )}
                 </div>
             );

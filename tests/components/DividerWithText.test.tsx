@@ -4,7 +4,7 @@ import DividerWithText from '@/components/DividerWithText';
 
 describe('DividerWithText', () => {
     test('renders with default text when provided', () => {
-        render(<DividerWithText text="Or continue with" />);
+        render(<DividerWithText text='Or continue with' />);
         const textEl = screen.getByText(/or continue with/i);
         expect(textEl).toBeInTheDocument();
     });

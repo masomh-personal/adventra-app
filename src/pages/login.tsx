@@ -108,34 +108,34 @@ export default function LoginPage(): React.JSX.Element {
     const ssoProviders: SSOProvider[] = [
         {
             name: 'Google',
-            icon: <FcGoogle className="h-5 w-5 mr-2 group-hover:hidden" />,
-            hoverIcon: <FcGoogle className="h-5 w-5 mr-2 hidden group-hover:inline text-red-500" />,
+            icon: <FcGoogle className='h-5 w-5 mr-2 group-hover:hidden' />,
+            hoverIcon: <FcGoogle className='h-5 w-5 mr-2 hidden group-hover:inline text-red-500' />,
             bg: 'bg-white',
             text: 'text-gray-700',
             border: 'border border-gray-300',
         },
         {
             name: 'Facebook',
-            icon: <FaFacebook className="h-5 w-5 mr-2 group-hover:hidden" />,
+            icon: <FaFacebook className='h-5 w-5 mr-2 group-hover:hidden' />,
             hoverIcon: (
-                <FaFacebook className="h-5 w-5 mr-2 hidden group-hover:inline text-white/80" />
+                <FaFacebook className='h-5 w-5 mr-2 hidden group-hover:inline text-white/80' />
             ),
             bg: 'bg-[#1877F2]',
             text: 'text-white',
         },
         {
             name: 'Instagram',
-            icon: <FaInstagram className="h-5 w-5 mr-2 group-hover:hidden" />,
+            icon: <FaInstagram className='h-5 w-5 mr-2 group-hover:hidden' />,
             hoverIcon: (
-                <FaInstagram className="h-5 w-5 mr-2 hidden group-hover:inline opacity-90" />
+                <FaInstagram className='h-5 w-5 mr-2 hidden group-hover:inline opacity-90' />
             ),
             bg: 'bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600',
             text: 'text-white',
         },
         {
             name: 'Apple',
-            icon: <FaApple className="h-5 w-5 mr-2 group-hover:hidden" />,
-            hoverIcon: <FaApple className="h-5 w-5 mr-2 hidden group-hover:inline text-gray-300" />,
+            icon: <FaApple className='h-5 w-5 mr-2 group-hover:hidden' />,
+            hoverIcon: <FaApple className='h-5 w-5 mr-2 hidden group-hover:inline text-gray-300' />,
             bg: 'bg-black',
             text: 'text-white',
         },
@@ -143,12 +143,12 @@ export default function LoginPage(): React.JSX.Element {
 
     return (
         <div
-            className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body"
-            data-testid="login-page"
+            className='w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body'
+            data-testid='login-page'
         >
-            <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
-                <h2 className="text-3xl font-heading text-center mb-2">🏕️ Login to Adventra</h2>
-                <hr className="border-t border-gray-300 mb-6" />
+            <div className='w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8'>
+                <h2 className='text-3xl font-heading text-center mb-2'>🏕️ Login to Adventra</h2>
+                <hr className='border-t border-gray-300 mb-6' />
 
                 {/* Email/Password Form */}
                 {!showMagicForm && (
@@ -165,31 +165,31 @@ export default function LoginPage(): React.JSX.Element {
                         }
                     >
                         <FormField
-                            label="Email Address"
-                            type="email"
-                            id="email"
-                            placeholder="you@example.com"
+                            label='Email Address'
+                            type='email'
+                            id='email'
+                            placeholder='you@example.com'
                         />
                         <FormField
-                            label="Password"
-                            type="password"
-                            id="password"
-                            placeholder="Enter your password"
+                            label='Password'
+                            type='password'
+                            id='password'
+                            placeholder='Enter your password'
                         />
                     </FormWrapper>
                 )}
 
                 {/* Magic Link Option */}
-                <div className="mt-6">
+                <div className='mt-6'>
                     {!showMagicForm ? (
                         <Button
-                            label="Login with One-Time Email Link"
+                            label='Login with One-Time Email Link'
                             onClick={() => !loading && setShowMagicForm(true)}
-                            variant="tertiary"
-                            className="text-sm w-full"
-                            size="base"
-                            aria-label="Switch to magic link login"
-                            testId="show-magic"
+                            variant='tertiary'
+                            className='text-sm w-full'
+                            size='base'
+                            aria-label='Switch to magic link login'
+                            testId='show-magic'
                         />
                     ) : (
                         <MagicLinkForm
@@ -201,25 +201,25 @@ export default function LoginPage(): React.JSX.Element {
                 </div>
 
                 {/* Signup Prompt */}
-                <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+                <div className='text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap'>
                     Don&rsquo;t have an account?
                     <Button
-                        as="a"
-                        href="/signup"
-                        label="Signup for free!"
-                        variant="secondary"
-                        size="sm"
-                        className="text-sm px-2 py-1"
-                        aria-label="Go to signup page"
-                        testId="signup-button"
+                        as='a'
+                        href='/signup'
+                        label='Signup for free!'
+                        variant='secondary'
+                        size='sm'
+                        className='text-sm px-2 py-1'
+                        aria-label='Go to signup page'
+                        testId='signup-button'
                     />
                 </div>
 
                 {/* Divider */}
-                <DividerWithText text="or continue with" />
+                <DividerWithText text='or continue with' />
 
                 {/* SSO Buttons */}
-                <div className="mt-6 grid grid-cols-2 gap-4">
+                <div className='mt-6 grid grid-cols-2 gap-4'>
                     {ssoProviders.map(({ name, icon, bg, text, border, hoverIcon }) => (
                         <button
                             key={name}
@@ -237,8 +237,8 @@ export default function LoginPage(): React.JSX.Element {
                 </div>
 
                 {/* Forgot Password Link */}
-                <div className="mt-4 text-center">
-                    <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                <div className='mt-4 text-center'>
+                    <Link href='/forgot-password' className='text-sm text-primary hover:underline'>
                         Forgot your password?
                     </Link>
                 </div>

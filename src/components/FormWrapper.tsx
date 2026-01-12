@@ -164,12 +164,12 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
             noValidate
             onSubmit={handleSubmit(handleFormSubmit, onError)}
             className={`space-y-4 ${className}`}
-            role="form"
+            role='form'
             {...formProps}
         >
-            {title && <h2 className="text-2xl font-heading text-center">{title}</h2>}
+            {title && <h2 className='text-2xl font-heading text-center'>{title}</h2>}
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
                 {typeof children === 'function'
                     ? children(formContext)
                     : React.Children.map(children, child => {
@@ -201,15 +201,15 @@ const FormWrapper = forwardRef<FormWrapperRef, FormWrapperProps>(function FormWr
             </div>
 
             {shouldRenderSubmitButton && (
-                <div className="pt-2">
+                <div className='pt-2'>
                     <Button
-                        type="submit"
+                        type='submit'
                         label={submitLabel}
                         isLoading={loading || isSubmitting}
                         isValid={isValid}
                         disabled={isButtonDisabled}
-                        className="w-full"
-                        size="lg"
+                        className='w-full'
+                        size='lg'
                     />
                 </div>
             )}

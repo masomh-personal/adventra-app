@@ -88,10 +88,10 @@ export default function SignupPage(): React.JSX.Element {
     };
 
     return (
-        <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
-            <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
-                <h2 className="text-3xl font-heading text-center mb-2">🏕️ Create Your Account</h2>
-                <hr className="border-t border-gray-300 mb-6" />
+        <div className='w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body'>
+            <div className='w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8'>
+                <h2 className='text-3xl font-heading text-center mb-2'>🏕️ Create Your Account</h2>
+                <hr className='border-t border-gray-300 mb-6' />
 
                 <FormWrapper
                     validationSchema={signupSchema}
@@ -100,12 +100,12 @@ export default function SignupPage(): React.JSX.Element {
                     submitLabel={isSubmitting ? 'Signing Up...' : 'Sign Up'}
                     loading={isSubmitting}
                 >
-                    <FormField label="Full Name" type="text" id="name" placeholder="Your name" />
+                    <FormField label='Full Name' type='text' id='name' placeholder='Your name' />
 
                     <FormField
-                        label="Date of Birth"
-                        id="birthdate"
-                        type="date"
+                        label='Date of Birth'
+                        id='birthdate'
+                        type='date'
                         registerOptions={{
                             max: new Date(new Date().setFullYear(new Date().getFullYear() - 18))
                                 .toISOString()
@@ -114,19 +114,19 @@ export default function SignupPage(): React.JSX.Element {
                     />
 
                     <FormField
-                        label="Email Address"
-                        type="email"
-                        id="email"
-                        placeholder="you@example.com"
-                        autoComplete="email"
+                        label='Email Address'
+                        type='email'
+                        id='email'
+                        placeholder='you@example.com'
+                        autoComplete='email'
                     />
 
                     <FormField
-                        label="Password"
-                        id="password"
-                        type="password"
-                        placeholder="Create a password"
-                        autoComplete="new-password"
+                        label='Password'
+                        id='password'
+                        type='password'
+                        placeholder='Create a password'
+                        autoComplete='new-password'
                         onChange={(
                             e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
                         ) => {
@@ -139,11 +139,11 @@ export default function SignupPage(): React.JSX.Element {
                     <PasswordStrengthMeter password={password} />
 
                     <FormField
-                        label="Confirm Password"
-                        type="password"
-                        id="confirmPassword"
-                        placeholder="Re-enter your password"
-                        autoComplete="new-password"
+                        label='Confirm Password'
+                        type='password'
+                        id='confirmPassword'
+                        placeholder='Re-enter your password'
+                        autoComplete='new-password'
                         onPaste={(
                             e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>,
                         ) => {
@@ -157,17 +157,17 @@ export default function SignupPage(): React.JSX.Element {
                     />
                 </FormWrapper>
 
-                <div className="text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap">
+                <div className='text-center text-sm mt-4 flex items-center justify-center gap-2 flex-wrap'>
                     Already have an account?
                     <Button
-                        as="a"
-                        href="/login"
-                        label="Log in"
-                        variant="secondary"
-                        size="sm"
-                        className="text-sm px-2 py-1"
-                        aria-label="Go to login page"
-                        testId="login-button"
+                        as='a'
+                        href='/login'
+                        label='Log in'
+                        variant='secondary'
+                        size='sm'
+                        className='text-sm px-2 py-1'
+                        aria-label='Go to login page'
+                        testId='login-button'
                     />
                 </div>
             </div>

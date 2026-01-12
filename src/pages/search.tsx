@@ -73,8 +73,8 @@ export default function SearchPage(): React.JSX.Element {
 
     if (loading)
         return (
-            <div className="w-full h-screen flex items-center justify-center bg-background text-foreground">
-                <LoadingSpinner label="Fetching profiles..." />
+            <div className='w-full h-screen flex items-center justify-center bg-background text-foreground'>
+                <LoadingSpinner label='Fetching profiles...' />
             </div>
         );
 
@@ -82,21 +82,21 @@ export default function SearchPage(): React.JSX.Element {
     const currentUser = filteredUsers[currentUserIndex];
 
     return (
-        <div className="w-full flex items-center justify-center bg-background text-foreground p-4 font-body">
+        <div className='w-full flex items-center justify-center bg-background text-foreground p-4 font-body'>
             {/* Wrapper for centering everything */}
-            <div className="flex flex-col items-center justify-center space-y-4">
+            <div className='flex flex-col items-center justify-center space-y-4'>
                 {/* Yay/Nay Buttons */}
-                <div className="flex justify-center gap-6">
+                <div className='flex justify-center gap-6'>
                     <Button
                         onClick={handleSwipeLeft}
-                        variant="danger"
-                        label="No Match"
+                        variant='danger'
+                        label='No Match'
                         leftIcon={<MdClose />}
                     />
                     <Button
                         onClick={handleSwipeRight}
-                        variant="green"
-                        label="Interested"
+                        variant='green'
+                        label='Interested'
                         leftIcon={<FaThumbsUp />}
                     />
                 </div>
@@ -129,17 +129,17 @@ export default function SearchPage(): React.JSX.Element {
                 )}
 
                 {/* Message Button */}
-                <div className="w-full">
+                <div className='w-full'>
                     <Button
-                        label="Message"
+                        label='Message'
                         onClick={async () => {
                             if (currentUser) {
                                 await router.push(`./messages?userId=${currentUser.user_id}`);
                             }
                         }}
-                        leftIcon={<FaComment className="mr-0" />}
-                        variant="tertiary"
-                        className="w-full"
+                        leftIcon={<FaComment className='mr-0' />}
+                        variant='tertiary'
+                        className='w-full'
                     />
                 </div>
             </div>

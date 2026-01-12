@@ -40,24 +40,24 @@ export default function AuthCallback(): React.JSX.Element {
     }, [router]);
 
     return (
-        <div className="w-full h-screen flex items-center justify-center bg-background">
-            <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
+        <div className='w-full h-screen flex items-center justify-center bg-background'>
+            <div className='text-center p-8 bg-white rounded-lg shadow-md max-w-md'>
                 {error ? (
                     <div>
-                        <h2 className="text-xl text-red-600 mb-4">Login Error</h2>
-                        <p className="mb-6 text-gray-700">{error}</p>
+                        <h2 className='text-xl text-red-600 mb-4'>Login Error</h2>
+                        <p className='mb-6 text-gray-700'>{error}</p>
                         <button
                             onClick={() => router.push('/login')}
-                            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
+                            className='px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark'
                         >
                             Back to Login
                         </button>
                     </div>
                 ) : (
                     <div>
-                        <h2 className="text-xl mb-4">Completing your login...</h2>
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-                        <p className="mt-4 text-gray-600">
+                        <h2 className='text-xl mb-4'>Completing your login...</h2>
+                        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto'></div>
+                        <p className='mt-4 text-gray-600'>
                             Please wait while we complete your authentication.
                         </p>
                     </div>

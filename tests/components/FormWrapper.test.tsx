@@ -69,9 +69,9 @@ describe('FormWrapper', () => {
     describe('rendering', () => {
         test('renders form title, fields, and submit button', async () => {
             await safeRender(
-                <FormWrapper title="Test Form" validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                <FormWrapper title='Test Form' validationSchema={schema} onSubmit={mockOnSubmit}>
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -84,8 +84,8 @@ describe('FormWrapper', () => {
 
         test('renders custom submit button label', async () => {
             await safeRender(
-                <FormWrapper submitLabel="Send" validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
+                <FormWrapper submitLabel='Send' validationSchema={schema} onSubmit={mockOnSubmit}>
+                    <MockFormField id='name' label='Name' />
                 </FormWrapper>,
             );
 
@@ -94,9 +94,9 @@ describe('FormWrapper', () => {
 
         test('does not render submit button if submitLabel is an empty string', async () => {
             await safeRender(
-                <FormWrapper submitLabel="" validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                <FormWrapper submitLabel='' validationSchema={schema} onSubmit={mockOnSubmit}>
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -107,7 +107,7 @@ describe('FormWrapper', () => {
         test('renders without title if not provided', async () => {
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
+                    <MockFormField id='name' label='Name' />
                 </FormWrapper>,
             );
 
@@ -117,8 +117,8 @@ describe('FormWrapper', () => {
         test('disables the submit button when form is invalid', async () => {
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -132,8 +132,8 @@ describe('FormWrapper', () => {
             const user = userEvent.setup();
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -159,8 +159,8 @@ describe('FormWrapper', () => {
             const user = userEvent.setup();
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -188,8 +188,8 @@ describe('FormWrapper', () => {
 
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -216,8 +216,8 @@ describe('FormWrapper', () => {
                     onSubmit={mockOnSubmit}
                     onError={mockOnError}
                 >
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -247,8 +247,8 @@ describe('FormWrapper', () => {
 
             await safeRender(
                 <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -278,8 +278,8 @@ describe('FormWrapper', () => {
                     onSubmit={mockOnSubmit}
                     defaultValues={{ name: 'Default Name', email: 'default@example.com' }}
                 >
-                    <MockFormField id="name" label="Name" />
-                    <MockFormField id="email" label="Email" />
+                    <MockFormField id='name' label='Name' />
+                    <MockFormField id='email' label='Email' />
                 </FormWrapper>,
             );
 
@@ -301,7 +301,7 @@ describe('FormWrapper', () => {
                         } as React.FormHTMLAttributes<HTMLFormElement>
                     }
                 >
-                    <MockFormField id="name" label="Name" />
+                    <MockFormField id='name' label='Name' />
                 </FormWrapper>,
             );
 
@@ -312,11 +312,11 @@ describe('FormWrapper', () => {
         test('applies className directly to form wrapper', async () => {
             await safeRender(
                 <FormWrapper
-                    className="custom-form"
+                    className='custom-form'
                     validationSchema={schema}
                     onSubmit={mockOnSubmit}
                 >
-                    <MockFormField id="name" label="Name" />
+                    <MockFormField id='name' label='Name' />
                 </FormWrapper>,
             );
 
@@ -333,8 +333,8 @@ describe('FormWrapper', () => {
                 }) => (
                     <div>
                         <MockFormField
-                            id="name"
-                            label="Name"
+                            id='name'
+                            label='Name'
                             register={context.register}
                             errors={context.errors}
                         />
@@ -366,8 +366,8 @@ describe('FormWrapper', () => {
                 return (
                     <div>
                         <MockFormField
-                            id="name"
-                            label="Name"
+                            id='name'
+                            label='Name'
                             register={
                                 props.register as UseFormRegister<{ name: string; email: string }>
                             }

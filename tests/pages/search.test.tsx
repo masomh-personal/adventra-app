@@ -53,7 +53,7 @@ vi.mock('@/components/LoadingSpinner', () => ({
     default: () => <div>Fetching profiles...</div>,
 }));
 vi.mock('@/components/PersonCard', () => ({
-    default: ({ name }: { name?: string }) => <div data-testid="person-card">{name}</div>,
+    default: ({ name }: { name?: string }) => <div data-testid='person-card'>{name}</div>,
 }));
 vi.mock('@/components/Button', () => ({
     default: ({ label, onClick }: { label: string; onClick?: () => void }) => (

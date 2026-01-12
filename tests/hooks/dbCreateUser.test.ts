@@ -83,7 +83,9 @@ describe('dbCreateUser', () => {
         expect(result).toEqual(mockUser);
         expect(mockUpsert).toHaveBeenCalledWith(
             [{ user_id: 'test-user-123', birthdate: undefined }],
-            { onConflict: 'user_id' },
+            {
+                onConflict: 'user_id',
+            },
         );
     });
 

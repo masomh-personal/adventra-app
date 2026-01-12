@@ -105,45 +105,45 @@ export default function Header(): React.JSX.Element {
           };
 
     return (
-        <header className="flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30">
+        <header className='flex justify-between items-center p-4 bg-primary-light shadow-md relative z-30'>
             {/* Logo + Text Link to Home */}
-            <Link href="/" className="flex items-center space-x-2" data-testid="logo-link">
+            <Link href='/' className='flex items-center space-x-2' data-testid='logo-link'>
                 <Image
-                    src="/adventra-logo.png"
-                    alt="Adventra Logo"
+                    src='/adventra-logo.png'
+                    alt='Adventra Logo'
                     width={48}
                     height={48}
                     priority
                 />
-                <span className="text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md">
+                <span className='text-white text-2xl font-heading font-semibold lowercase tracking-wide drop-shadow-md'>
                     adventra
                 </span>
             </Link>
 
             {/* Mobile Menu Button */}
             <button
-                className="md:hidden text-white p-2"
+                className='md:hidden text-white p-2'
                 onClick={toggleMenu}
-                aria-label="Toggle navigation menu"
-                data-testid="mobile-menu-button"
+                aria-label='Toggle navigation menu'
+                data-testid='mobile-menu-button'
             >
                 {isMenuOpen ? (
-                    <FaTimes className="w-6 h-6" data-testid="mobile-menu-times" />
+                    <FaTimes className='w-6 h-6' data-testid='mobile-menu-times' />
                 ) : (
-                    <FaBars className="w-6 h-6" data-testid="mobile-menu-bars" />
+                    <FaBars className='w-6 h-6' data-testid='mobile-menu-bars' />
                 )}
             </button>
 
             {/* Desktop Navigation */}
             <nav
-                className="hidden md:flex space-x-6 font-heading font-bold text-white"
-                data-testid="desktop-nav"
+                className='hidden md:flex space-x-6 font-heading font-bold text-white'
+                data-testid='desktop-nav'
             >
                 {navLinks.map(link => (
                     <Link
                         key={link.href}
                         href={link.href}
-                        className="hover:text-primary"
+                        className='hover:text-primary'
                         data-testid={link.dataTestId}
                     >
                         {link.label}
@@ -152,7 +152,7 @@ export default function Header(): React.JSX.Element {
                 {authLink.label === 'Logout' && authLink.onClick ? (
                     <button
                         onClick={authLink.onClick}
-                        className="hover:text-primary"
+                        className='hover:text-primary'
                         data-testid={authLink.dataTestId}
                     >
                         {authLink.label}
@@ -160,7 +160,7 @@ export default function Header(): React.JSX.Element {
                 ) : (
                     <Link
                         href={authLink.href}
-                        className="hover:text-primary"
+                        className='hover:text-primary'
                         data-testid={authLink.dataTestId}
                     >
                         {authLink.label}
@@ -171,18 +171,18 @@ export default function Header(): React.JSX.Element {
             {/* Mobile Navigation Menu (Dropdown) */}
             {isMenuOpen && (
                 <div
-                    className="absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50"
-                    data-testid="mobile-menu"
+                    className='absolute top-full left-0 right-0 bg-primary-light shadow-md md:hidden z-50'
+                    data-testid='mobile-menu'
                 >
                     <nav
-                        className="flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white"
-                        data-testid="mobile-nav"
+                        className='flex flex-col items-center py-4 space-y-4 font-heading font-bold text-white'
+                        data-testid='mobile-nav'
                     >
                         {navLinks.map(link => (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="hover:text-primary w-full text-center py-2"
+                                className='hover:text-primary w-full text-center py-2'
                                 data-testid={link.dataTestId}
                             >
                                 {link.label}
@@ -191,7 +191,7 @@ export default function Header(): React.JSX.Element {
                         {authLink.label === 'Logout' && authLink.onClick ? (
                             <button
                                 onClick={authLink.onClick}
-                                className="hover:text-primary w-full text-center py-2"
+                                className='hover:text-primary w-full text-center py-2'
                                 data-testid={authLink.dataTestId}
                             >
                                 {authLink.label}
@@ -199,7 +199,7 @@ export default function Header(): React.JSX.Element {
                         ) : (
                             <Link
                                 href={authLink.href}
-                                className="hover:text-primary w-full text-center py-2"
+                                className='hover:text-primary w-full text-center py-2'
                                 data-testid={authLink.dataTestId}
                             >
                                 {authLink.label}

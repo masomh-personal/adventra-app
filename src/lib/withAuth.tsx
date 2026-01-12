@@ -83,8 +83,8 @@ export default function withAuth<P extends object>(
 
         if (loading) {
             return (
-                <div className="w-full h-screen flex items-center justify-center">
-                    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                <div className='w-full h-screen flex items-center justify-center'>
+                    <div className='animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full'></div>
                 </div>
             );
         }

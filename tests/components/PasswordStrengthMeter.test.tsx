@@ -12,7 +12,7 @@ describe('PasswordStrengthMeter', () => {
     };
 
     test('renders nothing if password is empty', () => {
-        const { container } = render(<PasswordStrengthMeter password="" />);
+        const { container } = render(<PasswordStrengthMeter password='' />);
         expect(container.firstChild).toBeNull();
     });
 
@@ -28,7 +28,7 @@ describe('PasswordStrengthMeter', () => {
     });
 
     test('renders all password criteria in the checklist when not all are passed', () => {
-        render(<PasswordStrengthMeter password="weak" />);
+        render(<PasswordStrengthMeter password='weak' />);
         passwordCriteria.forEach(rule => {
             expect(screen.getByText(rule.label)).toBeInTheDocument();
         });

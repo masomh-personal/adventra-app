@@ -4,12 +4,12 @@ import { CharacterCounter } from '@/components/CharacterCounter';
 
 describe('CharacterCounter', () => {
     test('displays the correct character count', () => {
-        render(<CharacterCounter value="Hello" maxLength={100} />);
+        render(<CharacterCounter value='Hello' maxLength={100} />);
         expect(screen.getByRole('character-counter')).toHaveTextContent('5/100');
     });
 
     test('handles empty value correctly', () => {
-        render(<CharacterCounter value="" maxLength={100} />);
+        render(<CharacterCounter value='' maxLength={100} />);
         expect(screen.getByRole('character-counter')).toHaveTextContent('0/100');
     });
 
@@ -103,7 +103,7 @@ describe('CharacterCounter', () => {
     });
 
     test('applies custom className', () => {
-        render(<CharacterCounter value="Test" maxLength={100} className="custom-class" />);
+        render(<CharacterCounter value='Test' maxLength={100} className='custom-class' />);
         expect(screen.getByRole('character-counter')).toHaveClass('custom-class');
     });
 });

@@ -16,7 +16,7 @@ describe('LoadingSpinner', () => {
     });
 
     test('renders a custom label when provided', () => {
-        render(<LoadingSpinner label="Fetching profile..." />);
+        render(<LoadingSpinner label='Fetching profile...' />);
 
         const label = screen.getByText(/fetching profile/i);
         expect(label).toBeInTheDocument();

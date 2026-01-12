@@ -66,7 +66,7 @@ describe('InfoCard', () => {
             title: 'Test Title',
             description: 'Test Description',
             buttonLabel: 'Test Button',
-            buttonIcon: <FaEye className="mr-2" />,
+            buttonIcon: <FaEye className='mr-2' />,
         });
 
         const button = screen.getByTestId('infocard-button-test-button');

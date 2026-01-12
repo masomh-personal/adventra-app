@@ -35,38 +35,38 @@ export default function ForgotPasswordPage(): React.JSX.Element {
 
     const backToLoginButton = (
         <Button
-            as="a"
-            href="/login"
-            label="Back to Login"
-            variant="outline"
-            size="base"
-            leftIcon={<LuArrowLeft className="h-4 w-4" />}
-            testId="return-to-login-button"
+            as='a'
+            href='/login'
+            label='Back to Login'
+            variant='outline'
+            size='base'
+            leftIcon={<LuArrowLeft className='h-4 w-4' />}
+            testId='return-to-login-button'
         />
     );
 
     return (
-        <div className="w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body">
-            <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8">
-                <h2 className="text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2">
-                    <BiLockAlt className="text-primary text-4xl" />
+        <div className='w-full flex-grow bg-background text-foreground flex items-center justify-center p-6 font-body'>
+            <div className='w-full max-w-md bg-white shadow-md rounded-lg p-8 my-8'>
+                <h2 className='text-3xl font-heading text-center mb-2 flex items-center justify-center gap-2'>
+                    <BiLockAlt className='text-primary text-4xl' />
                     Reset Password
                 </h2>
 
-                <p className="text-center text-gray-600 mb-6">
+                <p className='text-center text-gray-600 mb-6'>
                     Enter your email address and we'll send you instructions to reset your password.
                 </p>
-                <hr className="border-t border-gray-300 mb-6" />
+                <hr className='border-t border-gray-300 mb-6' />
 
                 {message ? (
                     <>
                         <InfoBox
-                            variant="info"
+                            variant='info'
                             message={message}
-                            testId="forgot-password-placeholder-message"
+                            testId='forgot-password-placeholder-message'
                         />
-                        <div className="text-center mt-6">
-                            <p className="mb-4">
+                        <div className='text-center mt-6'>
+                            <p className='mb-4'>
                                 You can close this page or return to login below.
                             </p>
                             {backToLoginButton}
@@ -82,14 +82,14 @@ export default function ForgotPasswordPage(): React.JSX.Element {
                             loading={loading}
                         >
                             <FormField
-                                label="Email Address"
-                                type="email"
-                                id="email"
-                                placeholder="you@example.com"
+                                label='Email Address'
+                                type='email'
+                                id='email'
+                                placeholder='you@example.com'
                             />
                         </FormWrapper>
 
-                        <div className="mt-4 text-center">{backToLoginButton}</div>
+                        <div className='mt-4 text-center'>{backToLoginButton}</div>
                     </>
                 )}
             </div>

@@ -33,10 +33,10 @@ export default function MyApp({ Component, pageProps }: AppProps): React.JSX.Ele
             >
                 <Head>
                     <title>Adventra</title>
-                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <meta name='viewport' content='width=device-width, initial-scale=1' />
                 </Head>
                 <Header />
-                <main className="flex-grow flex">
+                <main className='flex-grow flex'>
                     <Component {...pageProps} />
                 </main>
                 <Footer />

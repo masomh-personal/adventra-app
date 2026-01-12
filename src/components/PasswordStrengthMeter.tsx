@@ -31,24 +31,24 @@ export default function PasswordStrengthMeter({
 
     return (
         <div
-            className="w-full mt-4 space-y-4"
-            aria-live="polite"
-            data-testid="password-strength-meter"
+            className='w-full mt-4 space-y-4'
+            aria-live='polite'
+            data-testid='password-strength-meter'
         >
             {/* Strength Meter */}
             <div>
                 <div
-                    className="flex justify-between text-xs font-extrabold font-heading text-gray-600 mb-1"
-                    data-testid="strength-label"
+                    className='flex justify-between text-xs font-extrabold font-heading text-gray-600 mb-1'
+                    data-testid='strength-label'
                 >
                     <span>Password Strength</span>
-                    <span className={`font-bold ${color}`} data-testid="strength-value">
+                    <span className={`font-bold ${color}`} data-testid='strength-value'>
                         {label.toUpperCase()}
                     </span>
                 </div>
-                <div className="w-full h-2 bg-gray-200 rounded">
+                <div className='w-full h-2 bg-gray-200 rounded'>
                     <div
-                        data-testid="strength-bar"
+                        data-testid='strength-bar'
                         className={`h-full ${bar} rounded transition-all duration-300 ease-in-out`}
                         style={{ width: `${(score / passwordCriteria.length) * 100}%` }}
                     />
@@ -58,19 +58,19 @@ export default function PasswordStrengthMeter({
             {/* Checklist or Success Message */}
             {allPassed ? (
                 <div
-                    className="flex items-center gap-2 p-3 text-sm rounded-md bg-green-50 border border-green-200 text-green-800 font-medium"
-                    data-testid="all-passed-message"
+                    className='flex items-center gap-2 p-3 text-sm rounded-md bg-green-50 border border-green-200 text-green-800 font-medium'
+                    data-testid='all-passed-message'
                 >
-                    <FaCheckCircle className="text-green-500 size-5" />
+                    <FaCheckCircle className='text-green-500 size-5' />
                     Fantastic! Your password meets all requirements
                 </div>
             ) : (
                 <fieldset
-                    className="bg-gray-50 rounded-md p-3 border border-gray-200"
-                    data-testid="checklist"
+                    className='bg-gray-50 rounded-md p-3 border border-gray-200'
+                    data-testid='checklist'
                 >
-                    <legend className="sr-only">Password Requirements</legend>
-                    <ul className="text-xs space-y-1">
+                    <legend className='sr-only'>Password Requirements</legend>
+                    <ul className='text-xs space-y-1'>
                         {passwordCriteria.map((rule, idx) => {
                             const isPassed = rule.test(password);
                             return (
@@ -83,13 +83,13 @@ export default function PasswordStrengthMeter({
                                 >
                                     {isPassed ? (
                                         <FaCheckCircle
-                                            className="text-green-500"
-                                            aria-label="Passed"
+                                            className='text-green-500'
+                                            aria-label='Passed'
                                         />
                                     ) : (
                                         <FaTimesCircle
-                                            className="text-red-500"
-                                            aria-label="Failed"
+                                            className='text-red-500'
+                                            aria-label='Failed'
                                         />
                                     )}
                                     <span className={isPassed ? 'text-green-700' : 'text-red-500'}>

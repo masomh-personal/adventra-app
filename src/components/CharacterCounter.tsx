@@ -31,8 +31,8 @@ export function CharacterCounter({
                       ? 'text-amber-500'
                       : 'text-green-600'
             }`}
-            data-testid="char-counter"
-            role="character-counter"
+            data-testid='char-counter'
+            role='character-counter'
         >
             {charCount}/{maxLength}
         </div>

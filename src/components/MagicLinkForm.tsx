@@ -37,38 +37,38 @@ export default function MagicLinkForm({
                 return onSubmit({ email });
             }}
             loading={loading}
-            className="animate-fade-in"
-            submitLabel="" // Hides FormWrapper's default submit
+            className='animate-fade-in'
+            submitLabel='' // Hides FormWrapper's default submit
         >
             {formContext => (
                 <>
                     <FormField
-                        id="email"
-                        label="Email"
-                        type="email"
-                        placeholder="you@example.com"
+                        id='email'
+                        label='Email'
+                        type='email'
+                        placeholder='you@example.com'
                         {...formContext}
                     />
 
-                    <div className="flex justify-center gap-4 pt-2">
+                    <div className='flex justify-center gap-4 pt-2'>
                         <Button
-                            type="button"
-                            label="Back to Login"
-                            variant="outline"
-                            size="base"
+                            type='button'
+                            label='Back to Login'
+                            variant='outline'
+                            size='base'
                             onClick={onCancel}
-                            leftIcon={<LuArrowLeft className="h-4 w-4" />}
-                            testId="cancel-magic"
+                            leftIcon={<LuArrowLeft className='h-4 w-4' />}
+                            testId='cancel-magic'
                         />
 
                         <Button
-                            type="submit"
-                            label="Send One-Time Link"
-                            variant="primary"
-                            size="base"
+                            type='submit'
+                            label='Send One-Time Link'
+                            variant='primary'
+                            size='base'
                             isLoading={loading}
                             isValid={formContext.isValid}
-                            testId="submit-magic"
+                            testId='submit-magic'
                         />
                     </div>
                 </>
