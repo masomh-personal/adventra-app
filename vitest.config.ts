@@ -34,10 +34,10 @@ export default defineConfig({
             ],
             include: ['src/**/*.{ts,tsx}'],
             thresholds: {
-                lines: 0, // Set your desired thresholds
-                functions: 0,
-                branches: 0,
-                statements: 0,
+                lines: 80, // Minimum 80% line coverage
+                functions: 80, // Minimum 80% function coverage
+                branches: 80, // Minimum 80% branch coverage
+                statements: 80, // Minimum 80% statement coverage
             },
         },
     },
