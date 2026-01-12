@@ -3,7 +3,7 @@
 import { vi } from 'vitest';
 
 declare global {
-  var jest: typeof vi;
+    var jest: typeof vi;
 }
 
 export {};

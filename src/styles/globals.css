@@ -4,148 +4,148 @@
    Root Design Tokens
 -------------------------------- */
 :root {
-  --background: #f2ede8;
-  --foreground: #232323;
+    --background: #f2ede8;
+    --foreground: #232323;
 
-  --primary: #3d6f4f;
-  --primary-light: #7ea98b;
-  --secondary: #d99a61;
-  --tertiary: #476b89;
+    --primary: #3d6f4f;
+    --primary-light: #7ea98b;
+    --secondary: #d99a61;
+    --tertiary: #476b89;
 
-  --text: #1f1f1f;
+    --text: #1f1f1f;
 
-  --font-heading: 'Quicksand', sans-serif;
-  --font-body: 'Nunito', sans-serif;
-  --font-accent: 'Baloo 2', cursive;
+    --font-heading: 'Quicksand', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+    --font-accent: 'Baloo 2', cursive;
 
-  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.07);
-  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.12);
-  --shadow-dark: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.07);
+    --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.12);
+    --shadow-dark: 0 10px 15px rgba(0, 0, 0, 0.15);
 
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  --border-radius-lg: 16px;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 16px;
 }
 
 /* -------------------------------
    Tailwind CSS Theming Layer
 -------------------------------- */
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-light: var(--primary-light);
-  --color-secondary: var(--secondary);
-  --color-tertiary: var(--tertiary);
-  --color-text: var(--text);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-primary: var(--primary);
+    --color-primary-light: var(--primary-light);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-text: var(--text);
 
-  --font-heading: var(--font-heading);
-  --font-body: var(--font-body);
+    --font-heading: var(--font-heading);
+    --font-body: var(--font-body);
 
-  --shadow-light: var(--shadow-light);
-  --shadow-medium: var(--shadow-medium);
-  --shadow-dark: var(--shadow-dark);
+    --shadow-light: var(--shadow-light);
+    --shadow-medium: var(--shadow-medium);
+    --shadow-dark: var(--shadow-dark);
 
-  --border-radius-sm: var(--border-radius-sm);
-  --border-radius-md: var(--border-radius-md);
-  --border-radius-lg: var(--border-radius-lg);
+    --border-radius-sm: var(--border-radius-sm);
+    --border-radius-md: var(--border-radius-md);
+    --border-radius-lg: var(--border-radius-lg);
 }
 
 /* -------------------------------
    Utility Classes & Animations
 -------------------------------- */
 @layer utilities {
-  .font-heading {
-    font-family: var(--font-heading), sans-serif;
-  }
-
-  .font-body {
-    font-family: var(--font-body), sans-serif;
-  }
-
-  .font-accent {
-    font-family: var(--font-accent), cursive;
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
+    .font-heading {
+        font-family: var(--font-heading), sans-serif;
     }
-    to {
-      opacity: 1;
-    }
-  }
 
-  @keyframes scale-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
+    .font-body {
+        font-family: var(--font-body), sans-serif;
     }
-    to {
-      opacity: 1;
-      transform: scale(1);
+
+    .font-accent {
+        font-family: var(--font-accent), cursive;
     }
-  }
 
-  @keyframes fade-in-scale {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
     }
-    to {
-      opacity: 1;
-      transform: scale(1);
+
+    @keyframes scale-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
-  }
 
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scale-in 0.2s ease-out forwards;
-  }
-
-  .animate-fade-in-scale {
-    animation: fade-in-scale 0.25s ease-in-out forwards;
-  }
-
-  /* Smoother swipe animations with rotation */
-  @keyframes swipeLeft {
-    from {
-      transform: translateX(0) rotate(0deg);
+    @keyframes fade-in-scale {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
-    to {
-      transform: translateX(-100vw) rotate(-30deg); /* Move off-screen and tilt */
-    }
-  }
 
-  @keyframes swipeRight {
-    from {
-      transform: translateX(0) rotate(0deg);
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-out forwards;
     }
-    to {
-      transform: translateX(100vw) rotate(30deg); /* Move off-screen and tilt */
+
+    .animate-scale-in {
+        animation: scale-in 0.2s ease-out forwards;
     }
-  }
 
-  .animate-swipe-left {
-    animation: swipeLeft 0.7s ease-out forwards; /* Smoother, slower swipe */
-  }
+    .animate-fade-in-scale {
+        animation: fade-in-scale 0.25s ease-in-out forwards;
+    }
 
-  .animate-swipe-right {
-    animation: swipeRight 0.7s ease-out forwards; /* Smoother, slower swipe */
-  }
+    /* Smoother swipe animations with rotation */
+    @keyframes swipeLeft {
+        from {
+            transform: translateX(0) rotate(0deg);
+        }
+        to {
+            transform: translateX(-100vw) rotate(-30deg); /* Move off-screen and tilt */
+        }
+    }
+
+    @keyframes swipeRight {
+        from {
+            transform: translateX(0) rotate(0deg);
+        }
+        to {
+            transform: translateX(100vw) rotate(30deg); /* Move off-screen and tilt */
+        }
+    }
+
+    .animate-swipe-left {
+        animation: swipeLeft 0.7s ease-out forwards; /* Smoother, slower swipe */
+    }
+
+    .animate-swipe-right {
+        animation: swipeRight 0.7s ease-out forwards; /* Smoother, slower swipe */
+    }
 }
 
 /* -------------------------------
    Base Styling
 -------------------------------- */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-body), sans-serif;
-  line-height: 1.6;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body), sans-serif;
+    line-height: 1.6;
 }
 
 /* Headings */
@@ -155,53 +155,53 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading), sans-serif;
-  font-weight: bold;
-  line-height: 1.2;
-  margin-bottom: 0.5rem;
+    font-family: var(--font-heading), sans-serif;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
 }
 
 h1 {
-  font-size: 1.875rem; /* ~30px */
+    font-size: 1.875rem; /* ~30px */
 }
 h2 {
-  font-size: 1.5rem; /* ~24px */
+    font-size: 1.5rem; /* ~24px */
 }
 h3 {
-  font-size: 1.25rem; /* ~20px */
+    font-size: 1.25rem; /* ~20px */
 }
 h4 {
-  font-size: 1.125rem; /* ~18px */
+    font-size: 1.125rem; /* ~18px */
 }
 h5 {
-  font-size: 1rem; /* ~16px */
+    font-size: 1rem; /* ~16px */
 }
 h6 {
-  font-size: 0.875rem; /* ~14px */
+    font-size: 0.875rem; /* ~14px */
 }
 
 /* -------------------------------
    Custom Utilities
 -------------------------------- */
 .logo {
-  height: 80px;
+    height: 80px;
 }
 
 .center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .btn {
-  padding: 10px 20px;
-  background-color: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--border-radius-md);
-  cursor: pointer;
+    padding: 10px 20px;
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
 }
 
 .btn:hover {
-  background-color: var(--secondary);
+    background-color: var(--secondary);
 }

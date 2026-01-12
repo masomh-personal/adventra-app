@@ -7,14 +7,14 @@ import type { User, CreateUserData } from '@/types/user';
  * @returns Result or error
  */
 export async function createUser(userData: CreateUserData): Promise<User> {
-  const { data, error } = await (supabase.from('users') as any)
-    .insert([userData])
-    .select()
-    .single();
+    const { data, error } = await (supabase.from('users') as any)
+        .insert([userData])
+        .select()
+        .single();
 
-  if (error) throw new Error(error instanceof Error ? error.message : String(error));
-  if (!data) throw new Error('User data was not returned from database');
-  return data as User;
+    if (error) throw new Error(error instanceof Error ? error.message : String(error));
+    if (!data) throw new Error('User data was not returned from database');
+    return data as User;
 }
 
 /**
@@ -23,8 +23,8 @@ export async function createUser(userData: CreateUserData): Promise<User> {
  * @returns User or null
  */
 export async function getUserById(id: string): Promise<User | null> {
-  const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
 
-  if (error) throw new Error(error.message);
-  return data as User | null;
+    if (error) throw new Error(error.message);
+    return data as User | null;
 }

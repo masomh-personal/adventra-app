@@ -15,31 +15,31 @@ import type { ApiError, ApiSuccess } from '@/types/api';
  * @access  Protected
  */
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<ApiSuccess | ApiError>,
+    req: NextApiRequest,
+    res: NextApiResponse<ApiSuccess | ApiError>,
 ): Promise<void> {
-  const {
-    query: { id },
-    method,
-  } = req;
+    const {
+        query: { id },
+        method,
+    } = req;
 
-  const userId = Array.isArray(id) ? id[0] : id;
+    const userId = Array.isArray(id) ? id[0] : id;
 
-  switch (method) {
-    case 'GET':
-      res.status(200).json({ message: `Fetch user with ID: ${userId}` });
-      break;
+    switch (method) {
+        case 'GET':
+            res.status(200).json({ message: `Fetch user with ID: ${userId}` });
+            break;
 
-    case 'PUT':
-      res.status(200).json({ message: `Update user with ID: ${userId}` });
-      break;
+        case 'PUT':
+            res.status(200).json({ message: `Update user with ID: ${userId}` });
+            break;
 
-    case 'DELETE':
-      res.status(200).json({ message: `Delete user with ID: ${userId}` });
-      break;
+        case 'DELETE':
+            res.status(200).json({ message: `Delete user with ID: ${userId}` });
+            break;
 
-    default:
-      res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
-      res.status(405).json({ error: `Method ${method} Not Allowed` });
-  }
+        default:
+            res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+            res.status(405).json({ error: `Method ${method} Not Allowed` });
+    }
 }

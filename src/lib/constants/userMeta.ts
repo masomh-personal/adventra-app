@@ -1,19 +1,19 @@
-import {
-    FaHiking,
-    FaCampground,
-    FaMountain,
-    FaCamera,
-    FaHeart,
-    FaTransgender,
-    FaRainbow,
-    FaHandshake,
-} from 'react-icons/fa';
 import type {
-    DatingPreferenceOption,
     AdventurePreferenceOption,
-    SkillLevelOption,
+    DatingPreferenceOption,
     SkillColors,
+    SkillLevelOption,
 } from '@/types/index';
+import {
+    FaCamera,
+    FaCampground,
+    FaHandshake,
+    FaHeart,
+    FaHiking,
+    FaMountain,
+    FaRainbow,
+    FaTransgender,
+} from 'react-icons/fa';
 
 export const datingPreferences: DatingPreferenceOption[] = [
     {
