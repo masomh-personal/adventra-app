@@ -392,5 +392,66 @@ describe('FormWrapper', () => {
             );
             expect(screen.getByLabelText('Name')).toBeInTheDocument();
         });
+
+        test('renders non-FormField, non-function children as-is', async () => {
+            await safeRender(
+                <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
+                    <div data-testid='regular-child'>Regular Content</div>
+                    <span data-testid='span-child'>Span Content</span>
+                    <MockFormField id='name' label='Name' />
+                </FormWrapper>,
+            );
+
+            // Regular children should render as-is (coverage for line 199)
+            expect(screen.getByTestId('regular-child')).toBeInTheDocument();
+            expect(screen.getByTestId('span-child')).toBeInTheDocument();
+            expect(screen.getByLabelText('Name')).toBeInTheDocument();
+        });
+
+        test('formContext trigger function works', async () => {
+            let formContextCapture: { trigger?: () => Promise<boolean> } = {};
+            const renderChildren = vi.fn((context: { trigger?: () => Promise<boolean> }) => {
+                formContextCapture = context;
+                return <div>Test</div>;
+            });
+
+            await safeRender(
+                <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
+                    {renderChildren}
+                </FormWrapper>,
+            );
+
+            // Test trigger function (coverage for line 131)
+            if (formContextCapture.trigger) {
+                const result = await formContextCapture.trigger();
+                expect(result).toBe(true);
+            }
+        });
+
+        test('formContext getFieldState function works', async () => {
+            let formContextCapture: { getFieldState?: () => unknown } = {};
+            const renderChildren = vi.fn((context: { getFieldState?: () => unknown }) => {
+                formContextCapture = context;
+                return <div>Test</div>;
+            });
+
+            await safeRender(
+                <FormWrapper validationSchema={schema} onSubmit={mockOnSubmit}>
+                    {renderChildren}
+                </FormWrapper>,
+            );
+
+            // Test getFieldState function (coverage for line 132)
+            if (formContextCapture.getFieldState) {
+                const result = formContextCapture.getFieldState();
+                expect(result).toMatchObject({
+                    invalid: false,
+                    isDirty: false,
+                    isTouched: false,
+                    isValidating: false,
+                    error: undefined,
+                });
+            }
+        });
     });
 });

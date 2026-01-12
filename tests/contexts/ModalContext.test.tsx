@@ -223,4 +223,39 @@ describe('ModalContext', () => {
 
         expect(screen.queryByText('Error occurred')).not.toBeInTheDocument();
     });
+
+    test('calls openModal directly', async () => {
+        const TestComponentWithOpen: React.FC = () => {
+            const { openModal } = useModal();
+            return (
+                <div>
+                    <button
+                        onClick={() =>
+                            openModal(
+                                <div>
+                                    <h2>Custom Modal</h2>
+                                    <p>Custom content</p>
+                                </div>,
+                            )
+                        }
+                    >
+                        Open Custom
+                    </button>
+                </div>
+            );
+        };
+
+        const user = userEvent.setup({ delay: null });
+        render(
+            <ModalProvider>
+                <TestComponentWithOpen />
+            </ModalProvider>,
+        );
+
+        const openButton = screen.getByText('Open Custom');
+        await user.click(openButton);
+
+        expect(await screen.findByText('Custom Modal')).toBeInTheDocument();
+        expect(screen.getByText('Custom content')).toBeInTheDocument();
+    });
 });

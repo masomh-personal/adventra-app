@@ -96,7 +96,7 @@ describe('withAuth HOC', () => {
 
         const WrappedComponent = withAuth(TestComponent);
 
-        render(<WrappedComponent testProp='test-value' />);
+        render(<WrappedComponent testProp='test-value' user={null} />);
 
         await waitFor(() => {
             expect(screen.getByText('Test Content: test-value')).toBeInTheDocument();
