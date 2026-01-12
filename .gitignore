@@ -86,6 +86,7 @@ build/
 
 # Environment variables (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # Vercel
 .vercel

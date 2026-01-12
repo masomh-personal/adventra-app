@@ -12,6 +12,8 @@ const eslintConfig = [
             'public/**',
             '*.config.{js,mjs,ts}',
             '.husky/**',
+            '**/*.yml',
+            '**/*.yaml',
         ],
     },
     ...nextPlugin,
