@@ -12,7 +12,7 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [22.x]
+                node-version: [24.x]
 
         steps:
             - name: Checkout code
@@ -55,9 +55,9 @@ jobs:
                   path: coverage/
                   retention-days: 7
 
-            - name: Check bundle size
+            - name: Build verification summary
               if: github.event_name == 'pull_request'
               run: |
-                  echo "### Build completed successfully ✅" >> $GITHUB_STEP_SUMMARY
+                  echo "### CI checks completed successfully ✅" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "Build artifacts are ready for Vercel deployment." >> $GITHUB_STEP_SUMMARY
+                  echo "All quality checks passed. Build verified and ready for Vercel auto-deployment." >> $GITHUB_STEP_SUMMARY
