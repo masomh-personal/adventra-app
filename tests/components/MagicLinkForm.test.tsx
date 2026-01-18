@@ -1,5 +1,5 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+
 import userEvent from '@testing-library/user-event';
 import MagicLinkForm from '@/components/MagicLinkForm';
 

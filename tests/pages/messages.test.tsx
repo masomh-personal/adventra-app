@@ -1,236 +1,213 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-import MessagesPage from '@/pages/messages';
-import { getCurrentUserId } from '@/lib/getCurrentUserId';
-import { useRouter } from 'next/router';
 
 // Hoist mocks
-const { mockFrom, mockGetCurrentUserId, mockUseRouter } = vi.hoisted(() => {
-    const mockFrom = vi.fn();
-    const mockGetCurrentUserId = vi.fn();
-    const mockUseRouter = vi.fn();
-    return { mockFrom, mockGetCurrentUserId, mockUseRouter };
-});
+const { mockAccountGet, mockListDocuments, mockGetDocument, mockGetCurrentUserId, mockRouterPush } =
+    vi.hoisted(() => ({
+        mockAccountGet: vi.fn(),
+        mockListDocuments: vi.fn(),
+        mockGetDocument: vi.fn(),
+        mockGetCurrentUserId: vi.fn(),
+        mockRouterPush: vi.fn(),
+    }));
 
-// 1) Mock the withAuth HOC so it just returns the component
-vi.mock('@/lib/withAuth', () => ({
-    default: (Component: React.ComponentType<unknown>) => Component,
-}));
-
-// 2) Stub out the entire Supabase client so it never reads env vars
-vi.mock('@/lib/supabaseClient', () => ({
-    __esModule: true,
-    default: {
-        from: mockFrom,
+// Mock Appwrite client
+vi.mock('@/lib/appwriteClient', () => ({
+    account: {
+        get: mockAccountGet,
     },
+    databases: {
+        listDocuments: mockListDocuments,
+        getDocument: mockGetDocument,
+    },
+    storage: {},
+    databaseId: 'test-db',
 }));
 
-// 3) Mock getCurrentUserId
+// Mock getCurrentUserId
 vi.mock('@/lib/getCurrentUserId', () => ({
     getCurrentUserId: mockGetCurrentUserId,
 }));
 
-// 4) Mock next/router
+// Mock Next.js router
 vi.mock('next/router', () => ({
-    useRouter: mockUseRouter,
+    useRouter: () => ({
+        push: mockRouterPush,
+        replace: vi.fn(),
+        pathname: '/messages',
+        query: {},
+        asPath: '/messages',
+        events: { on: vi.fn(), off: vi.fn() },
+    }),
 }));
 
-const mockedUseRouter = vi.mocked(useRouter);
-const mockedGetCurrentUserId = vi.mocked(getCurrentUserId);
+// Mock Appwrite Query
+vi.mock('appwrite', () => ({
+    Query: {
+        equal: vi.fn((field, value) => ({ field, value, type: 'equal' })),
+        orderDesc: vi.fn(field => ({ field, type: 'orderDesc' })),
+        orderAsc: vi.fn(field => ({ field, type: 'orderAsc' })),
+    },
+}));
+
+// Import after mocks
+import MessagesPage from '@/pages/messages';
+
+// Mock user
+const mockUser = {
+    $id: 'user-123',
+    name: 'John Doe',
+    email: 'john@example.com',
+    prefs: {},
+};
 
 describe('MessagesPage', () => {
-    let mockPush: ReturnType<typeof vi.fn>;
-
     beforeEach(() => {
         vi.clearAllMocks();
+        mockRouterPush.mockResolvedValue(true);
+        mockAccountGet.mockResolvedValue(mockUser);
+        mockGetCurrentUserId.mockResolvedValue('user-123');
+        // Default: no conversations
+        mockListDocuments.mockResolvedValue({ documents: [], total: 0 });
+    });
 
-        // router.push stub
-        mockPush = vi.fn();
-        mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<
-            typeof useRouter
-        >);
+    describe('Empty State', () => {
+        it('shows empty state when no conversations', async () => {
+            render(<MessagesPage />);
 
-        // current user stub
-        mockedGetCurrentUserId.mockResolvedValue('admin');
+            await waitFor(() => {
+                expect(screen.getByText(/no conversations yet/i)).toBeInTheDocument();
+            });
+        });
 
-        // conversations mock data - Supabase returns joined relations as arrays
-        const convs = [
-            {
-                conversation_id: 'conv1',
-                user_1_id: 'admin',
-                user_2_id: 'userA',
-                user_1: [{ name: 'Admin' }], // Supabase returns joined relations as arrays
-                user_2: [{ name: 'Alice' }], // Supabase returns joined relations as arrays
-                last_message_timestamp: '2025-01-01T00:00:00Z',
-            },
-        ];
-        // messages mock data
-        const msgs = [
-            {
-                message_id: 'msg1',
-                conversation_id: 'conv1',
-                sender_id: 'admin',
-                receiver_id: 'userA',
-                message_content: 'Hello Alice!',
-                timestamp: '2025-01-01T00:01:00Z',
-            },
-        ];
+        it('shows inbox header', async () => {
+            render(<MessagesPage />);
 
-        // supabase.from('conversations') chain
-        mockFrom.mockImplementation((table: string) => {
-            if (table === 'conversations') {
-                return {
-                    select: () => ({
-                        or: () => ({
-                            order: () => Promise.resolve({ data: convs, error: null }),
-                        }),
-                    }),
-                };
-            }
-            if (table === 'messages') {
-                return {
-                    select: () => ({
-                        eq: () => ({
-                            order: () => Promise.resolve({ data: msgs, error: null }),
-                        }),
-                    }),
-                };
-            }
-            return {
-                select: () => ({
-                    order: () => Promise.resolve({ data: [], error: null }),
-                }),
-            };
+            await waitFor(() => {
+                expect(screen.getByText(/inbox/i)).toBeInTheDocument();
+            });
         });
     });
 
-    test('shows spinner then loads inbox', async () => {
-        render(<MessagesPage />);
-        expect(screen.getByText(/Loading messages/i)).toBeInTheDocument();
-        await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
-    });
-
-    test('handles conversations with null user arrays', async () => {
-        const conversationsWithNullUsers = [
+    describe('With Conversations', () => {
+        const mockConversations = [
             {
+                $id: 'conv-1',
                 conversation_id: 'conv-1',
-                user_1_id: 'user-1',
-                user_2_id: 'user-2',
-                last_message_timestamp: '2024-01-01T10:00:00Z',
-                user_1: null,
-                user_2: [{ name: 'Bob' }],
+                user_1_id: 'user-123',
+                user_2_id: 'user-456',
+                last_message_timestamp: '2024-01-01T12:00:00.000Z',
             },
         ];
 
-        mockFrom.mockImplementation((table: string) => {
-            if (table === 'conversations') {
-                return {
-                    select: () => ({
-                        or: () => ({
-                            order: () =>
-                                Promise.resolve({ data: conversationsWithNullUsers, error: null }),
-                        }),
-                    }),
-                };
-            }
-            return {
-                select: () => ({
-                    eq: () => ({
-                        order: () => Promise.resolve({ data: [], error: null }),
-                    }),
-                }),
-            };
+        const mockUserDoc = {
+            $id: 'user-456',
+            user_id: 'user-456',
+            name: 'Jane Smith',
+            email: 'jane@example.com',
+        };
+
+        beforeEach(() => {
+            // First call for user_1 conversations, second for user_2 conversations
+            mockListDocuments
+                .mockResolvedValueOnce({ documents: mockConversations, total: 1 })
+                .mockResolvedValueOnce({ documents: [], total: 0 });
+
+            mockGetDocument.mockImplementation((dbId, collectionId, docId) => {
+                if (docId === 'user-123') {
+                    return Promise.resolve({
+                        $id: 'user-123',
+                        name: 'John Doe',
+                    });
+                }
+                if (docId === 'user-456') {
+                    return Promise.resolve(mockUserDoc);
+                }
+                return Promise.reject(new Error('Not found'));
+            });
         });
 
-        render(<MessagesPage />);
-        await waitFor(() => {
-            expect(screen.getByText(/unknown user/i)).toBeInTheDocument();
+        it('displays conversation list', async () => {
+            render(<MessagesPage />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+            });
+        });
+
+        it('shows placeholder when no conversation selected', async () => {
+            render(<MessagesPage />);
+
+            await waitFor(() => {
+                expect(screen.getByText(/select a conversation/i)).toBeInTheDocument();
+            });
+        });
+
+        it('fetches messages when conversation is selected', async () => {
+            const mockMessages = [
+                {
+                    $id: 'msg-1',
+                    message_id: 'msg-1',
+                    sender_id: 'user-123',
+                    receiver_id: 'user-456',
+                    content: 'Hello!',
+                    created_at: '2024-01-01T12:00:00.000Z',
+                    conversation_id: 'conv-1',
+                },
+            ];
+
+            // Reset mock for message fetch
+            mockListDocuments.mockReset();
+            mockListDocuments
+                .mockResolvedValueOnce({ documents: mockConversations, total: 1 })
+                .mockResolvedValueOnce({ documents: [], total: 0 })
+                .mockResolvedValueOnce({ documents: mockMessages, total: 1 });
+
+            render(<MessagesPage />);
+            const user = userEvent.setup();
+
+            await waitFor(() => {
+                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Jane Smith'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Hello!')).toBeInTheDocument();
+            });
         });
     });
 
-    test('handles conversations with empty user arrays', async () => {
-        const conversationsWithEmptyUsers = [
-            {
-                conversation_id: 'conv-1',
-                user_1_id: 'user-1',
-                user_2_id: 'user-2',
-                last_message_timestamp: '2024-01-01T10:00:00Z',
-                user_1: [],
-                user_2: [{ name: 'Bob' }],
-            },
-        ];
+    describe('Navigation', () => {
+        it('navigates back to dashboard', async () => {
+            render(<MessagesPage />);
+            const user = userEvent.setup();
 
-        mockFrom.mockImplementation((table: string) => {
-            if (table === 'conversations') {
-                return {
-                    select: () => ({
-                        or: () => ({
-                            order: () =>
-                                Promise.resolve({ data: conversationsWithEmptyUsers, error: null }),
-                        }),
-                    }),
-                };
-            }
-            return {
-                select: () => ({
-                    eq: () => ({
-                        order: () => Promise.resolve({ data: [], error: null }),
-                    }),
-                }),
-            };
-        });
+            await waitFor(() => {
+                expect(screen.getByText(/back to dashboard/i)).toBeInTheDocument();
+            });
 
-        render(<MessagesPage />);
-        await waitFor(() => {
-            expect(screen.getByText(/unknown user/i)).toBeInTheDocument();
+            await user.click(screen.getByText(/back to dashboard/i));
+
+            expect(mockRouterPush).toHaveBeenCalledWith('/dashboard');
         });
     });
 
-    test('handles error when fetching conversations fails', async () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    describe('Error Handling', () => {
+        it('handles fetch error gracefully', async () => {
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            mockListDocuments.mockRejectedValue(new Error('Network error'));
 
-        mockFrom.mockImplementation((table: string) => {
-            if (table === 'conversations') {
-                return {
-                    select: () => ({
-                        or: () => ({
-                            order: () => Promise.reject(new Error('Failed to fetch conversations')),
-                        }),
-                    }),
-                };
-            }
-            return {
-                select: () => ({
-                    eq: () => ({
-                        order: () => Promise.resolve({ data: [], error: null }),
-                    }),
-                }),
-            };
+            render(<MessagesPage />);
+
+            await waitFor(() => {
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Error fetching data:',
+                    expect.any(Error),
+                );
+            });
+
+            consoleErrorSpy.mockRestore();
         });
-
-        render(<MessagesPage />);
-        await waitFor(() => {
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching data:', expect.any(Error));
-        });
-
-        consoleErrorSpy.mockRestore();
-    });
-
-    test('loads messages when clicking a conversation', async () => {
-        render(<MessagesPage />);
-        await waitFor(() => screen.getByText('Alice'), { timeout: 3000 });
-        const user = userEvent.setup();
-        await user.click(screen.getByText('Alice'));
-        expect(await screen.findByText('Conversation')).toBeInTheDocument();
-        expect(screen.getByText('Hello Alice!')).toBeInTheDocument();
-    });
-
-    test('navigates back on button click', async () => {
-        render(<MessagesPage />);
-        await waitFor(() => screen.getByRole('button', { name: /Back to Dashboard/i }));
-        const user = userEvent.setup();
-        await user.click(screen.getByRole('button', { name: /Back to Dashboard/i }));
-        expect(mockPush).toHaveBeenCalledWith('/dashboard');
     });
 });

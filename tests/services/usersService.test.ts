@@ -1,116 +1,117 @@
 import { createUser, getUserById } from '@/services/usersService';
-import type { CreateUserData, User } from '@/types/user';
+import { COLLECTION_IDS } from '@/types/appwrite';
 
-// Hoist mock functions
-const { mockSingle } = vi.hoisted(() => {
-    const mockSingle = vi.fn();
-    return { mockSingle };
-});
+// Hoist mocks
+const { mockCreateDocument, mockGetDocument, mockDatabaseId } = vi.hoisted(() => ({
+    mockCreateDocument: vi.fn(),
+    mockGetDocument: vi.fn(),
+    mockDatabaseId: 'test-database-id',
+}));
 
-const mockSelect = vi.fn(() => ({ single: mockSingle }));
-const mockInsert = vi.fn(() => ({ select: mockSelect }));
-const mockEq = vi.fn(() => ({ single: mockSingle }));
-
-vi.mock('@/lib/supabaseClient', () => {
-    const mockFrom = vi.fn((table: string) => {
-        if (table === 'users') {
-            return {
-                insert: mockInsert,
-                select: vi.fn(() => ({ eq: mockEq })),
-            };
-        }
-        return {};
-    });
-
-    return {
-        __esModule: true,
-        default: {
-            from: mockFrom,
-        },
-    };
-});
+// Mock Appwrite client
+vi.mock('@/lib/appwriteClient', () => ({
+    databases: {
+        createDocument: mockCreateDocument,
+        getDocument: mockGetDocument,
+    },
+    databaseId: mockDatabaseId,
+}));
 
 describe('usersService', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockSingle.mockReset();
     });
 
     describe('createUser', () => {
-        const mockUserData: CreateUserData = {
-            user_id: 'user-1',
-            name: 'Test User',
-            email: 'test@example.com',
-            birthdate: '1990-01-01',
-        };
-
-        const mockUser: User = {
-            user_id: 'user-1',
+        const mockUserData = {
+            user_id: 'user-123',
             name: 'Test User',
             email: 'test@example.com',
         };
 
-        test('creates user successfully', async () => {
-            mockSingle.mockResolvedValue({ data: mockUser, error: null });
+        const mockDocument = {
+            $id: 'user-123',
+            $createdAt: '2024-01-01T00:00:00.000Z',
+            $updatedAt: '2024-01-01T00:00:00.000Z',
+            user_id: 'user-123',
+            name: 'Test User',
+            email: 'test@example.com',
+        };
+
+        it('creates a user successfully', async () => {
+            mockCreateDocument.mockResolvedValue(mockDocument);
 
             const result = await createUser(mockUserData);
 
-            expect(result).toEqual(mockUser);
-            expect(mockInsert).toHaveBeenCalledWith([mockUserData]);
+            expect(mockCreateDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.USER,
+                mockUserData.user_id,
+                {
+                    user_id: mockUserData.user_id,
+                    name: mockUserData.name,
+                    email: mockUserData.email,
+                },
+            );
+
+            expect(result).toEqual({
+                user_id: 'user-123',
+                name: 'Test User',
+                email: 'test@example.com',
+            });
         });
 
-        test('throws error when insert fails', async () => {
-            const insertError = new Error('Database error');
-            mockSingle.mockResolvedValue({ data: null, error: insertError });
+        it('throws error when createDocument fails', async () => {
+            mockCreateDocument.mockRejectedValue(new Error('Database error'));
 
             await expect(createUser(mockUserData)).rejects.toThrow('Database error');
         });
 
-        test('throws error when data is not returned', async () => {
-            mockSingle.mockResolvedValue({ data: null, error: null });
+        it('handles non-Error objects in catch block', async () => {
+            mockCreateDocument.mockRejectedValue('String error');
 
-            await expect(createUser(mockUserData)).rejects.toThrow(
-                'User data was not returned from database',
-            );
-        });
-
-        test('handles error object without message property', async () => {
-            const insertError = { code: 'PGRST116', details: 'Row not found' };
-            mockSingle.mockResolvedValue({ data: null, error: insertError });
-
-            await expect(createUser(mockUserData)).rejects.toThrow();
+            await expect(createUser(mockUserData)).rejects.toThrow('String error');
         });
     });
 
     describe('getUserById', () => {
-        const mockUser: User = {
-            user_id: 'user-1',
+        const mockDocument = {
+            $id: 'user-123',
+            user_id: 'user-123',
             name: 'Test User',
             email: 'test@example.com',
         };
 
-        test('returns user successfully', async () => {
-            mockSingle.mockResolvedValue({ data: mockUser, error: null });
+        it('returns user when found', async () => {
+            mockGetDocument.mockResolvedValue(mockDocument);
 
-            const result = await getUserById('user-1');
+            const result = await getUserById('user-123');
 
-            expect(result).toEqual(mockUser);
-            expect(mockEq).toHaveBeenCalledWith('id', 'user-1');
-        });
+            expect(mockGetDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.USER,
+                'user-123',
+            );
 
-        test('throws error when query fails', async () => {
-            mockSingle.mockResolvedValue({
-                data: null,
-                error: new Error('Database error'),
+            expect(result).toEqual({
+                user_id: 'user-123',
+                name: 'Test User',
+                email: 'test@example.com',
             });
-
-            await expect(getUserById('user-1')).rejects.toThrow('Database error');
         });
 
-        test('returns null when data is null', async () => {
-            mockSingle.mockResolvedValue({ data: null, error: null });
+        it('returns null when user is not found', async () => {
+            mockGetDocument.mockRejectedValue(new Error('Document not found'));
 
-            const result = await getUserById('user-1');
+            const result = await getUserById('nonexistent-user');
+
+            expect(result).toBeNull();
+        });
+
+        it('returns null on any error', async () => {
+            mockGetDocument.mockRejectedValue(new Error('Network error'));
+
+            const result = await getUserById('user-123');
 
             expect(result).toBeNull();
         });

@@ -1,9 +1,10 @@
 import React from 'react';
 import { render, screen, act, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import HomePage from '@/pages/index';
 import { useRouter } from 'next/router';
+
+// Note: fireEvent is kept only for video error simulation (no userEvent equivalent)
 
 // Mock the router
 vi.mock('next/router', () => ({

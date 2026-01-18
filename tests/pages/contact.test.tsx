@@ -1,8 +1,9 @@
 import { render, screen, act, cleanup, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import ContactPage from '@/pages/contact';
 import { useRouter } from 'next/router';
+
+// Note: fireEvent.change is used only for direct value setting (2000+ chars), which is faster than userEvent.type
 
 vi.mock('next/router', () => ({
     useRouter: vi.fn(),

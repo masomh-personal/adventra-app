@@ -1,138 +1,200 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
-// Import the actual Dashboard component (not the wrapped one from default export)
-// Since we mock withAuth, we need to import the component directly
-import DashboardPageModule from '@/pages/dashboard';
-import { useRouter } from 'next/router';
-import type { User } from '@supabase/supabase-js';
 
 // Hoist mocks
-const { mockSignOut, mockUseRouter } = vi.hoisted(() => {
-    const mockSignOut = vi.fn();
-    const mockUseRouter = vi.fn();
-    return { mockSignOut, mockUseRouter };
-});
-
-// Mock the withAuth HOC - returns component that accepts user prop
-vi.mock('@/lib/withAuth', () => ({
-    default: <P extends { user: unknown }>(Component: React.ComponentType<P>) => {
-        const MockWithAuth = (props: P) => <Component {...props} />;
-        MockWithAuth.displayName = `WithAuth(${(Component.displayName || Component.name || 'Component') as string})`;
-        return MockWithAuth;
-    },
+const { mockAccountGet, mockAccountDeleteSession, mockRouterPush } = vi.hoisted(() => ({
+    mockAccountGet: vi.fn(),
+    mockAccountDeleteSession: vi.fn(),
+    mockRouterPush: vi.fn(),
 }));
 
-// Mock router
+// Mock Appwrite client - must be before imports
+vi.mock('@/lib/appwriteClient', () => ({
+    account: {
+        get: mockAccountGet,
+        deleteSession: mockAccountDeleteSession,
+    },
+    databases: {},
+    storage: {},
+    databaseId: 'test-db',
+}));
+
+// Mock Next.js router
 vi.mock('next/router', () => ({
-    useRouter: mockUseRouter,
-}));
-
-// Mock supabase
-vi.mock('@/lib/supabaseClient', () => ({
-    __esModule: true,
-    default: {
-        auth: {
-            signOut: mockSignOut,
-        },
-    },
-}));
-
-const mockedUseRouter = vi.mocked(useRouter);
-
-// Optional: mock modal context if used
-vi.mock('@/contexts/ModalContext', () => ({
-    useModal: () => ({
-        showErrorModal: vi.fn(),
-        showSuccessModal: vi.fn(),
-        openModal: vi.fn(),
-        closeModal: vi.fn(),
-        showInfoModal: vi.fn(),
-        showConfirmationModal: vi.fn().mockResolvedValue(false),
+    useRouter: () => ({
+        push: mockRouterPush,
+        replace: vi.fn(),
+        pathname: '/dashboard',
+        query: {},
+        asPath: '/dashboard',
+        events: { on: vi.fn(), off: vi.fn() },
     }),
 }));
 
-describe('Dashboard', () => {
-    const setup = () => userEvent.setup();
-    const mockUser: User = {
-        id: 'test-user',
-        user_metadata: { full_name: 'Test User' },
-        app_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-    } as User;
+// Now import component after mocks are set up
+import Dashboard from '@/pages/dashboard';
 
-    let mockPush: ReturnType<typeof vi.fn>;
+// Mock user
+const mockUser = {
+    $id: 'user-123',
+    name: 'John Doe',
+    email: 'john@example.com',
+    prefs: {},
+};
 
+describe('Dashboard Page', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockPush = vi.fn();
-        mockedUseRouter.mockReturnValue({ push: mockPush } as unknown as ReturnType<
-            typeof useRouter
-        >);
+        mockRouterPush.mockResolvedValue(true);
+        // Auth resolves immediately with mock user
+        mockAccountGet.mockResolvedValue(mockUser);
     });
 
-    // Dashboard is wrapped with withAuth, so we need to cast it to accept user prop
-    const DashboardPage = DashboardPageModule as React.ComponentType<{ user: User | null }>;
+    describe('Initial Render', () => {
+        it('displays welcome message with user first name', async () => {
+            render(<Dashboard />);
 
-    test('renders the dashboard header and welcome message', () => {
-        render(<DashboardPage user={mockUser} />);
-        expect(screen.getByText(/Welcome,/i)).toBeInTheDocument();
-        expect(screen.getByText(/Test/i)).toBeInTheDocument();
-    });
+            await waitFor(() => {
+                expect(screen.getByText(/welcome/i)).toBeInTheDocument();
+            });
 
-    test('renders the Edit Profile and Log Out buttons', () => {
-        render(<DashboardPage user={mockUser} />);
-        expect(screen.getByTestId('edit-profile-button')).toBeInTheDocument();
-        expect(screen.getByTestId('log-out-button')).toBeInTheDocument();
-    });
+            expect(screen.getByText('John')).toBeInTheDocument();
+        });
 
-    test('renders the InfoCards', () => {
-        render(<DashboardPage user={mockUser} />);
-        expect(screen.getByTestId('adventurers-infocard')).toBeInTheDocument();
-        expect(screen.getByTestId('messages-infocard')).toBeInTheDocument();
-    });
+        it('shows all dashboard action cards', async () => {
+            render(<Dashboard />);
 
-    test('calls signOut and redirects to login when Log Out is clicked', async () => {
-        const user = setup();
-        mockSignOut.mockResolvedValueOnce({ error: null });
+            await waitFor(() => {
+                expect(screen.getByText(/find adventurers/i)).toBeInTheDocument();
+            });
 
-        render(<DashboardPage user={mockUser} />);
-        await user.click(screen.getByTestId('log-out-button'));
+            // Check card titles specifically
+            const cardTitles = screen.getAllByTestId('infocard-title');
+            const titleTexts = cardTitles.map(el => el.textContent);
+            expect(titleTexts).toContain('Find Adventurers');
+            expect(titleTexts).toContain('Messages');
+            expect(titleTexts).toContain('Edit Profile');
+            expect(titleTexts).toContain('Logout');
+        });
 
-        await waitFor(() => {
-            expect(mockSignOut).toHaveBeenCalled();
-            expect(mockPush).toHaveBeenCalledWith('/login');
+        it('shows action buttons', async () => {
+            render(<Dashboard />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('start-matching-button')).toBeInTheDocument();
+            });
+
+            expect(screen.getByTestId('view-messages-button')).toBeInTheDocument();
+            expect(screen.getByTestId('edit-profile-button')).toBeInTheDocument();
+            expect(screen.getByTestId('logout-button')).toBeInTheDocument();
         });
     });
 
-    test('logs an error if signOut fails', async () => {
-        const user = setup();
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        mockSignOut.mockResolvedValueOnce({
-            error: new Error('Sign out failed'),
+    describe('Navigation', () => {
+        it('navigates to search page when Start Matching clicked', async () => {
+            render(<Dashboard />);
+            const user = userEvent.setup();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('start-matching-button')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByTestId('start-matching-button'));
+
+            expect(mockRouterPush).toHaveBeenCalledWith('/search');
         });
 
-        render(<DashboardPage user={mockUser} />);
-        await user.click(screen.getByTestId('log-out-button'));
+        it('navigates to messages page when View Messages clicked', async () => {
+            render(<Dashboard />);
+            const user = userEvent.setup();
 
-        await waitFor(() => {
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Error logging out:', expect.any(Error));
+            await waitFor(() => {
+                expect(screen.getByTestId('view-messages-button')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByTestId('view-messages-button'));
+
+            expect(mockRouterPush).toHaveBeenCalledWith('/messages');
         });
 
-        consoleErrorSpy.mockRestore();
+        it('navigates to edit profile page when Edit Profile clicked', async () => {
+            render(<Dashboard />);
+            const user = userEvent.setup();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('edit-profile-button')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByTestId('edit-profile-button'));
+
+            expect(mockRouterPush).toHaveBeenCalledWith('/edit-profile');
+        });
     });
 
-    test('calls router.push when Edit Profile is clicked', async () => {
-        const user = setup();
+    describe('Logout', () => {
+        it('logs out and redirects to login page', async () => {
+            mockAccountDeleteSession.mockResolvedValue({});
 
-        render(<DashboardPage user={mockUser} />);
-        const editProfileButton = screen.getByTestId('edit-profile-button');
+            render(<Dashboard />);
+            const user = userEvent.setup();
 
-        await user.click(editProfileButton);
+            await waitFor(() => {
+                expect(screen.getByTestId('logout-button')).toBeInTheDocument();
+            });
 
-        await waitFor(() => {
-            expect(mockPush).toHaveBeenCalledWith('/edit-profile');
+            await user.click(screen.getByTestId('logout-button'));
+
+            await waitFor(() => {
+                expect(mockAccountDeleteSession).toHaveBeenCalledWith('current');
+                expect(mockRouterPush).toHaveBeenCalledWith('/login');
+            });
+        });
+
+        it('logs error when logout fails', async () => {
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            mockAccountDeleteSession.mockRejectedValue(new Error('Logout failed'));
+
+            render(<Dashboard />);
+            const user = userEvent.setup();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('logout-button')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByTestId('logout-button'));
+
+            await waitFor(() => {
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Error logging out:',
+                    expect.any(Error),
+                );
+            });
+
+            consoleErrorSpy.mockRestore();
+        });
+    });
+
+    describe('User Display', () => {
+        it('shows "User" when name is not available', async () => {
+            const userWithoutName = { ...mockUser, name: undefined };
+            mockAccountGet.mockResolvedValue(userWithoutName);
+
+            render(<Dashboard />);
+
+            await waitFor(() => {
+                expect(screen.getByText('User')).toBeInTheDocument();
+            });
+        });
+
+        it('shows first name only from full name', async () => {
+            const userWithFullName = { ...mockUser, name: 'Jane Elizabeth Smith' };
+            mockAccountGet.mockResolvedValue(userWithFullName);
+
+            render(<Dashboard />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Jane')).toBeInTheDocument();
+            });
         });
     });
 });

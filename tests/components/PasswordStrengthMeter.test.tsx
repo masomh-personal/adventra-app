@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+
 import PasswordStrengthMeter from '@/components/PasswordStrengthMeter';
 import { passwordCriteria } from '@/validation/validationUtils';
 

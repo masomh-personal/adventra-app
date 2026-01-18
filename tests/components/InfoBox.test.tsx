@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+
 import InfoBox from '@/components/InfoBox';
 
 describe('InfoBox', () => {

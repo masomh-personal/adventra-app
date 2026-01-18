@@ -1,119 +1,160 @@
 import { createMatch, getUserMatches } from '@/services/matchesService';
-import type { MatchData } from '@/services/matchesService';
+import { COLLECTION_IDS } from '@/types/appwrite';
 
-// Hoist mock functions
-const { mockSingle, mockEq } = vi.hoisted(() => {
-    const mockSingle = vi.fn();
-    const mockEq = vi.fn();
-    return { mockSingle, mockEq };
-});
+// Hoist mocks
+const { mockCreateDocument, mockListDocuments, mockDatabaseId } = vi.hoisted(() => ({
+    mockCreateDocument: vi.fn(),
+    mockListDocuments: vi.fn(),
+    mockDatabaseId: 'test-database-id',
+}));
 
-const mockSelect = vi.fn(() => ({ single: mockSingle }));
-const mockInsert = vi.fn(() => ({ select: mockSelect }));
+// Mock Appwrite client
+vi.mock('@/lib/appwriteClient', () => ({
+    databases: {
+        createDocument: mockCreateDocument,
+        listDocuments: mockListDocuments,
+    },
+    databaseId: mockDatabaseId,
+}));
 
-vi.mock('@/lib/supabaseClient', () => {
-    const mockFrom = vi.fn((table: string) => {
-        if (table === 'matches') {
-            return {
-                insert: mockInsert,
-                select: vi.fn(() => ({ eq: mockEq })),
-            };
-        }
-        return {};
-    });
-
-    return {
-        __esModule: true,
-        default: {
-            from: mockFrom,
-        },
-    };
-});
+// Mock Appwrite Query and ID
+vi.mock('appwrite', () => ({
+    Query: {
+        equal: vi.fn((field, value) => `${field}=${value}`),
+    },
+    ID: {
+        unique: vi.fn(() => 'generated-id'),
+    },
+}));
 
 describe('matchesService', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockSingle.mockReset();
-        mockEq.mockReset();
     });
 
     describe('createMatch', () => {
-        const mockMatchData: MatchData = {
+        const mockMatchData = {
             user_id: 'user-1',
             matched_user_id: 'user-2',
             status: 'pending',
         };
 
-        test('creates match successfully', async () => {
-            mockSingle.mockResolvedValue({ data: mockMatchData, error: null });
+        const mockDocument = {
+            $id: 'match-123',
+            user_id: 'user-1',
+            matched_user_id: 'user-2',
+            status: 'pending',
+            created_at: '2024-01-01T00:00:00.000Z',
+        };
+
+        it('creates a match successfully', async () => {
+            mockCreateDocument.mockResolvedValue(mockDocument);
 
             const result = await createMatch(mockMatchData);
 
-            expect(result).toEqual(mockMatchData);
-            expect(mockInsert).toHaveBeenCalledWith([mockMatchData]);
+            expect(mockCreateDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.MATCHES,
+                'generated-id',
+                expect.objectContaining({
+                    user_id: 'user-1',
+                    matched_user_id: 'user-2',
+                    status: 'pending',
+                }),
+            );
+
+            expect(result).toEqual({
+                user_id: 'user-1',
+                matched_user_id: 'user-2',
+                status: 'pending',
+                created_at: '2024-01-01T00:00:00.000Z',
+            });
         });
 
-        test('throws error when insert fails', async () => {
-            const insertError = new Error('Database error');
-            mockSingle.mockResolvedValue({ data: null, error: insertError });
+        it('sets default status to null when not provided', async () => {
+            const dataWithoutStatus = {
+                user_id: 'user-1',
+                matched_user_id: 'user-2',
+            };
+
+            const documentWithNullStatus = {
+                ...mockDocument,
+                status: null,
+            };
+
+            mockCreateDocument.mockResolvedValue(documentWithNullStatus);
+
+            const result = await createMatch(dataWithoutStatus);
+
+            expect(mockCreateDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.MATCHES,
+                'generated-id',
+                expect.objectContaining({
+                    status: null,
+                }),
+            );
+
+            expect(result.status).toBeNull();
+        });
+
+        it('throws error when createDocument fails', async () => {
+            mockCreateDocument.mockRejectedValue(new Error('Database error'));
 
             await expect(createMatch(mockMatchData)).rejects.toThrow('Database error');
-        });
-
-        test('throws error when data is not returned', async () => {
-            mockSingle.mockResolvedValue({ data: null, error: null });
-
-            await expect(createMatch(mockMatchData)).rejects.toThrow(
-                'Match data was not returned from database',
-            );
-        });
-
-        test('handles error object without message property', async () => {
-            const insertError = { code: 'PGRST116', details: 'Row not found' };
-            mockSingle.mockResolvedValue({ data: null, error: insertError });
-
-            await expect(createMatch(mockMatchData)).rejects.toThrow();
         });
     });
 
     describe('getUserMatches', () => {
-        test('returns matches for user successfully', async () => {
-            const mockMatches: MatchData[] = [
-                {
-                    user_id: 'user-1',
-                    matched_user_id: 'user-2',
-                    status: 'pending',
-                },
-                {
-                    user_id: 'user-1',
-                    matched_user_id: 'user-3',
-                    status: 'accepted',
-                },
-            ];
+        const mockDocuments = [
+            {
+                $id: 'match-1',
+                user_id: 'user-1',
+                matched_user_id: 'user-2',
+                status: 'accepted',
+                created_at: '2024-01-01T00:00:00.000Z',
+            },
+            {
+                $id: 'match-2',
+                user_id: 'user-1',
+                matched_user_id: 'user-3',
+                status: 'pending',
+                created_at: '2024-01-02T00:00:00.000Z',
+            },
+        ];
 
-            mockEq.mockResolvedValue({ data: mockMatches, error: null });
-
-            const result = await getUserMatches('user-1');
-
-            expect(result).toEqual(mockMatches);
-            expect(mockEq).toHaveBeenCalledWith('user_id', 'user-1');
-        });
-
-        test('returns empty array when error occurs', async () => {
-            mockEq.mockResolvedValue({
-                data: null,
-                error: new Error('Database error'),
+        it('returns all matches for a user', async () => {
+            mockListDocuments.mockResolvedValue({
+                documents: mockDocuments,
+                total: 2,
             });
 
-            await expect(getUserMatches('user-1')).rejects.toThrow('Database error');
-        });
-
-        test('returns empty array when data is null', async () => {
-            mockEq.mockResolvedValue({ data: null, error: null });
-
             const result = await getUserMatches('user-1');
 
+            expect(mockListDocuments).toHaveBeenCalledWith(mockDatabaseId, COLLECTION_IDS.MATCHES, [
+                'user_id=user-1',
+            ]);
+
+            expect(result).toHaveLength(2);
+            expect(result[0].matched_user_id).toBe('user-2');
+            expect(result[1].matched_user_id).toBe('user-3');
+        });
+
+        it('returns empty array when no matches found', async () => {
+            mockListDocuments.mockResolvedValue({
+                documents: [],
+                total: 0,
+            });
+
+            const result = await getUserMatches('user-no-matches');
+
             expect(result).toEqual([]);
+        });
+
+        it('throws error when listDocuments fails', async () => {
+            mockListDocuments.mockRejectedValue(new Error('Network error'));
+
+            await expect(getUserMatches('user-1')).rejects.toThrow('Network error');
         });
     });
 });

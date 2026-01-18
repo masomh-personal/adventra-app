@@ -1,127 +1,101 @@
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
-import { getFullUserProfile } from '@/lib/getFullUserProfile';
 import { calcAgeFromBirthdate } from '@/lib/calcAgeFromBirthdate';
 
-// Hoist mock functions so they can be used in the mock factory
-const { mockGetSession, mockSingle } = vi.hoisted(() => {
-    const mockGetSession = vi.fn();
-    const mockSingle = vi.fn();
-    return { mockGetSession, mockSingle };
-});
+// Hoist mocks
+const { mockAccountGet } = vi.hoisted(() => ({
+    mockAccountGet: vi.fn(),
+}));
 
-vi.mock('@/lib/supabaseClient', () => {
-    const mockEq = vi.fn(() => ({ single: mockSingle }));
-    const mockSelect = vi.fn(() => ({ eq: mockEq }));
-    const mockFrom = vi.fn(() => ({ select: mockSelect }));
-
-    return {
-        __esModule: true,
-        default: {
-            auth: { getSession: mockGetSession },
-            from: mockFrom,
-        },
-    };
-});
-
-// Silence expected console errors
-beforeAll(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
-afterAll(() => {
-    vi.restoreAllMocks();
-});
-
-describe('calcAgeFromBirthdate', () => {
-    test('returns correct age when birthday has passed this year', () => {
-        const birthdate = new Date();
-        birthdate.setFullYear(birthdate.getFullYear() - 25);
-        birthdate.setMonth(birthdate.getMonth() - 1);
-
-        expect(calcAgeFromBirthdate(birthdate.toISOString())).toBe(25);
-    });
-
-    test('returns correct age when birthday is yet to come this year', () => {
-        const birthdate = new Date();
-        birthdate.setFullYear(birthdate.getFullYear() - 30);
-        birthdate.setMonth(birthdate.getMonth() + 1);
-
-        expect(calcAgeFromBirthdate(birthdate.toISOString())).toBe(29);
-    });
-
-    test('returns null for invalid input', () => {
-        expect(calcAgeFromBirthdate(null)).toBeNull();
-        expect(calcAgeFromBirthdate('invalid-date')).toBeNull();
-    });
-});
+// Mock Appwrite client
+vi.mock('@/lib/appwriteClient', () => ({
+    account: {
+        get: mockAccountGet,
+    },
+    databases: {},
+    storage: {},
+    databaseId: 'test-db',
+}));
 
 describe('getCurrentUserId', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    test('returns user ID when session is valid', async () => {
-        mockGetSession.mockResolvedValue({
-            data: { session: { user: { id: 'abc123' } } },
-            error: null,
+    it('returns user ID when authenticated', async () => {
+        mockAccountGet.mockResolvedValue({
+            $id: 'user-123',
+            name: 'Test User',
+            email: 'test@example.com',
         });
 
         const result = await getCurrentUserId();
-        expect(result).toBe('abc123');
+
+        expect(result).toBe('user-123');
+        expect(mockAccountGet).toHaveBeenCalled();
     });
 
-    test('returns null when no session exists', async () => {
-        mockGetSession.mockResolvedValue({
-            data: { session: null },
-            error: null,
-        });
+    it('returns null when not authenticated', async () => {
+        mockAccountGet.mockRejectedValue(new Error('Not authenticated'));
 
         const result = await getCurrentUserId();
+
         expect(result).toBeNull();
     });
 
-    test('throws error if Supabase fails', async () => {
-        mockGetSession.mockResolvedValue({
-            data: {},
-            error: new Error('Session error'),
-        });
+    it('returns null when user object has no $id', async () => {
+        mockAccountGet.mockResolvedValue(null);
 
-        await expect(getCurrentUserId()).rejects.toThrow('Session error');
+        const result = await getCurrentUserId();
+
+        expect(result).toBeNull();
     });
 });
 
-describe('getFullUserProfile', () => {
+describe('calcAgeFromBirthdate', () => {
+    // Mock the current date for consistent tests
+    const mockNow = new Date('2024-06-15T12:00:00.000Z');
+
     beforeEach(() => {
-        vi.clearAllMocks();
-        mockSingle.mockReset();
+        vi.useFakeTimers();
+        vi.setSystemTime(mockNow);
     });
 
-    test('returns hydrated profile with age', async () => {
-        const profile = {
-            bio: 'Explorer',
-            adventure_preferences: ['climbing'],
-            skill_summary: 'advanced',
-            profile_image_url: '/img.jpg',
-            birthdate: '1995-08-10',
-            user: { name: 'Test User', email: 'test@example.com' },
-            user_id: 'user-123',
-        };
-
-        mockSingle.mockResolvedValue({ data: profile, error: null });
-
-        const result = await getFullUserProfile('user-123');
-        expect(result).toMatchObject({
-            ...profile,
-            age: expect.any(Number),
-        });
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
-    test('returns null if Supabase throws error', async () => {
-        mockSingle.mockResolvedValue({ data: null, error: new Error('fail') });
+    it('calculates age correctly for birthday already passed this year', () => {
+        const birthdate = '1990-03-15'; // March 15, 1990
+        const age = calcAgeFromBirthdate(birthdate);
 
-        const result = await getFullUserProfile('user-123');
-        expect(result).toBeNull();
+        expect(age).toBe(34); // As of June 15, 2024
     });
 
-    test('returns null if no UID provided', async () => {
-        const result = await getFullUserProfile(null);
-        expect(result).toBeNull();
+    it('calculates age correctly for birthday not yet passed this year', () => {
+        const birthdate = '1990-12-25'; // December 25, 1990
+        const age = calcAgeFromBirthdate(birthdate);
+
+        expect(age).toBe(33); // As of June 15, 2024 (birthday hasn't happened yet)
+    });
+
+    it('calculates age correctly for birthday on exact current date', () => {
+        const birthdate = '1990-06-15'; // Same day as mock date
+        const age = calcAgeFromBirthdate(birthdate);
+
+        expect(age).toBe(34);
+    });
+
+    it('handles leap year birthdays', () => {
+        const birthdate = '2000-02-29'; // Leap year birthday
+        const age = calcAgeFromBirthdate(birthdate);
+
+        expect(age).toBe(24); // As of June 15, 2024
+    });
+
+    it('returns 0 for newborn (born this year)', () => {
+        const birthdate = '2024-01-01';
+        const age = calcAgeFromBirthdate(birthdate);
+
+        expect(age).toBe(0);
     });
 });

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+
 import PersonCard from '@/components/PersonCard';
 import type { AdventurePreference } from '@/types/index';
 

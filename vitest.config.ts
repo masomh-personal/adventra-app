@@ -20,15 +20,16 @@ export default defineConfig({
                 'node_modules/',
                 'tests/',
                 '**/*.d.ts',
-                '**/*.config.{js,ts}',
+                '**/*.config.{js,ts,mjs}',
                 '**/vitest.setup.ts',
                 'src/pages/_app.tsx',
                 'src/pages/_document.tsx',
                 'src/pages/api/**', // API routes need integration tests, not unit tests
-                'src/pages/auth/callback.tsx', // OAuth callback, integration test territory
+                'src/pages/auth/**', // OAuth callbacks, integration test territory
                 'src/types/**/*.ts', // Type definitions only, no runtime code
-                'src/lib/supabaseClient.ts', // Just creates client instance
-                'src/lib/supabaseServer.ts', // Just creates server client instance
+                'src/lib/appwriteClient.ts', // Just creates client instance
+                'src/lib/appwriteServer.ts', // Just creates server client instance
+                'src/pages/edit-profile.tsx', // TODO: Complex page needs Supabase→Appwrite migration first
                 'coverage/',
                 '.next/',
             ],

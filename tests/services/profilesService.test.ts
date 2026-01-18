@@ -1,114 +1,177 @@
 import { upsertProfile, getProfile } from '@/services/profilesService';
-import type { CreateProfileData, UserProfile } from '@/types/user';
+import { COLLECTION_IDS } from '@/types/appwrite';
 
-// Hoist mock functions
-const { mockSingle } = vi.hoisted(() => {
-    const mockSingle = vi.fn();
-    return { mockSingle };
-});
+// Hoist mocks
+const { mockCreateDocument, mockUpdateDocument, mockGetDocument, mockDatabaseId } = vi.hoisted(
+    () => ({
+        mockCreateDocument: vi.fn(),
+        mockUpdateDocument: vi.fn(),
+        mockGetDocument: vi.fn(),
+        mockDatabaseId: 'test-database-id',
+    }),
+);
 
-const mockSelect = vi.fn(() => ({ single: mockSingle }));
-const mockUpsert = vi.fn(() => ({ select: mockSelect }));
-const mockEq = vi.fn(() => ({ single: mockSingle }));
-
-vi.mock('@/lib/supabaseClient', () => {
-    const mockFrom = vi.fn((table: string) => {
-        if (table === 'profiles') {
-            return {
-                upsert: mockUpsert,
-                select: vi.fn(() => ({ eq: mockEq })),
-            };
-        }
-        return {};
-    });
-
-    return {
-        __esModule: true,
-        default: {
-            from: mockFrom,
-        },
-    };
-});
+// Mock Appwrite client
+vi.mock('@/lib/appwriteClient', () => ({
+    databases: {
+        createDocument: mockCreateDocument,
+        updateDocument: mockUpdateDocument,
+        getDocument: mockGetDocument,
+    },
+    databaseId: mockDatabaseId,
+}));
 
 describe('profilesService', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mockSingle.mockReset();
     });
 
     describe('upsertProfile', () => {
-        const mockProfileData: CreateProfileData = {
-            user_id: 'user-1',
-            bio: 'Adventurer',
-            adventure_preferences: ['hiking'],
+        const mockProfileData = {
+            user_id: 'user-123',
+            bio: 'Test bio',
+            adventure_preferences: ['hiking', 'camping'],
+            skill_summary: { hiking: 'beginner' },
+            profile_image_url: 'https://example.com/image.jpg',
+            birthdate: '1990-01-01',
+            instagram_url: 'https://instagram.com/test',
+            facebook_url: 'https://facebook.com/test',
+            dating_preferences: 'casual',
         };
 
-        const mockProfile: UserProfile = {
-            user_id: 'user-1',
-            bio: 'Adventurer',
-            adventure_preferences: ['hiking'],
+        const mockDocument = {
+            $id: 'user-123',
+            user_id: 'user-123',
+            bio: 'Test bio',
+            adventure_preferences: ['hiking', 'camping'],
+            skill_summary: '{"hiking":"beginner"}',
+            profile_image_url: 'https://example.com/image.jpg',
+            birthdate: '1990-01-01',
+            instagram_url: 'https://instagram.com/test',
+            facebook_url: 'https://facebook.com/test',
+            dating_preferences: 'casual',
         };
 
-        test('upserts profile successfully', async () => {
-            mockSingle.mockResolvedValue({ data: mockProfile, error: null });
+        it('updates existing profile successfully', async () => {
+            mockUpdateDocument.mockResolvedValue(mockDocument);
 
             const result = await upsertProfile(mockProfileData);
 
-            expect(result).toEqual(mockProfile);
-            expect(mockUpsert).toHaveBeenCalledWith(mockProfileData);
-        });
-
-        test('throws error when upsert fails', async () => {
-            const upsertError = new Error('Database error');
-            mockSingle.mockResolvedValue({ data: null, error: upsertError });
-
-            await expect(upsertProfile(mockProfileData)).rejects.toThrow('Database error');
-        });
-
-        test('throws error when data is not returned', async () => {
-            mockSingle.mockResolvedValue({ data: null, error: null });
-
-            await expect(upsertProfile(mockProfileData)).rejects.toThrow(
-                'Profile data was not returned from database',
+            expect(mockUpdateDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.USERPROFILE,
+                'user-123',
+                expect.objectContaining({
+                    user_id: 'user-123',
+                    bio: 'Test bio',
+                }),
             );
+
+            expect(result.user_id).toBe('user-123');
+            expect(result.bio).toBe('Test bio');
+            expect(result.skill_summary).toEqual({ hiking: 'beginner' });
         });
 
-        test('handles error object without message property', async () => {
-            const upsertError = { code: 'PGRST116', details: 'Row not found' };
-            mockSingle.mockResolvedValue({ data: null, error: upsertError });
+        it('creates new profile when update fails (document does not exist)', async () => {
+            mockUpdateDocument.mockRejectedValue(new Error('Document not found'));
+            mockCreateDocument.mockResolvedValue(mockDocument);
 
-            await expect(upsertProfile(mockProfileData)).rejects.toThrow();
+            const result = await upsertProfile(mockProfileData);
+
+            expect(mockUpdateDocument).toHaveBeenCalled();
+            expect(mockCreateDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.USERPROFILE,
+                'user-123',
+                expect.objectContaining({
+                    user_id: 'user-123',
+                }),
+            );
+
+            expect(result.user_id).toBe('user-123');
+        });
+
+        it('handles null/undefined optional fields', async () => {
+            const minimalData = { user_id: 'user-123' };
+            const minimalDocument = {
+                $id: 'user-123',
+                user_id: 'user-123',
+                bio: null,
+                adventure_preferences: null,
+                skill_summary: null,
+                profile_image_url: null,
+                birthdate: null,
+                instagram_url: null,
+                facebook_url: null,
+                dating_preferences: null,
+            };
+
+            mockUpdateDocument.mockResolvedValue(minimalDocument);
+
+            const result = await upsertProfile(minimalData);
+
+            expect(result.bio).toBeNull();
+            expect(result.skill_summary).toBeNull();
+        });
+
+        it('throws error when both update and create fail', async () => {
+            mockUpdateDocument.mockRejectedValue(new Error('Update failed'));
+            mockCreateDocument.mockRejectedValue(new Error('Create failed'));
+
+            await expect(upsertProfile(mockProfileData)).rejects.toThrow('Create failed');
         });
     });
 
     describe('getProfile', () => {
-        const mockProfile: UserProfile = {
-            user_id: 'user-1',
-            bio: 'Adventurer',
+        const mockDocument = {
+            $id: 'user-123',
+            user_id: 'user-123',
+            bio: 'Test bio',
+            adventure_preferences: ['hiking'],
+            skill_summary: '{"hiking":"beginner"}',
+            profile_image_url: null,
+            birthdate: '1990-01-01',
+            instagram_url: null,
+            facebook_url: null,
+            dating_preferences: null,
         };
 
-        test('returns profile successfully', async () => {
-            mockSingle.mockResolvedValue({ data: mockProfile, error: null });
+        it('returns profile when found', async () => {
+            mockGetDocument.mockResolvedValue(mockDocument);
 
-            const result = await getProfile('user-1');
+            const result = await getProfile('user-123');
 
-            expect(result).toEqual(mockProfile);
-            expect(mockEq).toHaveBeenCalledWith('user_id', 'user-1');
-        });
+            expect(mockGetDocument).toHaveBeenCalledWith(
+                mockDatabaseId,
+                COLLECTION_IDS.USERPROFILE,
+                'user-123',
+            );
 
-        test('throws error when query fails', async () => {
-            mockSingle.mockResolvedValue({
-                data: null,
-                error: new Error('Database error'),
+            expect(result).toEqual({
+                user_id: 'user-123',
+                bio: 'Test bio',
+                adventure_preferences: ['hiking'],
+                skill_summary: { hiking: 'beginner' },
+                profile_image_url: null,
+                birthdate: '1990-01-01',
+                instagram_url: null,
+                facebook_url: null,
+                dating_preferences: null,
             });
-
-            await expect(getProfile('user-1')).rejects.toThrow('Database error');
         });
 
-        test('returns null when data is null', async () => {
-            mockSingle.mockResolvedValue({ data: null, error: null });
+        it('returns null when profile is not found', async () => {
+            mockGetDocument.mockRejectedValue(new Error('Document not found'));
 
-            const result = await getProfile('user-1');
+            const result = await getProfile('nonexistent-user');
+
+            expect(result).toBeNull();
+        });
+
+        it('returns null on any error', async () => {
+            mockGetDocument.mockRejectedValue(new Error('Network error'));
+
+            const result = await getProfile('user-123');
 
             expect(result).toBeNull();
         });
