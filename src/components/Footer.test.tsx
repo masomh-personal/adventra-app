@@ -23,10 +23,14 @@ describe('Footer', () => {
 
         test('renders build version tag with GitHub link', () => {
             render(<Footer />);
-            const repoLink = screen.getByRole('link', { name: /dev-branch/i });
-            expect(repoLink).toBeInTheDocument();
-            expect(repoLink).toHaveAttribute('href', expect.stringContaining('github.com'));
-            expect(repoLink).toHaveAttribute('target', '_blank');
+            // There are two GitHub links (mobile and desktop versions)
+            const repoLinks = screen.getAllByRole('link', { name: /dev-branch/i });
+            expect(repoLinks).toHaveLength(2);
+            repoLinks.forEach(repoLink => {
+                expect(repoLink).toBeInTheDocument();
+                expect(repoLink).toHaveAttribute('href', expect.stringContaining('github.com'));
+                expect(repoLink).toHaveAttribute('target', '_blank');
+            });
         });
     });
 
