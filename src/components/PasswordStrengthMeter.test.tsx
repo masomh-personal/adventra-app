@@ -29,15 +29,13 @@ describe('PasswordStrengthMeter', () => {
         test('shows Medium for medium score', () => {
             render(<PasswordStrengthMeter password='Test123' />);
             const strengthValue = screen.getByTestId('strength-value');
-            const strengthLabel = strengthValue.textContent || '';
-            expect(['MEDIUM', 'WEAK', 'STRONG']).toContain(strengthLabel);
+            expect(['MEDIUM', 'WEAK', 'STRONG']).toContain(strengthValue.textContent || '');
         });
 
         test('shows Strong for high score', () => {
             render(<PasswordStrengthMeter password='Test1234!@#$' />);
             const strengthValue = screen.getByTestId('strength-value');
-            const strengthLabel = strengthValue.textContent || '';
-            expect(['STRONG', 'MEDIUM']).toContain(strengthLabel);
+            expect(['STRONG', 'MEDIUM']).toContain(strengthValue.textContent || '');
         });
     });
 
@@ -56,7 +54,11 @@ describe('PasswordStrengthMeter', () => {
         test('shows passed rules in green', () => {
             render(<PasswordStrengthMeter password='Test1' />);
             const rules = screen.getAllByTestId(/^rule-/);
-            const passedRules = rules.filter(rule => rule.querySelector('.text-green-500'));
+            // Check that at least one rule has green checkmark icon
+            const passedRules = rules.filter(rule => {
+                const checkIcon = rule.querySelector('[aria-label="Passed"]');
+                return checkIcon !== null;
+            });
             expect(passedRules.length).toBeGreaterThan(0);
         });
     });

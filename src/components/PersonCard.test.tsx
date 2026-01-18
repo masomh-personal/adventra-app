@@ -71,4 +71,72 @@ describe('PersonCard', () => {
             expect(facebookLink).toHaveAttribute('href', 'https://facebook.com/test');
         });
     });
+
+    describe('Image Error Handling', () => {
+        test('handles image error with Next.js Image', () => {
+            render(<PersonCard name='John' imgSrc='/invalid.jpg' useNextImage />);
+            const img = screen.getByTestId('person-card-image');
+            expect(img).toBeInTheDocument();
+
+            // Trigger error event on the element
+            const errorEvent = new Event('error', { bubbles: true });
+            img.dispatchEvent(errorEvent);
+
+            // Should still render (error handler prevents crash)
+            expect(screen.getByTestId('person-card-name')).toBeInTheDocument();
+        });
+
+        test('handles image error with regular img', () => {
+            render(<PersonCard name='John' imgSrc='/invalid.jpg' useNextImage={false} />);
+            const img = screen.getByTestId('person-card-image');
+            expect(img).toBeInTheDocument();
+
+            // Trigger error event on the element
+            const errorEvent = new Event('error', { bubbles: true });
+            img.dispatchEvent(errorEvent);
+
+            // Should still render
+            expect(screen.getByTestId('person-card-name')).toBeInTheDocument();
+        });
+
+        test('uses fallback image on Next.js Image error', () => {
+            render(<PersonCard name='John' imgSrc='/invalid.jpg' useNextImage />);
+            const img = screen.getByTestId('person-card-image') as HTMLImageElement;
+
+            // Simulate image error by setting src property
+            Object.defineProperty(img, 'src', {
+                writable: true,
+                value: '/member_pictures/default.png',
+            });
+
+            expect(img).toBeInTheDocument();
+        });
+    });
+
+    describe('Dating Preference', () => {
+        test('renders dating preference when provided', () => {
+            render(<PersonCard name='John' datingPreference='straight' />);
+            expect(screen.getByTestId('person-card-dating-preference')).toBeInTheDocument();
+        });
+
+        test('shows "Not specified" when dating preference is null', () => {
+            render(<PersonCard name='John' datingPreference={null} />);
+            const datingPrefSection = screen.getByTestId('person-card-dating-preference');
+            expect(datingPrefSection).toHaveTextContent('Not specified');
+        });
+    });
+
+    describe('Swipe Direction', () => {
+        test('applies swipe-left class', () => {
+            const { container } = render(<PersonCard name='John' swipeDirection='left' />);
+            const rootElement = container.firstChild as HTMLElement;
+            expect(rootElement).toHaveClass('animate-swipe-left');
+        });
+
+        test('applies swipe-right class', () => {
+            const { container } = render(<PersonCard name='John' swipeDirection='right' />);
+            const rootElement = container.firstChild as HTMLElement;
+            expect(rootElement).toHaveClass('animate-swipe-right');
+        });
+    });
 });

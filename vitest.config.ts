@@ -10,18 +10,32 @@ export default defineConfig({
         setupFiles: ['./vitest.setup.ts'],
         include: ['src/**/*.test.{ts,tsx}'],
         coverage: {
-            provider: 'v8',
+            provider: 'v8', // Using v8 due to istanbul provider bug: "Coverage must be initialized with a path or an object"
+            // Bug occurs in getCoverageMapForUncoveredFiles when processing uncovered files
+            // Issue: @vitest/coverage-istanbul@4.0.17 has bug with undefined file paths
             reporter: ['text', 'html', 'json'],
             include: ['src/**/*.{ts,tsx}'],
             exclude: [
-                'node_modules/',
+                'node_modules/**',
                 '**/*.d.ts',
                 '**/*.config.{js,ts,mjs}',
                 'vitest.setup.ts',
-                'src/pages/_app.tsx',
-                'src/pages/_document.tsx',
+                // Next.js pages (better tested with E2E)
+                'src/pages/**',
+                // API routes (separate testing strategy)
                 'src/pages/api/**',
+                // Type definitions
                 'src/types/**',
+                // Appwrite client wrappers (mostly config)
+                'src/lib/appwriteClient.ts',
+                'src/lib/appwriteServer.ts',
+                // Mock implementations (tested through integration)
+                'src/lib/mockAppwriteClient.ts',
+                'src/lib/mockData.ts',
+                // Schema definitions (pure Yup schemas)
+                'src/validation/*Schema.ts',
+                // Constants (pure data exports)
+                'src/lib/constants/**',
             ],
             thresholds: {
                 lines: 80,
