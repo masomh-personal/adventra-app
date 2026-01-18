@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-push: Comprehensive checks before code leaves local machine (2-5 minutes)
+# - Type checking (full codebase - needed for type graph)
+# - Full test suite (catches regressions)
+# These run less frequently than pre-commit, so can be more thorough
+
+echo "🔍 Running type check..."
+npm run type-check
+
+echo "🧪 Running test suite..."
+npm run test:run
+
+echo "✅ Pre-push checks passed!"

@@ -1,1 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit: Fast checks on staged files only (< 30 seconds)
+# - Linting + auto-fix on staged files
+# - Formatting on staged files
+# Keep this lightweight to avoid blocking frequent commits
+
 npx lint-staged
