@@ -1,64 +1,87 @@
 # 🌲🏕️ Adventra
 
-### **A Social Networking App for Outdoor Adventurers**
+### **A Social Networking App for Outdoor Adventurers - Proof of Concept**
 
-[adventra-demo](https://adventra-app.vercel.app/)
+[Live Demo](https://adventra-app.vercel.app/)
 
 ## **Project Overview**
 
-Adventra is a **social networking app** designed to connect outdoor adventurers with like-minded individuals based on adventure type, skill level, and location. Whether it's **hiking, kayaking, rock climbing, or exploring new trails**, users can match and coordinate activities with others who share their passion for the outdoors.
+Adventra is a **proof of concept (POC)** social networking app designed to demonstrate a platform for connecting outdoor adventurers. This is a frontend showcase using **mock data stored in localStorage** - no backend-as-a-service (BaaS) is required.
 
-### **Key Features**
+The app demonstrates key UI/UX patterns and component architecture that would power a full production application for matching adventurers based on adventure type, skill level, and location. Whether it's **hiking, kayaking, rock climbing, or exploring new trails**, the app showcases how users could discover and connect with like-minded outdoor enthusiasts.
 
-- **User Authentication** – Sign up and login (SSO implementation for extra credit).
-- **User Profiles** – Create and customize adventure preferences.
-- **Matching System** – Swipe left/right to connect with adventurers.
-- **In-App Messaging** – Chat, voice, and video calls (extra credit).
-- **Profile Photos & Social Media Integration** – Connect Instagram, upload images.
-- **Geo-Based Matching** – Find adventurers based on location.
+### **⚠️ Important: This is a Proof of Concept**
+
+- **No Backend Required**: Uses mock data stored in browser localStorage
+- **Frontend Showcase**: Demonstrates React/Next.js patterns, component design, and UI/UX
+- **Production-Ready Code**: Full TypeScript, testing, CI/CD, and modern development practices
+- **Easy to Extend**: Codebase is structured to easily integrate with a real backend later
+
+### **Demonstrated Features**
+
+- **User Authentication UI** – Sign up and login forms with validation
+- **User Profiles** – Create and customize adventure preferences
+- **Matching System UI** – Swipe left/right interface to browse adventurers
+- **Messaging Interface** – Chat UI for matched users (mock conversations)
+- **Profile Photos & Social Links** – Image handling and social media integration UI
+- **Form Validation** – Comprehensive client-side validation with Yup schemas
 
 ---
 
 ## **Tech Stack**
 
-| **Technology**      | **Purpose**                     |
-| ------------------- | ------------------------------- |
-| **Next.js**         | Frontend framework              |
-| **React**           | UI components                   |
-| **Tailwind CSS**    | Styling framework               |
-| **Appwrite**        | Backend-as-a-service (BaaS)     |
-| **Vercel**          | Hosting & deployment            |
-| **GitHub Projects** | Agile project management        |
-| **GitHub**          | Version control & documentation |
+| **Technology**      | **Purpose**                               |
+| ------------------- | ----------------------------------------- |
+| **Next.js 16**      | React framework with SSR and API routes   |
+| **React 19**        | UI component library                      |
+| **TypeScript**      | Type-safe development                     |
+| **Tailwind CSS 4**  | Utility-first styling framework           |
+| **React Hook Form** | Form state management                     |
+| **Yup**             | Schema validation                         |
+| **Vitest**          | Modern testing framework                  |
+| **Mock Data**       | localStorage-based mock backend (no BaaS) |
+| **Vercel**          | Hosting & deployment                      |
+| **GitHub Actions**  | CI/CD pipeline                            |
+| **Husky**           | Git hooks for code quality                |
 
 ---
 
-## Continuous Integration (CI)
+## **Development Quality**
 
-Our project uses a combination of **Vercel** and **GitHub Actions** to implement a robust Continuous Integration (CI) workflow.
+This project demonstrates **production-grade development practices**:
+
+- ✅ **TypeScript** with strict type checking
+- ✅ **212 unit tests** across 27 test files (Vitest + React Testing Library)
+- ✅ **80%+ code coverage** thresholds for statements, branches, functions, and lines
+- ✅ **ESLint** with Next.js and TypeScript rules
+- ✅ **Prettier** for consistent code formatting
+- ✅ **Git hooks** (Husky) for pre-commit and pre-push validation
+- ✅ **CI/CD** with GitHub Actions and Vercel automatic deployments
+
+## **Continuous Integration & Deployment**
+
+### GitHub Actions CI Pipeline
 
 ![CI](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml/badge.svg)
 
+Automated checks on every push and pull request:
+
+- **Linting** – ESLint validation
+- **Type Checking** – TypeScript compilation
+- **Testing** – Full test suite execution
+- **Build Verification** – Ensures production builds succeed
+
+[View CI Workflow](https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml)
+
 ### Vercel Deployment
 
-We use **Vercel** for automatic deployments. Every time code is pushed to the `main` branch (or a feature branch with an open pull request), Vercel:
+**Automatic deployments** via Vercel:
 
-- Builds the application
-- Runs basic checks
-- Deploys to a preview or production environment
+- ✅ **Production** – Deploys on push to `main` branch
+- ✅ **Preview** – Creates preview URLs for pull requests
+- ✅ **Build Verification** – Ensures app builds correctly before deployment
 
-This allows for continuous feedback and seamless collaboration with live previews.
-
-### GitHub Actions for Testing
-
-We use **GitHub Actions** to automate testing. Whenever code is pushed or a pull request is opened:
-
-- GitHub Actions runs our test suite
-- Ensures that all tests pass before changes are merged
-- Helps maintain code quality and catch bugs early
-- https://github.com/masomh-personal/adventra-app/actions/workflows/node.js.yml
-
-This setup helps us ensure that both our application functionality and deployment workflows remain stable throughout development.
+[Live Demo](https://adventra-app.vercel.app/)
 
 ---
 
@@ -159,7 +182,65 @@ npm run dev # can access site via localhost:3000
 ### 4. Run Tests and Check Test Coverage
 
 ```bash
-jest # run all tests
+# Run all tests
+npm run test:run
 
-jest --coverage # run coverage script
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
 ```
+
+### 5. Development Quality Checks
+
+```bash
+# Run linting, type-checking, and format checking
+npm run healthcheck
+
+# Fix linting issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Type check only
+npm run type-check
+```
+
+---
+
+## **Architecture Overview**
+
+### Mock Backend
+
+The app uses a **mock Appwrite client** that simulates backend behavior:
+
+- **Data Storage**: Mock user profiles, matches, and messages stored in `localStorage`
+- **Authentication**: Client-side session management (no real backend required)
+- **API Simulation**: Mock API responses that mirror real Appwrite SDK patterns
+- **Easy Migration**: Code is structured to easily swap mock client for real Appwrite SDK
+
+### Code Structure
+
+```
+src/
+├── components/     # Reusable UI components
+├── pages/          # Next.js pages and API routes
+├── lib/            # Utilities, mock clients, helpers
+├── services/       # Business logic layer
+├── hooks/          # Custom React hooks
+├── contexts/       # React context providers
+├── validation/     # Yup validation schemas
+└── types/          # TypeScript type definitions
+```
+
+### Testing Strategy
+
+- **Unit Tests**: Component behavior, utility functions, services
+- **Integration Tests**: Form workflows, user interactions
+- **Mock Strategy**: Comprehensive mocking of Appwrite SDK for reliable tests
+- **Coverage Goals**: 80%+ coverage across all metrics
