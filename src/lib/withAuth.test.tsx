@@ -35,7 +35,7 @@ describe('withAuth', () => {
         vi.mocked(account.get).mockImplementation(() => new Promise(() => {})); // Never resolves
 
         const ProtectedComponent = withAuth(MockComponent);
-        render(<ProtectedComponent />);
+        render(<ProtectedComponent user={null} />);
 
         expect(screen.queryByTestId('user')).not.toBeInTheDocument();
     });
@@ -47,7 +47,7 @@ describe('withAuth', () => {
         );
 
         const ProtectedComponent = withAuth(MockComponent);
-        render(<ProtectedComponent testProp='test' />);
+        render(<ProtectedComponent user={null} testProp='test' />);
 
         await waitFor(() => {
             expect(screen.getByTestId('user')).toHaveTextContent('authenticated');
@@ -60,7 +60,7 @@ describe('withAuth', () => {
         vi.mocked(account.get).mockRejectedValue(new Error('Not authenticated'));
 
         const ProtectedComponent = withAuth(MockComponent);
-        render(<ProtectedComponent />);
+        render(<ProtectedComponent user={null} />);
 
         await waitFor(() => {
             expect(screen.getByTestId('user')).toHaveTextContent('not-authenticated');
@@ -74,7 +74,7 @@ describe('withAuth', () => {
         );
 
         const ProtectedComponent = withAuth(MockComponent, { redirectIfAuthenticated: true });
-        render(<ProtectedComponent />);
+        render(<ProtectedComponent user={null} />);
 
         await waitFor(() => {
             expect(mockPush).toHaveBeenCalledWith('/dashboard');

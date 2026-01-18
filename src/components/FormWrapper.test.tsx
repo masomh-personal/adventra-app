@@ -199,12 +199,12 @@ describe('FormWrapper', () => {
 
         test('provides getFieldState function', () => {
             let contextGetFieldState:
-                | (() => {
+                | ((name: string) => {
                       invalid: boolean;
                       isDirty: boolean;
                       isTouched: boolean;
                       isValidating: boolean;
-                      error: unknown;
+                      error?: unknown;
                   })
                 | undefined;
 
@@ -218,7 +218,7 @@ describe('FormWrapper', () => {
             );
 
             expect(contextGetFieldState).toBeDefined();
-            const state = contextGetFieldState!();
+            const state = contextGetFieldState!('testField');
             expect(state.invalid).toBe(false);
             expect(state.isDirty).toBe(false);
         });
