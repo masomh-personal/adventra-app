@@ -38,8 +38,8 @@ export async function sendMessage(messageData: MessageData): Promise<MessageData
             sender_id: document.sender_id as string,
             receiver_id: document.receiver_id as string,
             content: document.content as string,
-            conversation_id: (document.conversation_id as string) || null,
-            created_at: (document.created_at as string) || null,
+            conversation_id: (document.conversation_id as string) || undefined,
+            created_at: (document.created_at as string) || undefined,
         };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -65,17 +65,18 @@ export async function getConversation(user1: string, user2: string): Promise<Mes
         // Filter to only messages between user1 and user2
         const messages = response.documents
             .filter(
-                doc =>
+                (doc: any) =>
                     (doc.sender_id === user1 && doc.receiver_id === user2) ||
                     (doc.sender_id === user2 && doc.receiver_id === user1),
             )
-            .map(doc => ({
+
+            .map((doc: any) => ({
                 message_id: (doc.message_id as string) || doc.$id,
                 sender_id: doc.sender_id as string,
                 receiver_id: doc.receiver_id as string,
                 content: doc.content as string,
-                conversation_id: (doc.conversation_id as string) || null,
-                created_at: (doc.created_at as string) || null,
+                conversation_id: (doc.conversation_id as string) || undefined,
+                created_at: (doc.created_at as string) || undefined,
             }));
 
         return messages;

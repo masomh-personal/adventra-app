@@ -1,21 +1,53 @@
-import { Client, Account, Databases, Storage } from 'appwrite';
+/**
+ * Appwrite Client
+ *
+ * This module exports the Appwrite client and services.
+ * In demo mode (when NEXT_PUBLIC_USE_MOCK_DATA=true or no Appwrite env vars),
+ * it uses mock data stored in localStorage instead of a real backend.
+ */
 
-// Environment variables for public keys (client-side)
-const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
-const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
-export const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
+// Check if we should use mock mode
+const useMockMode =
+    process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' ||
+    !process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ||
+    !process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID ||
+    !process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
 
-if (!endpoint || !projectId || !databaseId) {
-    throw new Error('Missing Appwrite environment variables for the client.');
+// Export database ID (mock or real)
+export const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'mock-database';
+
+// Use 'any' type to avoid union type issues between mock and real SDK
+
+let account: any;
+
+let databases: any;
+
+let storage: any;
+
+if (useMockMode) {
+    // Use mock client
+    console.log('🎭 Running in DEMO MODE - using mock data (no real backend)');
+
+    // Dynamic import to avoid loading Appwrite SDK when not needed
+    const mockClient = require('./mockAppwriteClient');
+    account = mockClient.mockAccount;
+    databases = mockClient.mockDatabases;
+    storage = mockClient.mockStorage;
+} else {
+    // Use real Appwrite client
+    const { Client, Account, Databases, Storage } = require('appwrite');
+
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!;
+
+    const client = new Client().setEndpoint(endpoint).setProject(projectId);
+
+    account = new Account(client);
+    databases = new Databases(client, databaseId);
+    storage = new Storage(client);
 }
 
-// Initialize Appwrite client
-const client = new Client().setEndpoint(endpoint).setProject(projectId);
+export { account, databases, storage };
 
-// Initialize services
-export const account = new Account(client);
-export const databases = new Databases(client, databaseId);
-export const storage = new Storage(client);
-
-// Export client for custom use cases
-export default client;
+// Default export for backwards compatibility
+export default { account, databases, storage };

@@ -31,8 +31,8 @@ export async function createMatch(matchData: MatchData): Promise<MatchData> {
         return {
             user_id: document.user_id as string,
             matched_user_id: document.matched_user_id as string,
-            status: (document.status as string) || null,
-            created_at: (document.created_at as string) || null,
+            status: (document.status as string) || undefined,
+            created_at: (document.created_at as string) || undefined,
         };
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -51,11 +51,11 @@ export async function getUserMatches(userId: string): Promise<MatchData[]> {
             Query.equal('user_id', userId),
         ]);
 
-        return response.documents.map(doc => ({
+        return response.documents.map((doc: any) => ({
             user_id: doc.user_id as string,
             matched_user_id: doc.matched_user_id as string,
-            status: (doc.status as string) || null,
-            created_at: (doc.created_at as string) || null,
+            status: (doc.status as string) || undefined,
+            created_at: (doc.created_at as string) || undefined,
         }));
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);

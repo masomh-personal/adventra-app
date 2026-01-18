@@ -5,6 +5,8 @@ import withAuth from '@/lib/withAuth';
 import { getCurrentUserId } from '@/lib/getCurrentUserId';
 import getPublicProfileImageUrl from '@/lib/getPublicProfileImageUrl';
 import { getFullUserProfile } from '@/lib/getFullUserProfile';
+import { account, databases, storage, databaseId } from '@/lib/appwriteClient';
+import { COLLECTION_IDS } from '@/types/appwrite';
 import useRunOnce from '@/hooks/useRunOnce';
 import { adventurePreferences, datingPreferences, skillLevels } from '@/lib/constants/userMeta';
 import { editProfileSchema as validationSchema } from '@/validation/editProfileSchema';
@@ -107,18 +109,12 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
         }
 
         setIsUploading(true);
-        const filePath = `user-${userId}.jpg`;
+        const fileId = `user-${userId}.jpg`;
 
-        const { error: uploadErr } = await supabase.storage
-            .from('profile-photos')
-            .upload(filePath, file, {
-                contentType: file.type,
-                upsert: true,
-                cacheControl: 'public, max-age=0, must-revalidate',
-                metadata: { owner: userId },
-            });
-
-        if (uploadErr) {
+        try {
+            // Upload to storage (mock just returns success)
+            await storage.createFile('profile-photos', fileId, file);
+        } catch (uploadErr) {
             console.error(uploadErr);
             showErrorModal('Image upload failed.', 'Upload Error');
             setIsUploading(false);
@@ -128,10 +124,14 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
         const cleanUrl = getPublicProfileImageUrl(userId);
         const busted = getPublicProfileImageUrl(userId, { bustCache: true });
 
-        const { error: dbErr } = await (supabase.from('userprofile') as any).upsert(
-            { user_id: userId, profile_image_url: cleanUrl },
-            { onConflict: 'user_id' },
-        );
+        let dbErr: Error | null = null;
+        try {
+            await databases.updateDocument(databaseId, COLLECTION_IDS.USERPROFILE, userId, {
+                profile_image_url: cleanUrl,
+            });
+        } catch (err) {
+            dbErr = err instanceof Error ? err : new Error(String(err));
+        }
 
         if (dbErr) {
             console.error(dbErr);
@@ -158,30 +158,33 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
                 await handleImageUpload();
             }
 
-            const { error } = await (supabase.from('userprofile') as any).upsert(
-                {
-                    user_id: userId,
-                    bio: formData.bio,
-                    adventure_preferences: formData.adventurePreferences as string[],
-                    skill_summary: formData.skillLevel
-                        ? (() => {
-                              try {
-                                  return JSON.parse(formData.skillLevel);
-                              } catch {
-                                  // If it's not JSON, it's likely a plain string value from radio button
-                                  return formData.skillLevel;
-                              }
-                          })()
-                        : null,
-                    profile_image_url: profile?.profileImageUrl,
-                    dating_preferences: formData.datingPreferences,
-                    instagram_url: formData.instagramUrl,
-                    facebook_url: formData.facebookUrl,
-                },
-                { onConflict: 'user_id' },
-            );
-
-            if (error) {
+            try {
+                // Try update first, then create if it fails
+                try {
+                    await databases.updateDocument(databaseId, COLLECTION_IDS.USERPROFILE, userId, {
+                        user_id: userId,
+                        bio: formData.bio || null,
+                        adventure_preferences: formData.adventurePreferences || null,
+                        skill_summary: formData.skillLevel || null,
+                        profile_image_url: profile?.profileImageUrl || null,
+                        dating_preferences: formData.datingPreferences || null,
+                        instagram_url: formData.instagramUrl || null,
+                        facebook_url: formData.facebookUrl || null,
+                    });
+                } catch (_updateErr) {
+                    // Document doesn't exist, create it
+                    await databases.createDocument(databaseId, COLLECTION_IDS.USERPROFILE, userId, {
+                        user_id: userId,
+                        bio: formData.bio || null,
+                        adventure_preferences: formData.adventurePreferences || null,
+                        skill_summary: formData.skillLevel || null,
+                        profile_image_url: profile?.profileImageUrl || null,
+                        dating_preferences: formData.datingPreferences || null,
+                        instagram_url: formData.instagramUrl || null,
+                        facebook_url: formData.facebookUrl || null,
+                    });
+                }
+            } catch (error) {
                 console.error(error);
                 showErrorModal('Failed to save profile.', 'Save Error');
                 return;
@@ -226,7 +229,7 @@ function EditProfile({ user: _user }: EditProfileProps): React.JSX.Element {
             const payload = await res.json();
             if (!res.ok) throw new Error((payload as { error?: string }).error || 'Delete failed');
 
-            await supabase.auth.signOut();
+            await account.deleteSession('current');
             showSuccessModal('Profile deleted.', 'Done', () => router.push('/'));
         } catch (err) {
             console.error(err);

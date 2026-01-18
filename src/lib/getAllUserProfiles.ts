@@ -26,7 +26,8 @@ export async function getAllUserProfiles(): Promise<FullUserProfile[]> {
 
         // Create a map of users by user_id for quick lookup
         const usersMap = new Map<string, { name: string; email: string }>();
-        usersResponse.documents.forEach(userDoc => {
+
+        usersResponse.documents.forEach((userDoc: any) => {
             usersMap.set(userDoc.user_id as string, {
                 name: userDoc.name as string,
                 email: userDoc.email as string,
@@ -34,7 +35,8 @@ export async function getAllUserProfiles(): Promise<FullUserProfile[]> {
         });
 
         // Transform Appwrite response to match our type
-        const profiles: FullUserProfile[] = profilesResponse.documents.map(doc => {
+
+        const profiles: FullUserProfile[] = profilesResponse.documents.map((doc: any) => {
             const userId = doc.user_id as string;
             const user = usersMap.get(userId) || null;
 

@@ -20,7 +20,7 @@ export default async function handler(
     try {
         const response = await databases.listDocuments(databaseId, COLLECTION_IDS.USERPROFILE);
 
-        const profiles: UserProfile[] = response.documents.map(doc => ({
+        const profiles: UserProfile[] = response.documents.map((doc: any) => ({
             user_id: doc.user_id as string,
             bio: (doc.bio as string) || null,
             adventure_preferences: (doc.adventure_preferences as string[]) || null,

@@ -123,7 +123,7 @@ function MessagesPage({ user: _user }: MessagesPageProps): React.JSX.Element {
                 Query.orderAsc('created_at'),
             ]);
 
-            const messagesData: Message[] = response.documents.map(doc => ({
+            const messagesData: Message[] = response.documents.map((doc: any) => ({
                 message_id: (doc.message_id as string) || doc.$id,
                 sender_id: doc.sender_id as string,
                 receiver_id: doc.receiver_id as string,
