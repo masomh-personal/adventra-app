@@ -112,7 +112,7 @@ export default function Header(): React.JSX.Element {
                         className='rounded-full'
                         priority
                     />
-                    <span className='text-2xl font-heading text-primary font-bold'>Adventra</span>
+                    <span className='text-2xl font-heading text-primary font-bold'>adventra</span>
                 </Link>
 
                 {/* Desktop Navigation */}

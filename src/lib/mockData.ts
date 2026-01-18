@@ -159,7 +159,7 @@ const DEMO_USERS: MockUser[] = [
         $id: 'demo-user-1',
         name: 'Masom H',
         email: 'masom@demo.com',
-        password: 'Demo123!',
+        password: 'Password123!',
     }),
 ];
 
