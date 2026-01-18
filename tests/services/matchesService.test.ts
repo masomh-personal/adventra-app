@@ -20,7 +20,7 @@ vi.mock('@/lib/appwriteClient', () => ({
 // Mock Appwrite Query and ID
 vi.mock('appwrite', () => ({
     Query: {
-        equal: vi.fn((field, value) => `${field}=${value}`),
+        equal: vi.fn((field: string, value: string) => `${field}=${value}`),
     },
     ID: {
         unique: vi.fn(() => 'generated-id'),

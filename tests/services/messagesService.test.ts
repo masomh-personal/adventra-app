@@ -20,9 +20,9 @@ vi.mock('@/lib/appwriteClient', () => ({
 // Mock Appwrite Query and ID
 vi.mock('appwrite', () => ({
     Query: {
-        equal: vi.fn((field, value) => ({ field, value, type: 'equal' })),
-        or: vi.fn(queries => ({ queries, type: 'or' })),
-        orderAsc: vi.fn(field => ({ field, type: 'orderAsc' })),
+        equal: vi.fn((field: string, value: string) => ({ field, value, type: 'equal' })),
+        or: vi.fn((queries: unknown[]) => ({ queries, type: 'or' })),
+        orderAsc: vi.fn((field: string) => ({ field, type: 'orderAsc' })),
     },
     ID: {
         unique: vi.fn(() => 'generated-message-id'),

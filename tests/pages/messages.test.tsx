@@ -44,9 +44,9 @@ vi.mock('next/router', () => ({
 // Mock Appwrite Query
 vi.mock('appwrite', () => ({
     Query: {
-        equal: vi.fn((field, value) => ({ field, value, type: 'equal' })),
-        orderDesc: vi.fn(field => ({ field, type: 'orderDesc' })),
-        orderAsc: vi.fn(field => ({ field, type: 'orderAsc' })),
+        equal: vi.fn((field: string, value: string) => ({ field, value, type: 'equal' })),
+        orderDesc: vi.fn((field: string) => ({ field, type: 'orderDesc' })),
+        orderAsc: vi.fn((field: string) => ({ field, type: 'orderAsc' })),
     },
 }));
 
@@ -113,18 +113,20 @@ describe('MessagesPage', () => {
                 .mockResolvedValueOnce({ documents: mockConversations, total: 1 })
                 .mockResolvedValueOnce({ documents: [], total: 0 });
 
-            mockGetDocument.mockImplementation((dbId, collectionId, docId) => {
-                if (docId === 'user-123') {
-                    return Promise.resolve({
-                        $id: 'user-123',
-                        name: 'John Doe',
-                    });
-                }
-                if (docId === 'user-456') {
-                    return Promise.resolve(mockUserDoc);
-                }
-                return Promise.reject(new Error('Not found'));
-            });
+            mockGetDocument.mockImplementation(
+                (_dbId: string, _collectionId: string, docId: string) => {
+                    if (docId === 'user-123') {
+                        return Promise.resolve({
+                            $id: 'user-123',
+                            name: 'John Doe',
+                        });
+                    }
+                    if (docId === 'user-456') {
+                        return Promise.resolve(mockUserDoc);
+                    }
+                    return Promise.reject(new Error('Not found'));
+                },
+            );
         });
 
         it('displays conversation list', async () => {

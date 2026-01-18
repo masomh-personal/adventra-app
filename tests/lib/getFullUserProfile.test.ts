@@ -57,7 +57,7 @@ describe('getFullUserProfile', () => {
             email: 'john@example.com',
         };
 
-        mockGetDocument.mockImplementation((_dbId, collectionId) => {
+        mockGetDocument.mockImplementation((_dbId: string, collectionId: string) => {
             if (collectionId === 'userprofile') {
                 return Promise.resolve(mockProfileDoc);
             }
@@ -100,7 +100,7 @@ describe('getFullUserProfile', () => {
 
         const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-        mockGetDocument.mockImplementation((_dbId, collectionId) => {
+        mockGetDocument.mockImplementation((_dbId: string, collectionId: string) => {
             if (collectionId === 'userprofile') {
                 return Promise.resolve(mockProfileDoc);
             }
