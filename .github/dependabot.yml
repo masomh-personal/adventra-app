@@ -8,8 +8,8 @@ updates:
       directory: '/' # Location of package.json
       schedule:
           interval: 'weekly' # Check for updates weekly (Monday is default)
-          day: 'monday'
-          time: '09:00' # UTC time
+          day: 'sunday'
+          time: '04:00' # UTC time
       open-pull-requests-limit: 10 # Maximum number of open PRs
       reviewers:
           - 'masomh-personal' # Auto-assign reviewer
