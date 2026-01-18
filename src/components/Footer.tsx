@@ -7,23 +7,12 @@ export default function Footer(): React.JSX.Element {
     const gitBranch = process.env.NEXT_PUBLIC_GIT_BRANCH || 'dev-branch';
     const repoUrl = 'https://github.com/masomh-personal/adventra-app';
 
-    // Enhanced build/version tag styling with pizzazz
-    const buildTagStyle = `
-    group inline-flex items-center gap-2
-    bg-[#161b22]
-    text-[#c9d1d9] hover:text-white
-    text-[0.7rem] font-mono font-medium
-    px-2.5 py-1.5 rounded-md
-    border border-white/60 hover:border-white/90
-    shadow-sm hover:shadow-md
-    transition-colors duration-200
-    backdrop-blur-sm
-    mt-1
-    cursor-pointer
-  `;
+    // Build version tag base styles (reduced font size by one step: 0.7rem -> 0.625rem)
+    const buildTagBaseClasses =
+        'group inline-flex items-center gap-2 bg-[#161b22] text-[#c9d1d9] hover:text-white text-[0.625rem] font-mono font-medium px-2.5 py-1.5 rounded-md border border-white/60 hover:border-white/90 shadow-sm hover:shadow-md transition-colors duration-200 backdrop-blur-sm cursor-pointer';
 
     return (
-        <footer className='bg-primary text-white py-4 px-4 z-10 relative'>
+        <footer className='bg-primary text-white pt-4 pb-2 px-4 z-10 relative'>
             <div className='flex flex-col items-center'>
                 {/* Footer Links */}
                 <div className='flex flex-wrap justify-center gap-4 sm:gap-7 font-body font-semibold'>
@@ -48,29 +37,44 @@ export default function Footer(): React.JSX.Element {
                 </div>
 
                 {/* Attribution & Build Info */}
-                <div className='text-center mt-2 text-sm space-y-2'>
+                <div className='text-center mt-2 text-sm space-y-2 pb-2'>
                     <p className='font-semibold'>
                         &copy; {new Date().getFullYear()} adventra. All rights reserved.
                     </p>
-                    <p className='flex items-center justify-center gap-1 flex-wrap'>
-                        Made with <AiFillHeart className='text-red-500' /> by{' '}
-                        <span className='ml-0.5 px-2.5 py-1 rounded-md border border-amber-400/50 bg-amber-500/20 text-xs font-medium tracking-wide transition-all duration-200 hover:border-amber-300/70 hover:bg-amber-500/30'>
-                            mhDesigns
+                    <div className='flex items-center justify-center gap-1 flex-wrap'>
+                        <p className='flex items-center justify-center gap-1'>
+                            Made with <AiFillHeart className='text-red-500' /> by{' '}
+                            <span className='ml-0.5 px-2.5 py-1 rounded-md border border-amber-400/50 bg-amber-500/20 text-xs font-medium tracking-wide transition-all duration-200 hover:border-amber-300/70 hover:bg-amber-500/30'>
+                                mhDesigns
+                            </span>
+                        </p>
+                    </div>
+                    {/* Build Version Tag - Shown on mobile below "Made with" */}
+                    <a
+                        href={repoUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className={`${buildTagBaseClasses} sm:hidden`}
+                        title={`Branch: ${gitBranch}\nFull SHA: ${gitSha}`}
+                    >
+                        <span className='flex items-center gap-1'>
+                            <FaGithub className='w-4 h-4 opacity-80' />
+                            {gitBranch} |
+                            <FaCodeBranch className='w-3.5 h-3.5 opacity-70' /> {gitSha.slice(0, 7)}
                         </span>
-                    </p>
+                    </a>
                 </div>
             </div>
 
-            {/* Build Version Tag - Bottom Right */}
-            <div className='absolute bottom-2 right-4'>
+            {/* Build Version Tag - Desktop: absolute positioned bottom right */}
+            <div className='hidden sm:block absolute bottom-2 right-4'>
                 <a
                     href={repoUrl}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className={buildTagStyle}
+                    className={buildTagBaseClasses}
                     title={`Branch: ${gitBranch}\nFull SHA: ${gitSha}`}
                 >
-                    {/* Branch and SHA */}
                     <span className='flex items-center gap-1'>
                         <FaGithub className='w-4 h-4 opacity-80' />
                         {gitBranch} |
