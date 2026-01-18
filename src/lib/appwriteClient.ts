@@ -26,7 +26,7 @@ let storage: any;
 
 if (useMockMode) {
     // Use mock client
-    console.log('🎭 Running in DEMO MODE - using mock data (no real backend)');
+    console.warn('🎭 Running in DEMO MODE - using mock data (no real backend)');
 
     // Dynamic import to avoid loading Appwrite SDK when not needed
     const mockClient = require('./mockAppwriteClient');
@@ -37,8 +37,12 @@ if (useMockMode) {
     // Use real Appwrite client
     const { Client, Account, Databases, Storage } = require('appwrite');
 
-    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!;
-    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!;
+    const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT;
+    const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
+
+    if (!endpoint || !projectId) {
+        throw new Error('Appwrite endpoint and project ID are required');
+    }
 
     const client = new Client().setEndpoint(endpoint).setProject(projectId);
 
@@ -50,4 +54,5 @@ if (useMockMode) {
 export { account, databases, storage };
 
 // Default export for backwards compatibility
-export default { account, databases, storage };
+const appwriteClient = { account, databases, storage };
+export default appwriteClient;

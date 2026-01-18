@@ -22,6 +22,8 @@
         "test:coverage": "vitest --coverage",
         "test:run": "vitest run",
         "type-check": "tsc --noEmit",
+        "format:check": "prettier --check .",
+        "healthcheck": "npm run lint && npm run type-check && npm run format:check",
         "clean": "rm -rf node_modules .next package-lock.json coverage && npm cache clean --force",
         "clean:test": "rm -rf coverage",
         "clean:install": "rm -rf node_modules package-lock.json && npm install",

@@ -292,7 +292,7 @@ export const mockDatabases = {
     ): Promise<void> => {
         await delay(100);
         // For demo purposes, we won't actually delete anything
-        console.log('Mock: Delete document (not implemented for demo)');
+        console.warn('Mock: Delete document (not implemented for demo)');
     },
 };
 
