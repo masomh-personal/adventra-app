@@ -2,7 +2,12 @@
 
 ### **A Social Networking App for Outdoor Adventurers - Proof of Concept**
 
-[Live Demo](https://adventra-app.vercel.app/)
+<div align="left">
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-adventra--app.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://adventra-app.vercel.app/)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/masomh-personal/adventra-app)
+
+</div>
 
 ## **Project Overview**
 
@@ -81,7 +86,11 @@ Automated checks on every push and pull request:
 - ✅ **Preview** – Creates preview URLs for pull requests
 - ✅ **Build Verification** – Ensures app builds correctly before deployment
 
-[Live Demo](https://adventra-app.vercel.app/)
+<div align="left">
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Vercel_Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://adventra-app.vercel.app/)
+
+</div>
 
 ---
 
@@ -146,8 +155,13 @@ Each Product Backlog Item (PBI) must include:
 
 ## **Useful Links**
 
-- **GitHub Repository**: [Repo Link](https://github.com/masomh-personal/adventra-app)
-- **GitHub Projects / Kanban Board**: [Backlog Link](https://github.com/users/masomh-personal/projects/2)
+<div align="left">
+
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-adventra--app.vercel.app-00C7B7?style=flat-square&logo=vercel&logoColor=white)](https://adventra-app.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/masomh-personal/adventra-app)
+[![GitHub Projects](https://img.shields.io/badge/GitHub-Projects_Board-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/users/masomh-personal/projects/2)
+
+</div>
 
 ---
 
