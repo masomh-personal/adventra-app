@@ -141,4 +141,50 @@ describe('SearchPage', () => {
         await user.click(screen.getByText('Message'));
         await waitFor(() => expect(mockPush).toHaveBeenCalledWith('./messages?userId=2'));
     });
+
+    test('handles error when fetching profiles fails', async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        mockedGetAllUserProfiles.mockRejectedValue(new Error('Network error'));
+
+        render(<SearchPage />);
+
+        // Should show loading initially
+        expect(screen.getByText('Fetching profiles...')).toBeInTheDocument();
+
+        // Wait for error handling (will stay on loading because of error)
+        await waitFor(() => {
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Error fetching profiles or current user:',
+                expect.any(Error),
+            );
+        });
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('handles null currentUserId', async () => {
+        mockedGetCurrentUserId.mockResolvedValue(null);
+
+        render(<SearchPage />);
+
+        await waitFor(() => screen.getByTestId('person-card'));
+
+        // Should show all users since current user is null
+        expect(screen.getByTestId('person-card')).toBeInTheDocument();
+    });
+
+    test('cycles back to first user after last user', async () => {
+        // Only one other user (Bob, since current user is Alice with id=1)
+        render(<SearchPage />);
+        await waitFor(() => screen.getByTestId('person-card'));
+
+        const user = userEvent.setup();
+
+        // Click No Match to advance
+        await user.click(screen.getByText('No Match'));
+
+        // Should cycle back to Bob (the only other user)
+        await waitFor(() => expect(screen.getByTestId('person-card')).toHaveTextContent('Bob'));
+    });
 });

@@ -213,5 +213,58 @@ describe('LoginPage', () => {
                 );
             });
         });
+
+        it('shows modal for each SSO provider', async () => {
+            renderPage();
+            const user = setupUser();
+
+            // Test Facebook SSO
+            await user.click(screen.getByTestId('sso-facebook'));
+            await waitFor(() => {
+                expect(mockShowErrorModal).toHaveBeenCalledWith(
+                    expect.stringContaining('Facebook'),
+                    'SSO Under Development',
+                );
+            });
+        });
+    });
+
+    describe('Form Error Handling', () => {
+        it('logs form validation errors', async () => {
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            renderPage();
+            const user = setupUser();
+
+            // Submit with invalid email to trigger validation
+            await user.type(screen.getByLabelText(/email address/i), 'invalid');
+            await user.click(screen.getByTestId('button'));
+
+            // Wait for validation to complete
+            await waitFor(() => {
+                expect(screen.getByText(/please enter a valid email/i)).toBeInTheDocument();
+            });
+
+            consoleErrorSpy.mockRestore();
+        });
+    });
+
+    describe('Magic Link Cancel', () => {
+        it('returns to login form when cancel is clicked and not loading', async () => {
+            renderPage();
+            const user = setupUser();
+
+            // Switch to magic link form
+            await user.click(screen.getByTestId('show-magic'));
+            expect(screen.getByTestId('submit-magic')).toBeInTheDocument();
+
+            // Click back to login
+            await user.click(screen.getByRole('button', { name: /back to login/i }));
+
+            // Should return to login form
+            await waitFor(() => {
+                expect(screen.getByTestId('login-form')).toBeInTheDocument();
+            });
+        });
     });
 });

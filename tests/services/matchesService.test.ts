@@ -103,6 +103,29 @@ describe('matchesService', () => {
 
             await expect(createMatch(mockMatchData)).rejects.toThrow('Database error');
         });
+
+        it('handles non-Error object in catch block', async () => {
+            mockCreateDocument.mockRejectedValue('String error');
+
+            await expect(createMatch(mockMatchData)).rejects.toThrow('String error');
+        });
+
+        it('handles null/undefined values in returned document', async () => {
+            const documentWithNulls = {
+                $id: 'match-123',
+                user_id: 'user-1',
+                matched_user_id: 'user-2',
+                status: undefined,
+                created_at: undefined,
+            };
+
+            mockCreateDocument.mockResolvedValue(documentWithNulls);
+
+            const result = await createMatch(mockMatchData);
+
+            expect(result.status).toBeNull();
+            expect(result.created_at).toBeNull();
+        });
     });
 
     describe('getUserMatches', () => {
@@ -155,6 +178,34 @@ describe('matchesService', () => {
             mockListDocuments.mockRejectedValue(new Error('Network error'));
 
             await expect(getUserMatches('user-1')).rejects.toThrow('Network error');
+        });
+
+        it('handles non-Error object in catch block', async () => {
+            mockListDocuments.mockRejectedValue('String error');
+
+            await expect(getUserMatches('user-1')).rejects.toThrow('String error');
+        });
+
+        it('handles null/undefined values in returned documents', async () => {
+            const documentsWithNulls = [
+                {
+                    $id: 'match-1',
+                    user_id: 'user-1',
+                    matched_user_id: 'user-2',
+                    status: undefined,
+                    created_at: undefined,
+                },
+            ];
+
+            mockListDocuments.mockResolvedValue({
+                documents: documentsWithNulls,
+                total: 1,
+            });
+
+            const result = await getUserMatches('user-1');
+
+            expect(result[0].status).toBeNull();
+            expect(result[0].created_at).toBeNull();
         });
     });
 });

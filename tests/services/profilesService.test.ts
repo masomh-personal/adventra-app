@@ -120,6 +120,64 @@ describe('profilesService', () => {
 
             await expect(upsertProfile(mockProfileData)).rejects.toThrow('Create failed');
         });
+
+        it('handles non-Error object in catch block', async () => {
+            mockUpdateDocument.mockRejectedValue(new Error('Update failed'));
+            mockCreateDocument.mockRejectedValue('String error');
+
+            await expect(upsertProfile(mockProfileData)).rejects.toThrow('String error');
+        });
+
+        it('handles undefined values in returned document (update path)', async () => {
+            const documentWithUndefined = {
+                $id: 'user-123',
+                user_id: 'user-123',
+                bio: undefined,
+                adventure_preferences: undefined,
+                skill_summary: undefined,
+                profile_image_url: undefined,
+                birthdate: undefined,
+                instagram_url: undefined,
+                facebook_url: undefined,
+                dating_preferences: undefined,
+            };
+
+            mockUpdateDocument.mockResolvedValue(documentWithUndefined);
+
+            const result = await upsertProfile({ user_id: 'user-123' });
+
+            expect(result.bio).toBeNull();
+            expect(result.adventure_preferences).toBeNull();
+            expect(result.skill_summary).toBeNull();
+            expect(result.profile_image_url).toBeNull();
+            expect(result.birthdate).toBeNull();
+            expect(result.instagram_url).toBeNull();
+            expect(result.facebook_url).toBeNull();
+            expect(result.dating_preferences).toBeNull();
+        });
+
+        it('handles undefined values in returned document (create path)', async () => {
+            const documentWithUndefined = {
+                $id: 'user-123',
+                user_id: 'user-123',
+                bio: undefined,
+                adventure_preferences: undefined,
+                skill_summary: undefined,
+                profile_image_url: undefined,
+                birthdate: undefined,
+                instagram_url: undefined,
+                facebook_url: undefined,
+                dating_preferences: undefined,
+            };
+
+            mockUpdateDocument.mockRejectedValue(new Error('Not found'));
+            mockCreateDocument.mockResolvedValue(documentWithUndefined);
+
+            const result = await upsertProfile({ user_id: 'user-123' });
+
+            expect(result.bio).toBeNull();
+            expect(result.skill_summary).toBeNull();
+        });
     });
 
     describe('getProfile', () => {
@@ -174,6 +232,28 @@ describe('profilesService', () => {
             const result = await getProfile('user-123');
 
             expect(result).toBeNull();
+        });
+
+        it('handles undefined values in returned document', async () => {
+            const documentWithUndefined = {
+                $id: 'user-123',
+                user_id: 'user-123',
+                bio: undefined,
+                adventure_preferences: undefined,
+                skill_summary: undefined,
+                profile_image_url: undefined,
+                birthdate: undefined,
+                instagram_url: undefined,
+                facebook_url: undefined,
+                dating_preferences: undefined,
+            };
+
+            mockGetDocument.mockResolvedValue(documentWithUndefined);
+
+            const result = await getProfile('user-123');
+
+            expect(result?.bio).toBeNull();
+            expect(result?.skill_summary).toBeNull();
         });
     });
 });

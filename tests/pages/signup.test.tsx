@@ -231,5 +231,67 @@ describe('SignupPage', () => {
                 expect(mockShowErrorModal).toHaveBeenCalledWith('Network error', 'Signup Error');
             });
         });
+
+        it('handles non-Error rejection', async () => {
+            mockAccountCreate.mockRejectedValue('string error');
+
+            renderPage();
+            const user = setupUser();
+
+            await fillSignupForm(user, validFormData);
+            await waitFor(() => expect(screen.getByTestId('button')).toBeEnabled());
+            await user.click(screen.getByTestId('button'));
+
+            await waitFor(() => {
+                expect(mockShowErrorModal).toHaveBeenCalledWith(
+                    expect.stringContaining('unexpected error'),
+                    'Signup Error',
+                );
+            });
+        });
+
+        it('continues successfully even if session creation fails', async () => {
+            const mockUser = { $id: 'user-123', name: 'John Doe', email: 'john@example.com' };
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            mockAccountCreate.mockResolvedValue(mockUser);
+            mockDbCreateUser.mockResolvedValue({ user_id: 'user-123' });
+            mockCreateEmailSession.mockRejectedValue(new Error('Session creation failed'));
+
+            renderPage();
+            const user = setupUser();
+
+            await fillSignupForm(user, validFormData);
+            await user.click(screen.getByTestId('button'));
+
+            await waitFor(() => {
+                // Should still show success modal even if session fails
+                expect(mockShowSuccessModal).toHaveBeenCalledWith(
+                    expect.stringContaining('account is all set'),
+                    'Signup Successful!',
+                    expect.any(Function),
+                    'Go to Homepage',
+                );
+            });
+
+            consoleErrorSpy.mockRestore();
+        });
+
+        it('logs form validation errors', async () => {
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            renderPage();
+            const user = setupUser();
+
+            // Submit with invalid data to trigger validation error
+            await user.type(screen.getByLabelText(/email address/i), 'invalid');
+            await user.click(screen.getByTestId('button'));
+
+            await waitFor(() => {
+                expect(screen.getByText(/please enter a valid email/i)).toBeInTheDocument();
+            });
+
+            consoleErrorSpy.mockRestore();
+        });
     });
 });

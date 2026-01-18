@@ -209,5 +209,48 @@ describe('MessagesPage', () => {
 
             consoleErrorSpy.mockRestore();
         });
+
+        it('handles message fetch error gracefully', async () => {
+            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const mockConversations = [
+                {
+                    $id: 'conv-1',
+                    conversation_id: 'conv-1',
+                    user_1_id: 'user-123',
+                    user_2_id: 'user-456',
+                    last_message_timestamp: '2024-01-01T12:00:00.000Z',
+                },
+            ];
+
+            // First two calls succeed, message fetch fails
+            mockListDocuments
+                .mockResolvedValueOnce({ documents: mockConversations, total: 1 })
+                .mockResolvedValueOnce({ documents: [], total: 0 })
+                .mockRejectedValueOnce(new Error('Message fetch failed'));
+
+            mockGetDocument.mockResolvedValue({
+                $id: 'user-456',
+                name: 'Jane Smith',
+            });
+
+            render(<MessagesPage />);
+            const user = userEvent.setup();
+
+            await waitFor(() => {
+                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByText('Jane Smith'));
+
+            await waitFor(() => {
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Error fetching messages:',
+                    expect.any(Error),
+                );
+            });
+
+            consoleErrorSpy.mockRestore();
+        });
     });
 });

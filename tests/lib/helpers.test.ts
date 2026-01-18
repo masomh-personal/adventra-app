@@ -64,38 +64,69 @@ describe('calcAgeFromBirthdate', () => {
         vi.useRealTimers();
     });
 
-    it('calculates age correctly for birthday already passed this year', () => {
-        const birthdate = '1990-03-15'; // March 15, 1990
-        const age = calcAgeFromBirthdate(birthdate);
+    describe('valid inputs', () => {
+        it('calculates age correctly for birthday already passed this year', () => {
+            const birthdate = '1990-03-15'; // March 15, 1990
+            const age = calcAgeFromBirthdate(birthdate);
 
-        expect(age).toBe(34); // As of June 15, 2024
+            expect(age).toBe(34); // As of June 15, 2024
+        });
+
+        it('calculates age correctly for birthday not yet passed this year', () => {
+            const birthdate = '1990-12-25'; // December 25, 1990
+            const age = calcAgeFromBirthdate(birthdate);
+
+            expect(age).toBe(33); // As of June 15, 2024 (birthday hasn't happened yet)
+        });
+
+        it('calculates age correctly for birthday on exact current date', () => {
+            const birthdate = '1990-06-15'; // Same day as mock date
+            const age = calcAgeFromBirthdate(birthdate);
+
+            expect(age).toBe(34);
+        });
+
+        it('handles leap year birthdays', () => {
+            const birthdate = '2000-02-29'; // Leap year birthday
+            const age = calcAgeFromBirthdate(birthdate);
+
+            expect(age).toBe(24); // As of June 15, 2024
+        });
+
+        it('returns 0 for newborn (born this year)', () => {
+            const birthdate = '2024-01-01';
+            const age = calcAgeFromBirthdate(birthdate);
+
+            expect(age).toBe(0);
+        });
+
+        it('accepts Date object input', () => {
+            const birthdate = new Date('1990-03-15');
+            const age = calcAgeFromBirthdate(birthdate);
+
+            expect(age).toBe(34);
+        });
     });
 
-    it('calculates age correctly for birthday not yet passed this year', () => {
-        const birthdate = '1990-12-25'; // December 25, 1990
-        const age = calcAgeFromBirthdate(birthdate);
+    describe('invalid inputs', () => {
+        it('returns null for null input', () => {
+            expect(calcAgeFromBirthdate(null)).toBeNull();
+        });
 
-        expect(age).toBe(33); // As of June 15, 2024 (birthday hasn't happened yet)
-    });
+        it('returns null for undefined input', () => {
+            expect(calcAgeFromBirthdate(undefined)).toBeNull();
+        });
 
-    it('calculates age correctly for birthday on exact current date', () => {
-        const birthdate = '1990-06-15'; // Same day as mock date
-        const age = calcAgeFromBirthdate(birthdate);
+        it('returns null for empty string', () => {
+            expect(calcAgeFromBirthdate('')).toBeNull();
+        });
 
-        expect(age).toBe(34);
-    });
+        it('returns null for invalid date string', () => {
+            expect(calcAgeFromBirthdate('not-a-date')).toBeNull();
+        });
 
-    it('handles leap year birthdays', () => {
-        const birthdate = '2000-02-29'; // Leap year birthday
-        const age = calcAgeFromBirthdate(birthdate);
-
-        expect(age).toBe(24); // As of June 15, 2024
-    });
-
-    it('returns 0 for newborn (born this year)', () => {
-        const birthdate = '2024-01-01';
-        const age = calcAgeFromBirthdate(birthdate);
-
-        expect(age).toBe(0);
+        it('returns null for malformed date', () => {
+            expect(calcAgeFromBirthdate('2024-99-99')).toBeNull();
+        });
     });
 });
