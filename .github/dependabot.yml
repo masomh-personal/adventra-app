@@ -1,0 +1,43 @@
+# Dependabot configuration for automated dependency updates
+# See: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+    # Enable version updates for npm dependencies
+    - package-ecosystem: 'npm'
+      directory: '/' # Location of package.json
+      schedule:
+          interval: 'weekly' # Check for updates weekly (Monday is default)
+          day: 'monday'
+          time: '09:00' # UTC time
+      open-pull-requests-limit: 10 # Maximum number of open PRs
+      reviewers:
+          - 'masomh-personal' # Auto-assign reviewer
+      labels:
+          - 'dependencies'
+          - 'automated'
+      commit-message:
+          prefix: 'chore'
+          prefix-development: 'chore'
+          include: 'scope'
+      # Group related dependency updates together
+      groups:
+          # Group all patch/minor updates for development dependencies
+          development-dependencies:
+              dependency-type: 'development'
+              update-types:
+                  - 'minor'
+                  - 'patch'
+          # Group all patch/minor updates for production dependencies
+          production-dependencies:
+              dependency-type: 'production'
+              update-types:
+                  - 'minor'
+                  - 'patch'
+      # Ignore major version updates (require manual review)
+      ignore:
+          - dependency-name: '*'
+            update-types:
+                - 'version-update:semver-major'
+      # Allow updates for specific major versions
+      versioning-strategy: increase

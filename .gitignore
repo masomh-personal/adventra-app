@@ -1,78 +1,8 @@
-# Node.js dependencies
+# ====================
+# Dependencies
+# ====================
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Next.js build outputs
-.next/
-.swc/
-.turbo/
-out/
-
-# Logs
-logs
-*.log
-lerna-debug.log*
-
-# Environment variables
-.env
-.env.local
-.env.development
-.env.production
-.env.test
-.env.*.local
-
-# Database files
-*.sqlite
-*.sqlite-journal
-
-# Prisma
-prisma/migrations/
-prisma/dev.db
-prisma/*.db
-prisma/*.db-journal
-
-# PostgreSQL
-pgdata/
-*.pg_dump
-
-# Visual Studio folder
-.vs/
-
-# VSCode
-.vscode/
-
-# WebStorm
-.idea/
-
-# MacOS
-.DS_Store
-
-# Linux
-*~
-.npm/
-.cache/
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Build artifacts
-dist/
-coverage/
-public/static/
-public/uploads/
-/.vs/adventra-app/FileContentIndex
-/.vs/adventra-app/CopilotIndices/17.12.53.23981
-/.vs/adventra-app/v17
-/.vs/adventra-app/copilot-chat/118693c5/sessions
-
-# dependencies
-/node_modules
-/.pnp
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -80,28 +10,84 @@ public/uploads/
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# ====================
+# Next.js / Build
+# ====================
+.next/
+.swc/
+.turbo/
+out/
+build/
+dist/
 
-# next.js
-/.next/
-/out/
+# ====================
+# Environment
+# ====================
+.env
+.env.*
+!.env.example
 
-# production
-/build
+# ====================
+# Testing / Coverage
+# ====================
+coverage/
+*.lcov
 
-# misc
-*.pem
+# ====================
+# Logs
+# ====================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# debug
-.pnpm-debug.log*
+# ====================
+# Editor / IDE
+# ====================
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
 
-# env files (can opt-in for committing if needed)
-.env*
+# ====================
+# OS Generated
+# ====================
+# macOS
+.DS_Store
+._*
 
-# vercel
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ====================
+# Cache
+# ====================
+.cache/
+.npm/
+*.tsbuildinfo
+
+# ====================
+# Deployment
+# ====================
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# ====================
+# Security
+# ====================
+*.pem
+*.key
+*.crt
+
+# ====================
+# Misc
+# ====================
+public/uploads/
